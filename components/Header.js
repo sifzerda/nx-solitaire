@@ -1,32 +1,28 @@
 // src/components/Header.js
 'use client';
 
-import Image from "next/image";
+import Link from "next/link";
+//import Image from "next/image";
 
-function Header() {
+export default function Header() {
   return (
-    <header
-      role="banner"
-      className="w-full h-12 bg-black text-white px-6 flex items-center justify-between fixed top-0 left-0 z-40 sm:pl-64"
-    >
-      <div className="flex items-center gap-2 h-full">
-        <div className="relative h-full w-8"> 
-          {/* Constrain height to header (48px), width adjusts automatically */}
-          <Image
-            src="/vercel.svg" // Replace with your logo path
-            alt="Site Logo"
-            fill
-            style={{ objectFit: 'contain' }}
-            priority
-          />
-        </div>
-        <span className="text-sm sm:text-base font-semibold">My Website</span>
-      </div>
+    <header className="w-full bg-black text-white">
+      <div className="flex flex-col items-center py-6">
 
-      <div className="text-sm sm:text-base font-semibold">My Website</div>
-      <div className="text-xs sm:text-sm">Welcome back</div>
+        {/* Top suit */}
+        <div className="text-blue-400 text-xl mb-1">♠</div>
+
+        {/* Title */}
+        <h1 className="text-3xl md:text-4xl font-bold tracking-wide flex items-center gap-2">
+          <span className="text-red-500">♦</span>
+          <span className="font-[Cinzel]">solitaire</span>
+          <span className="text-red-500">♥</span>
+        </h1>
+
+        {/* Bottom suit */}
+        <div className="text-blue-400 text-xl mt-1">♣</div>
+
+      </div>
     </header>
   );
 }
-
-export default Header;
