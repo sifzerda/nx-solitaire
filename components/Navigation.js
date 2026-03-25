@@ -4,30 +4,37 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-//import Auth from '../utils/auth';
-
-//ADD AUTH I.E. IF LOGGED IN ETC
 
 export default function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  //useEffect(() => {
- //   const token = localStorage.getItem('token');
- //   setIsLoggedIn(!!token);
- // }, []);
+  // Helper to check if a token exists
+  const checkToken = () => setIsLoggedIn(!!localStorage.getItem('token'));
 
- // const handleLogout = () => {
- //   localStorage.removeItem('token');
- //   router.push('/'); // ✅ Next.js navigation (no full reload)
- // };
+  useEffect(() => {
+    checkToken(); // run on mount
 
+    // Listen for token changes in other tabs/windows
+    const handleStorage = () => checkToken();
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false); // update nav immediately
+    router.push('/'); // navigate without reload
+  };
+
+  // Define nav links
   const links = [
     { href: '/', label: 'Solitaire' },
     { href: '/profile', label: 'Profile' },
   ];
 
+  // Add auth links dynamically
   if (isLoggedIn) {
     links.push({ href: '#', label: 'Logout', onClick: handleLogout });
   } else {
@@ -39,7 +46,6 @@ export default function Navigation() {
 
   return (
     <nav className="w-full bg-black text-white">
-
       {/* Gold divider */}
       <div className="h-[2px] bg-yellow-500 w-full" />
 
@@ -51,28 +57,18 @@ export default function Navigation() {
 
             return (
               <li key={label}>
-                {onClick ? (
-                  <button
-                    onClick={onClick}
-                    className="px-4 py-1 text-sm border rounded-sm border-yellow-500 text-white hover:text-yellow-400 transition"
-                  >
-                    {label}
-                  </button>
-                ) : (
-                  <Link
-                    href={href}
-                    className={`
-                      px-4 py-1 text-sm border rounded-sm transition
-                      ${
-                        isActive
-                          ? 'border-red-500 text-red-500'
-                          : 'border-yellow-500 text-white hover:text-yellow-400'
-                      }
-                    `}
-                  >
-                    {label}
-                  </Link>
-                )}
+                <Link
+                  href={href}
+                  onClick={onClick} // works for Logout
+                  className={`
+                    px-4 py-1 text-sm border rounded-sm transition inline-block
+                    ${isActive
+                      ? 'border-red-500 text-red-500'
+                      : 'border-yellow-500 text-white hover:text-yellow-400'}
+                  `}
+                >
+                  {label}
+                </Link>
               </li>
             );
           })}
