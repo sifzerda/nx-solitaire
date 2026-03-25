@@ -1,11 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
+  engineType = "client"
 }
 
 datasource db {
@@ -14,7 +9,7 @@ datasource db {
 
 model User {
   id        String     @id @default(uuid())
-  username  String
+  username  String     @unique
   email     String     @unique
   password  String
   solScores SolScore[]
@@ -24,7 +19,6 @@ model SolScore {
   id           String   @id @default(uuid())
   solTimeTaken Int
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

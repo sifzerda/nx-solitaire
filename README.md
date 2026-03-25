@@ -38,6 +38,38 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 
+In Prisma 7 (updated) you now need an adapter, or Accelerate (which requires Prisma Accelerate setup)
+For a neon db (vercel):
+
+npm install @prisma/adapter-neon
+
+and paste this into your prisma.js:
+
+```bash
+import { PrismaClient } from '@prisma/client';
+import { PrismaNeon } from '@prisma/adapter-neon';
+
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error('DATABASE_URL is not defined');
+}
+
+console.log('DATABASE_URL exists:', !!connectionString);
+
+const adapter = new PrismaNeon({ connectionString });
+
+const globalForPrisma = globalThis;
+
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({ adapter });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+}
+```
+
 
 Install Auth System:
 
