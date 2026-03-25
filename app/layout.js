@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Cinzel } from "next/font/google";
+import { Geist, Geist_Mono, Cinzel, UnifrakturCook } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
@@ -19,6 +19,12 @@ const cinzel = Cinzel({
   subsets: ["latin"],
 });
 
+const unifraktur = UnifrakturCook({
+  variable: "--font-unifraktur",
+  weight: "700",
+  subsets: ["latin"],
+});
+
 export const metadata = {
   title: "Solitaire",
   description: "A game of Solitaire built with React Next",
@@ -28,7 +34,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} ${unifraktur.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
 

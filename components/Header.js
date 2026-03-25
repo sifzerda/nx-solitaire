@@ -12,7 +12,7 @@ export default function Header() {
                 {/* Title */}
                 <h1 className="text-3xl md:text-4xl font-bold tracking-wide flex items-center gap-2">
                     <span className="text-red-500 text-2xl md:text-3xl">♦</span>
-                    <span className="font-[Cinzel]">solitaire</span>
+                    <span className="font-[UnifrakturCook]">solitaire</span>
                     <span className="text-red-500 text-2xl md:text-3xl">♥</span>
                 </h1>
 
