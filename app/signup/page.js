@@ -2,82 +2,125 @@
 
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 export default function Signup() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [message, setMessage] = useState('');
+    const router = useRouter();
 
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-center py-24 px-16 bg-white dark:bg-black">
+    async function handleSubmit(e) {
+        e.preventDefault();
 
-        {/* Card */}
-        <div className="w-full max-w-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black p-8 flex flex-col items-center">
+        try {
+            const res = await fetch('/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, username }),
+            });
 
-          {/* Top gold line */}
-          <div className="w-full h-[2px] bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 mb-6" />
+            const text = await res.text();
+            const data = text ? JSON.parse(text) : {};
 
-          {/* Title */}
-          <h1 className="text-3xl tracking-wide mb-6 text-black dark:text-white flex items-center gap-2">
-            <span className="text-red-500">♦</span>
-            <span className="font-[var(--font-cinzel)]">Sign Up</span>
-            <span className="text-red-500">♥</span>
-          </h1>
+            if (res.ok) {
+                // Store JWT in localStorage
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                }
 
-          {/* Form */}
-          <form className="w-full flex flex-col gap-4">
+                // Redirect user
+                router.push('/');
+            } else {
+                setMessage(data.message || data.error || 'Signup failed.');
+            }
+        } catch (err) {
+            setMessage('Signup failed. Please try again.');
+            console.error('Signup error:', err);
+        }
+    }
 
-            <input
-              type="text"
-              placeholder="Username"
-              className="w-full px-4 py-2 bg-transparent border border-zinc-300 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:border-blue-500"
-            />
+    return (
+        <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
 
-            <input
-              type="email"
-              placeholder="Email"
-              className="w-full px-4 py-2 bg-transparent border border-zinc-300 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:border-blue-500"
-            />
+            <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-center py-24 px-16 bg-white dark:bg-black">
 
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full px-4 py-2 bg-transparent border border-zinc-300 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:border-blue-500"
-            />
+                {/* Card */}
+                <div className="w-full max-w-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black p-8 flex flex-col items-center">
 
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              className="w-full px-4 py-2 bg-transparent border border-zinc-300 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:border-blue-500"
-            />
+                    {/* Top gold line */}
+                    <div className="w-full h-[2px] bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 mb-6" />
 
-            <button
-              type="submit"
-              className="mt-4 w-full py-2 bg-black text-white border border-zinc-700 hover:bg-zinc-900 transition"
-            >
-              Create Account
-            </button>
-          </form>
+                    {/* Title */}
+                    <h1 className="text-3xl tracking-wide mb-6 text-black dark:text-white flex items-center gap-2">
+                        <span className="text-red-500">♦</span>
+                        <span className="font-[var(--font-cinzel)]">Sign Up</span>
+                        <span className="text-red-500">♥</span>
+                    </h1>
 
-          {/* Suits divider */}
-          <div className="flex items-center gap-3 text-lg my-6">
-            <span className="text-blue-400">♠</span>
-            <span className="text-red-500">♥</span>
-            <span className="text-blue-400">♣</span>
-            <span className="text-red-500">♦</span>
-          </div>
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
 
-          {/* Bottom text */}
-          <p className="text-sm text-zinc-500">
-            Already have an account?{" "}
-            <a href="/login" className="text-white hover:underline">
-              Sign in
-            </a>
-          </p>
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            className="w-full px-4 py-2 bg-transparent border border-zinc-300 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:border-blue-500"
+                        />
 
-          {/* Bottom blue line */}
-          <div className="w-full h-[2px] bg-gradient-to-r from-blue-900 via-blue-600 to-blue-900 mt-6" />
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                            required
+                            className="w-full px-4 py-2 bg-transparent border border-zinc-300 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:border-blue-500"
+                        />
 
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            required
+                            className="w-full px-4 py-2 bg-transparent border border-zinc-300 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:border-blue-500"
+                        />
+
+                        <button
+                            type="submit"
+                            className="mt-4 w-full py-2 bg-black text-white border border-zinc-700 hover:bg-zinc-900 transition"
+                        >
+                            Create Account
+                        </button>
+                        {message && <p className="mt-4 text-red-500">{message}</p>}
+                    </form>
+
+                    {/* Suits divider */}
+                    <div className="flex items-center gap-3 text-lg my-6">
+                        <span className="text-blue-400">♠</span>
+                        <span className="text-red-500">♥</span>
+                        <span className="text-blue-400">♣</span>
+                        <span className="text-red-500">♦</span>
+                    </div>
+
+                    {/* Bottom text */}
+                    <p className="text-sm text-zinc-500">
+                        Already have an account?{" "}
+                        <a href="/login" className="text-white hover:underline">
+                            Sign in
+                        </a>
+                    </p>
+
+                    {/* Bottom blue line */}
+                    <div className="w-full h-[2px] bg-gradient-to-r from-blue-900 via-blue-600 to-blue-900 mt-6" />
+
+                </div>
+
+            </main>
         </div>
-
-      </main>
-    </div>
-  );
+    );
 }
