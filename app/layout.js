@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Cinzel, UnifrakturCook } from "next/font/google";
+import { Geist, Geist_Mono, UnifrakturCook } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
@@ -11,11 +11,6 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const cinzel = Cinzel({
-  variable: "--font-cinzel",
   subsets: ["latin"],
 });
 
@@ -34,7 +29,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} ${unifraktur.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${unifraktur.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
 
