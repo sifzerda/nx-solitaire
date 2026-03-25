@@ -8,9 +8,6 @@ export default function Footer() {
                 {/* Top gold line */}
                 <div className="w-full h-[2px] bg-yellow-500 mb-6"></div>
 
-                {/* Text */}
-                <p className="text-sm text-gray-300 mb-1">Ordo ab chao.</p>
-
                 {/* Suits row */}
                 <div className="flex items-center gap-3 text-lg mb-1">
                     <span className="text-blue-400">♠</span>
