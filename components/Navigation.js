@@ -1,42 +1,21 @@
-// components/Navigation.js
 'use client';
 
 import Link from 'next/link';
+import { useAuth } from '../lib/authContext';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 export default function Navigation() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter(); // must be here, inside component
+  const { isLoggedIn, logout } = useAuth();
 
-  // Helper to check if a token exists
-  const checkToken = () => setIsLoggedIn(!!localStorage.getItem('token'));
+  // Base links
+  const links = [{ href: '/', label: 'Solitaire' }];
 
-  useEffect(() => {
-    checkToken(); // run on mount
-
-    // Listen for token changes in other tabs/windows
-    const handleStorage = () => checkToken();
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false); // update nav immediately
-    router.push('/'); // navigate without reload
-  };
-
-  // Define nav links
-  const links = [
-    { href: '/', label: 'Solitaire' },
-    { href: '/profile', label: 'Profile' },
-  ];
-
-  // Add auth links dynamically
+  // Conditional links
   if (isLoggedIn) {
-    links.push({ href: '#', label: 'Logout', onClick: handleLogout });
+    links.push({ href: '/profile', label: 'Profile' });
+    links.push({ label: 'Logout', onClick: null }); // placeholder
   } else {
     links.push(
       { href: '/signup', label: 'Signup' },
@@ -46,29 +25,43 @@ export default function Navigation() {
 
   return (
     <nav className="w-full bg-black text-white">
-      {/* Gold divider */}
       <div className="h-[2px] bg-yellow-500 w-full" />
-
-      {/* Nav buttons */}
       <div className="flex justify-center py-3">
         <ul className="flex gap-3">
           {links.map(({ href, label, onClick }) => {
-            const isActive = pathname === href;
+            const isActive = href ? pathname === href : false;
+
+            // Define logout click here where router is available
+            const handleClick = label === 'Logout' 
+              ? () => {
+                  logout();
+                  router.push('/'); // redirect after logout
+                }
+              : onClick;
 
             return (
               <li key={label}>
-                <Link
-                  href={href}
-                  onClick={onClick} // works for Logout
-                  className={`
-                    px-4 py-1 text-sm border rounded-sm transition inline-block
-                    ${isActive
-                      ? 'border-red-500 text-red-500'
-                      : 'border-yellow-500 text-white hover:text-yellow-400'}
-                  `}
-                >
-                  {label}
-                </Link>
+                {handleClick ? (
+                  <button
+                    onClick={handleClick}
+                    type="button"
+                    className="px-4 py-1 text-sm border rounded-sm transition inline-block border-yellow-500 text-white hover:text-yellow-400"
+                  >
+                    {label}
+                  </button>
+                ) : (
+                  <Link
+                    href={href}
+                    className={`
+                      px-4 py-1 text-sm border rounded-sm transition inline-block
+                      ${isActive
+                        ? 'border-red-500 text-red-500'
+                        : 'border-yellow-500 text-white hover:text-yellow-400'}
+                    `}
+                  >
+                    {label}
+                  </Link>
+                )}
               </li>
             );
           })}
