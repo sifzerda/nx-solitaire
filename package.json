@@ -2,10 +2,12 @@
   "name": "nx-solitaire",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "jest"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -29,6 +31,9 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/bcrypt": "^6.0.0",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2",
     "tailwindcss": "^4",
     "typescript": "6.0.2"
   }
