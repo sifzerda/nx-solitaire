@@ -4,14 +4,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../lib/authContext';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState(null);
     const router = useRouter();
-    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,13 +23,14 @@ export default function Login() {
 
         const data = await res.json();
 
-        if (res.ok) {
-            login(data.token); // update context
-            router.push('/profile'); // redirect
-        } else {
-            setMessage(data.error || 'Login failed');
-        }
-    };
+    if (res.ok) {
+      localStorage.setItem('token', data.token); // <-- Store token here
+      setMessage('Login successful!');
+      router.push('/');
+    } else {
+      setMessage(data.error || 'Login failed');
+    }
+  };
 
     return (
         <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
