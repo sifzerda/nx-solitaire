@@ -1,3 +1,5 @@
+// npm run dev and then visit http://localhost:3000/api/test to see the results of the Prisma test query.
+
 import { prisma } from '../../../lib/prisma';
 
 export async function GET() {
