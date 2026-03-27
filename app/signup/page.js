@@ -4,7 +4,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../lib/authContext';
 
 export default function Signup() {
     const [username, setUsername] = useState('');
@@ -12,26 +11,36 @@ export default function Signup() {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const router = useRouter();
-    const { login } = useAuth();
 
-    const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    const res = await fetch('/api/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, username }),
+      });
 
-    const data = await res.json();
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : {};
 
-    if (res.ok) {
-      login(data.token); // update context so nav shows "Logout"
-      router.push('/profile'); // redirect
-    } else {
-      setMessage(data.error || 'Signup failed');
+      if (res.ok) {
+        // Store JWT in localStorage
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+
+        // Redirect user
+        router.push('/');
+      } else {
+        setMessage(data.message || data.error || 'Signup failed.');
+      }
+    } catch (err) {
+      setMessage('Signup failed. Please try again.');
+      console.error('Signup error:', err);
     }
-  };
+  }
 
     return (
         <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
