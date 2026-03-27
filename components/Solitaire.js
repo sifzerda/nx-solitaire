@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+
+const ItemTypes = {
+  CARD: "card",
+};
 
 const suits = ["♠", "♥", "♦", "♣"];
 const values = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
@@ -9,136 +15,164 @@ function createDeck() {
   const deck = [];
   for (let suit of suits) {
     for (let value of values) {
-      deck.push({ suit, value, faceUp: false });
+      deck.push({ id: `${value}${suit}`, suit, value });
     }
   }
-  return shuffle(deck);
+  return deck.sort(() => Math.random() - 0.5);
 }
 
-function shuffle(deck) {
-  return [...deck].sort(() => Math.random() - 0.5);
+/* ---------------- CARD ---------------- */
+
+function Card({ card, index, pileId, moveCard }) {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: ItemTypes.CARD,
+    item: { card, from: pileId, index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
+
+  return (
+    <div
+      ref={drag}
+      className="w-16 h-24 border bg-white flex items-center justify-center cursor-move"
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
+      {card.id}
+    </div>
+  );
 }
 
-export default function Solitaire() {
-  const [deck, setDeck] = useState([]);
-  const [waste, setWaste] = useState([]);
-  const [foundations, setFoundations] = useState([[], [], [], []]);
-  const [tableau, setTableau] = useState([[], [], [], [], [], [], []]);
+/* ---------------- PILE ---------------- */
 
-  useEffect(() => {
-    initGame();
-  }, []);
+function Pile({ id, cards, moveCard }) {
+  const [, drop] = useDrop(() => ({
+    accept: ItemTypes.CARD,
+    drop: (item) => {
+      moveCard(item, id);
+    },
+  }));
 
-  function initGame() {
-    const newDeck = createDeck();
-    let t = [[], [], [], [], [], [], []];
+  return (
+    <div
+      ref={drop}
+      className="w-20 min-h-32 border p-2 flex flex-col gap-2"
+    >
+      {cards.map((card, idx) => (
+        <Card
+          key={card.id}
+          card={card}
+          index={idx}
+          pileId={id}
+          moveCard={moveCard}
+        />
+      ))}
+    </div>
+  );
+}
 
-    for (let i = 0; i < 7; i++) {
-      for (let j = 0; j <= i; j++) {
-        const card = newDeck.pop();
-        card.faceUp = j === i;
-        t[i].push(card);
-      }
+/* ---------------- MAIN GAME ---------------- */
+
+export default function SolitaireDemo() {
+const [tableau, setTableau] = useState(() => {
+  const deck = createDeck();
+  const t = [[], [], [], [], [], [], []];
+
+  for (let i = 0; i < 7; i++) {
+    for (let j = 0; j <= i; j++) {
+      t[i].push(deck.pop());
+    }
+  }
+  return t;
+});
+
+  const [foundation, setFoundation] = useState([[], [], [], []]);
+  const [stock, setStock] = useState(() => createDeck().slice(0, 24));
+
+  function moveCard(item, targetPileId) {
+    const { card, from } = item;
+
+    let newTableau = [...tableau];
+    let newFoundation = [...foundation];
+    let newStock = [...stock];
+
+    // remove from source
+    const removeFromPile = (pile, cardId) =>
+      pile.filter((c) => c.id !== cardId);
+
+    if (from.startsWith("tableau-")) {
+      const idx = parseInt(from.split("-")[1]);
+      newTableau[idx] = removeFromPile(newTableau[idx], card.id);
     }
 
-    setDeck(newDeck);
-    setTableau(t);
-    setWaste([]);
-    setFoundations([[], [], [], []]);
-  }
-
-  function drawCard() {
-    if (deck.length === 0) {
-      setDeck(waste.map(c => ({ ...c, faceUp: false })).reverse());
-      setWaste([]);
-      return;
+    if (from.startsWith("foundation-")) {
+      const idx = parseInt(from.split("-")[1]);
+      newFoundation[idx] = removeFromPile(newFoundation[idx], card.id);
     }
 
-    const newDeck = [...deck];
-    const card = newDeck.pop();
-    card.faceUp = true;
+    if (from === "stock") {
+      newStock = removeFromPile(newStock, card.id);
+    }
 
-    setDeck(newDeck);
-    setWaste([...waste, card]);
-  }
+    // add to target
+    if (targetPileId.startsWith("tableau-")) {
+      const idx = parseInt(targetPileId.split("-")[1]);
+      newTableau[idx] = [...newTableau[idx], card];
+    }
 
-  function canPlaceOnTableau(card, pile) {
-    if (pile.length === 0) return card.value === "K";
+    if (targetPileId.startsWith("foundation-")) {
+      const idx = parseInt(targetPileId.split("-")[1]);
+      newFoundation[idx] = [...newFoundation[idx], card];
+    }
 
-    const top = pile[pile.length - 1];
-    const red = ["♥", "♦"];
+    if (targetPileId === "stock") {
+      newStock = [...newStock, card];
+    }
 
-    const isOppositeColor = red.includes(card.suit) !== red.includes(top.suit);
-    const isOneLess = values.indexOf(card.value) === values.indexOf(top.value) - 1;
-
-    return isOppositeColor && isOneLess;
-  }
-
-  function moveWasteToTableau(i) {
-    if (waste.length === 0) return;
-    const card = waste[waste.length - 1];
-
-    if (!canPlaceOnTableau(card, tableau[i])) return;
-
-    const newWaste = waste.slice(0, -1);
-    const newTableau = [...tableau];
-    newTableau[i] = [...newTableau[i], card];
-
-    setWaste(newWaste);
     setTableau(newTableau);
-  }
-
-  function renderCard(card, index) {
-    return (
-      <div
-        key={index}
-        className={`w-16 h-24 border rounded-md flex items-center justify-center text-lg ${card.faceUp ? "bg-white" : "bg-blue-500"}`}
-      >
-        {card.faceUp ? `${card.value}${card.suit}` : ""}
-      </div>
-    );
+    setFoundation(newFoundation);
+    setStock(newStock);
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Solitaire</h1>
+    <DndProvider backend={HTML5Backend}>
+      <div className="p-6">
+        <h1 className="text-2xl mb-4">Simple DnD Solitaire (No Rules)</h1>
 
-      <div className="flex gap-4 mb-6">
-        <div>
-          <button onClick={drawCard} className="px-4 py-2 bg-green-600 text-white rounded">
-            Draw
-          </button>
-          <div className="mt-2">Deck: {deck.length}</div>
+        {/* Stock */}
+        <div className="mb-4">
+          <h2>Stock</h2>
+          <Pile id="stock" cards={stock} moveCard={moveCard} />
         </div>
 
-        <div>
-          <div className="mb-1">Waste</div>
-          <div className="flex">
-            {waste.slice(-1).map(renderCard)}
-          </div>
+        {/* Foundation */}
+        <div className="flex gap-4 mb-4">
+          {foundation.map((pile, i) => (
+            <div key={i}>
+              <h2>Foundation {i + 1}</h2>
+              <Pile
+                id={`foundation-${i}`}
+                cards={pile}
+                moveCard={moveCard}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Tableau */}
+        <div className="grid grid-cols-7 gap-4">
+          {tableau.map((pile, i) => (
+            <div key={i}>
+              <h2 className="text-sm">Tableau {i + 1}</h2>
+              <Pile
+                id={`tableau-${i}`}
+                cards={pile}
+                moveCard={moveCard}
+              />
+            </div>
+          ))}
         </div>
       </div>
-
-      <div className="grid grid-cols-7 gap-4">
-        {tableau.map((pile, i) => (
-          <div key={i} className="flex flex-col gap-1">
-            <button
-              onClick={() => moveWasteToTableau(i)}
-              className="text-xs text-blue-500"
-            >
-              Place Here
-            </button>
-            {pile.map(renderCard)}
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={initGame}
-        className="mt-6 px-4 py-2 bg-red-500 text-white rounded"
-      >
-        Restart
-      </button>
-    </div>
+    </DndProvider>
   );
 }
