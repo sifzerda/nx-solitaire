@@ -1,4 +1,4 @@
-// npm run dev and then visit http://localhost:3000/api/test to see the results of the Prisma test query.
+// npm run dev and then visit http://localhost:3000/api/test to test the Prisma connection and query. 
 
 import { prisma } from '../../../lib/prisma';
 
