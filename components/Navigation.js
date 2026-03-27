@@ -1,13 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '../lib/authContext';
 import { usePathname, useRouter } from 'next/navigation';
 
 export default function Navigation() {
   const pathname = usePathname();
-  const router = useRouter(); // must be here, inside component
-  const { isLoggedIn, logout } = useAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if JWT token exists in localStorage
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    // redirect after logout
+    window.location.href = '/';
+  };
 
   // Base links
   const links = [{ href: '/', label: 'Solitaire' }];
