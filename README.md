@@ -18,13 +18,14 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
-
-
 //////////////////////////////////////////////
 
 TECH:
-- AuthContext wrapping in layout
 
+- SPA App Router in Next.js
+- Auth using jose, JWT, bcrypt, AuthContext Provider wrapping Layout
+- Prisma Neon DB
+- Deployed over Vercel
 
 In Prisma 7 (updated) you now need an adapter, or Accelerate (which requires Prisma Accelerate setup)
 For a neon db (vercel):

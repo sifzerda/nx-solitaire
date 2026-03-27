@@ -8,10 +8,6 @@ export default function Footer() {
                 {/* Top gold line */}
                 <div className="w-full h-[2px] bg-yellow-500 mb-6"></div>
 
-                {/* Year */}
-                <p className="text-sm text-gray-400 mb-1">sifzerda 2026</p>
-
-
                 {/* Suits row */}
                 <div className="flex items-center gap-3 text-lg mb-1">
                     <span className="text-blue-400">♠</span>
@@ -37,7 +33,8 @@ export default function Footer() {
                     </svg>
                 </a>
 
-                
+                {/* Year */}
+                <p className="text-sm text-gray-400 mb-1">sifzerda 2026</p>
 
                 {/* Bottom blue line */}
                 <div className="w-full h-[2px] bg-blue-900 mt-6"></div>
