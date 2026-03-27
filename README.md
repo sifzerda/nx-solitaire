@@ -32,7 +32,7 @@ For a neon db (vercel):
 
 npm install @prisma/adapter-neon
 
-and paste this into your prisma.js:
+create a prisma.js and paste this into your prisma.js:
 
 ```bash
 import { PrismaClient } from '@prisma/client';
@@ -58,7 +58,27 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 ```
+then in terminal
 
+```bash
+npx prisma init
+```
+
+inside your prisma.config.ts:
+
+```bash
+npm install --save-dev prisma dotenv
+```
+
+and under datasource, paste: url: process.env.DATABASE_URL,
+
+Then you can enter models into the schema.prisma inside your prisma folder. Every time you make a change to the schema, run this: 
+
+```bash
+npx prisma generate
+```
+
+////////////////////////////////////////
 
 Install Auth System:
 
