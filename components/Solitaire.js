@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -74,32 +74,42 @@ function Pile({ id, cards, moveCard }) {
 /* ---------------- MAIN GAME ---------------- */
 
 export default function SolitaireDemo() {
-const [tableau, setTableau] = useState(() => {
-  const deck = createDeck();
-  const t = [[], [], [], [], [], [], []];
+  const [tableau, setTableau] = useState(null);
+  const [foundation, setFoundation] = useState(null);
+  const [stock, setStock] = useState(null);
 
-  for (let i = 0; i < 7; i++) {
-    for (let j = 0; j <= i; j++) {
-      t[i].push(deck.pop());
+  // ✅ Initialize game ONLY on client
+  useEffect(() => {
+    const deck = createDeck();
+
+    const t = [[], [], [], [], [], [], []];
+
+    for (let i = 0; i < 7; i++) {
+      for (let j = 0; j <= i; j++) {
+        t[i].push(deck.pop());
+      }
     }
-  }
-  return t;
-});
 
-  const [foundation, setFoundation] = useState([[], [], [], []]);
-  const [stock, setStock] = useState(() => createDeck().slice(0, 24));
+    const remainingStock = deck;
+
+    setTableau(t);
+    setFoundation([[], [], [], []]);
+    setStock(remainingStock.slice(0, 24));
+  }, []);
 
   function moveCard(item, targetPileId) {
+    if (!tableau || !foundation || !stock) return;
+
     const { card, from } = item;
 
     let newTableau = [...tableau];
     let newFoundation = [...foundation];
     let newStock = [...stock];
 
-    // remove from source
     const removeFromPile = (pile, cardId) =>
       pile.filter((c) => c.id !== cardId);
 
+    // remove from source
     if (from.startsWith("tableau-")) {
       const idx = parseInt(from.split("-")[1]);
       newTableau[idx] = removeFromPile(newTableau[idx], card.id);
@@ -134,10 +144,17 @@ const [tableau, setTableau] = useState(() => {
     setStock(newStock);
   }
 
+  // ✅ Prevent hydration mismatch
+  if (!tableau || !foundation || !stock) {
+    return <div className="p-6 text-white">Loading game...</div>;
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="p-6">
-        <h1 className="text-2xl mb-4">Simple DnD Solitaire (No Rules)</h1>
+        <h1 className="text-2xl mb-4">
+          Simple DnD Solitaire (No Rules)
+        </h1>
 
         {/* Stock */}
         <div className="mb-4">
