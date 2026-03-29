@@ -8,6 +8,7 @@ import { useAuth } from '../../lib/authContext';
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState(null);
   const { login } = useAuth();
   const router = useRouter();
 
