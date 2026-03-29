@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     if (res.ok) {
       login(data.token); // update context
-      router.push('/profile'); // redirect
+      router.push('/'); // redirect
     } else {
       setMessage(data.error || 'Login failed');
     }

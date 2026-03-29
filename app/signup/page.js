@@ -33,7 +33,7 @@ export default function Signup() {
                     localStorage.setItem('token', data.token);
                 }
                 // Redirect user
-                router.push('/profile');
+                router.push('/');
             } else {
                 setMessage(data.message || data.error || 'Signup failed.');
             }
