@@ -28,8 +28,8 @@ export default function Navigation() {
       <div className="h-[2px] bg-yellow-500 w-full" />
       <div className="flex justify-center py-3">
         <ul className="flex gap-3">
-          {links.map((link) => {
-            const isActive = link.href === pathname;
+          {links.map((href, label, onClick) => {
+            const isActive = href === pathname;
 
             // Define logout click here where router is available
             const handleClick = label === 'Logout'
@@ -40,18 +40,18 @@ export default function Navigation() {
               : onClick;
 
             return (
-              <li key={link.label}>
+              <li key={label}>
                 {handleClick ? (
                   <button
                     onClick={handleClick}
                     type="button"
                     className="px-4 py-1 text-sm border rounded-sm transition inline-block border-yellow-500 text-white hover:text-yellow-400"
                   >
-                    {link.label}
+                    {label}
                   </button>
                 ) : (
                   <Link
-                    href={link.href}
+                    href={href}
                     className={`
                       px-4 py-1 text-sm border rounded-sm transition inline-block
                       ${isActive
@@ -60,7 +60,7 @@ export default function Navigation() {
                       }
                     `}
                   >
-                    {link.label}
+                    {label}
                   </Link>
                 )}
               </li>
