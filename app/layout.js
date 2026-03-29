@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono, UnifrakturCook } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "../lib/authContext";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
@@ -33,6 +34,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col">
 
+        <AuthProvider>
           <Header />
 
           <Navigation />
@@ -42,6 +44,7 @@ export default function RootLayout({ children }) {
           </main>
 
           <Footer />
+        </AuthProvider>
 
       </body>
     </html>

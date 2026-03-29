@@ -1,26 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useAuth } from '../lib/authContext';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Navigation() {
   const pathname = usePathname();
+  const router = useRouter(); // must be here, inside component
+  const { isLoggedIn, logout } = useAuth();
 
-  //const isLoggedIn = status === "authenticated";
+  // Base links
+  const links = [{ href: '/', label: 'Solitaire' }];
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/" });
-  };
-
-  const links = [{ href: "/", label: "Solitaire" }];
-
-  //if (isLoggedIn) {
-    links.push({ href: "/profile", label: "Profile" });
-    links.push({ label: "Logout", action: handleLogout });
-  //} else {
+  // Conditional links
+  if (isLoggedIn) {
+    links.push({ href: '/profile', label: 'Profile' });
+    links.push({ label: 'Logout', onClick: null }); // placeholder
+  } else {
     links.push(
-      { href: "/signup", label: "Signup" },
-      { href: "/login", label: "Login" }
+      { href: '/signup', label: 'Signup' },
+      { href: '/login', label: 'Login' }
     );
   }
 
@@ -32,11 +31,19 @@ export default function Navigation() {
           {links.map((link) => {
             const isActive = link.href === pathname;
 
+            // Define logout click here where router is available
+            const handleClick = label === 'Logout'
+              ? () => {
+                logout();
+                router.push('/'); // redirect after logout
+              }
+              : onClick;
+
             return (
               <li key={link.label}>
-                {link.action ? (
+                {handleClick ? (
                   <button
-                    onClick={link.action}
+                    onClick={handleClick}
                     type="button"
                     className="px-4 py-1 text-sm border rounded-sm transition inline-block border-yellow-500 text-white hover:text-yellow-400"
                   >
@@ -47,10 +54,9 @@ export default function Navigation() {
                     href={link.href}
                     className={`
                       px-4 py-1 text-sm border rounded-sm transition inline-block
-                      ${
-                        isActive
-                          ? "border-red-500 text-red-500"
-                          : "border-yellow-500 text-white hover:text-yellow-400"
+                      ${isActive
+                        ? "border-red-500 text-red-500"
+                        : "border-yellow-500 text-white hover:text-yellow-400"
                       }
                     `}
                   >

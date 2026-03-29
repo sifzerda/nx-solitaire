@@ -1,9 +1,9 @@
 // app/signup.js
-
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../lib/authContext';
 
 export default function Signup() {
     const [username, setUsername] = useState('');
@@ -11,36 +11,37 @@ export default function Signup() {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const router = useRouter();
+    const { login } = useAuth();
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+    async function handleSubmit(e) {
+        e.preventDefault();
 
-    try {
-      const res = await fetch('/api/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, username }),
-      });
+        try {
+            const res = await fetch('/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, username }),
+            });
 
-      const text = await res.text();
-      const data = text ? JSON.parse(text) : {};
+            const text = await res.text();
+            const data = text ? JSON.parse(text) : {};
 
-      if (res.ok) {
-        // Store JWT in localStorage
-        if (data.token) {
-          localStorage.setItem('token', data.token);
+            if (res.ok) {
+                login(data.token); // update context with new token
+                // Store JWT in localStorage
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                }
+                // Redirect user
+                router.push('/profile');
+            } else {
+                setMessage(data.message || data.error || 'Signup failed.');
+            }
+        } catch (err) {
+            setMessage('Signup failed. Please try again.');
+            console.error('Signup error:', err);
         }
-
-        // Redirect user
-        router.push('/');
-      } else {
-        setMessage(data.message || data.error || 'Signup failed.');
-      }
-    } catch (err) {
-      setMessage('Signup failed. Please try again.');
-      console.error('Signup error:', err);
     }
-  }
 
     return (
         <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
