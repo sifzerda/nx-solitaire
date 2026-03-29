@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
 
 export default function Navigation() {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
 
-  const isLoggedIn = status === "authenticated";
+  //const isLoggedIn = status === "authenticated";
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/" });
@@ -16,10 +14,10 @@ export default function Navigation() {
 
   const links = [{ href: "/", label: "Solitaire" }];
 
-  if (isLoggedIn) {
+  //if (isLoggedIn) {
     links.push({ href: "/profile", label: "Profile" });
     links.push({ label: "Logout", action: handleLogout });
-  } else {
+  //} else {
     links.push(
       { href: "/signup", label: "Signup" },
       { href: "/login", label: "Login" }

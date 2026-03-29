@@ -30,7 +30,7 @@
     "**/*.mts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "app/api/signup/route.js"  ],
   "exclude": [
     "node_modules"
   ]

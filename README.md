@@ -262,3 +262,19 @@ export async function POST(req) {
 
 
 ```
+
+
+
+when you npx create-next app, if you say no to 'import' question, 
+you can't use @ imports. Unless you paste baseUrl into the jsconfig.json:
+
+```bash
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+```
