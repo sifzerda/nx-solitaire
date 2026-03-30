@@ -9,52 +9,21 @@ const ItemTypes = {
 };
 
 const suits = ["♠", "♥", "♦", "♣"];
-const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-
-const valueRank = Object.fromEntries(values.map((v, i) => [v, i + 1]));
-const isRed = (suit) => suit === "♥" || suit === "♦";
-
-function canDrop(card, targetPile, targetId) {
-  const top = targetPile[targetPile.length - 1];
-
-  // Foundation rules
-  if (targetId.startsWith("foundation-")) {
-    if (!top) return card.value === "A";
-
-    return (
-      top.suit === card.suit &&
-      valueRank[card.value] === valueRank[top.value] + 1
-    );
-  }
-
-  // Tableau rules
-  if (targetId.startsWith("tableau-")) {
-    if (!top) return card.value === "K";
-
-    return (
-      isRed(top.suit) !== isRed(card.suit) &&
-      valueRank[card.value] === valueRank[top.value] - 1
-    );
-  }
-
-  return true;
-}
+const values = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 
 function createDeck() {
   const deck = [];
-
   for (let suit of suits) {
     for (let value of values) {
       deck.push({ id: `${value}${suit}`, suit, value });
     }
   }
-
   return deck.sort(() => Math.random() - 0.5);
 }
 
 /* ---------------- CARD ---------------- */
 
-function Card({ card, index, pileId }) {
+function Card({ card, index, pileId, moveCard }) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.CARD,
     item: { card, from: pileId, index },
@@ -66,7 +35,7 @@ function Card({ card, index, pileId }) {
   return (
     <div
       ref={drag}
-      className="w-16 h-24 border rounded bg-white flex items-center justify-center cursor-move shadow text-black"
+      className="w-16 h-24 border bg-white flex items-center justify-center cursor-move"
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       {card.id}
@@ -87,7 +56,7 @@ function Pile({ id, cards, moveCard }) {
   return (
     <div
       ref={drop}
-      className="w-20 min-h-32 border rounded p-2 flex flex-col gap-2 bg-green-700"
+      className="w-20 min-h-32 border p-2 flex flex-col gap-2"
     >
       {cards.map((card, idx) => (
         <Card
@@ -95,6 +64,7 @@ function Pile({ id, cards, moveCard }) {
           card={card}
           index={idx}
           pileId={id}
+          moveCard={moveCard}
         />
       ))}
     </div>
@@ -108,6 +78,7 @@ export default function SolitaireDemo() {
   const [foundation, setFoundation] = useState(null);
   const [stock, setStock] = useState(null);
 
+  // ✅ Initialize game ONLY on client
   useEffect(() => {
     const deck = createDeck();
 
@@ -119,9 +90,11 @@ export default function SolitaireDemo() {
       }
     }
 
+    const remainingStock = deck;
+
     setTableau(t);
     setFoundation([[], [], [], []]);
-    setStock(deck.slice(0, 24));
+    setStock(remainingStock.slice(0, 24));
   }, []);
 
   function moveCard(item, targetPileId) {
@@ -129,65 +102,41 @@ export default function SolitaireDemo() {
 
     const { card, from } = item;
 
-    // prevent dropping onto same pile
-    if (from === targetPileId) return;
-
-    let newTableau = tableau.map((pile) => [...pile]);
-    let newFoundation = foundation.map((pile) => [...pile]);
+    let newTableau = [...tableau];
+    let newFoundation = [...foundation];
     let newStock = [...stock];
 
-    const removeCard = (pile) => pile.filter((c) => c.id !== card.id);
+    const removeFromPile = (pile, cardId) =>
+      pile.filter((c) => c.id !== cardId);
 
-    // remove from source first
+    // remove from source
     if (from.startsWith("tableau-")) {
       const idx = parseInt(from.split("-")[1]);
-      newTableau[idx] = removeCard(newTableau[idx]);
+      newTableau[idx] = removeFromPile(newTableau[idx], card.id);
     }
 
     if (from.startsWith("foundation-")) {
       const idx = parseInt(from.split("-")[1]);
-      newFoundation[idx] = removeCard(newFoundation[idx]);
+      newFoundation[idx] = removeFromPile(newFoundation[idx], card.id);
     }
 
     if (from === "stock") {
-      newStock = removeCard(newStock);
-    }
-
-    // get updated target pile after removal
-    let targetPile = [];
-
-    if (targetPileId.startsWith("tableau-")) {
-      const idx = parseInt(targetPileId.split("-")[1]);
-      targetPile = newTableau[idx];
-    }
-
-    if (targetPileId.startsWith("foundation-")) {
-      const idx = parseInt(targetPileId.split("-")[1]);
-      targetPile = newFoundation[idx];
-    }
-
-    if (targetPileId === "stock") {
-      targetPile = newStock;
-    }
-
-    // invalid move -> revert nothing
-    if (!canDrop(card, targetPile, targetPileId)) {
-      return;
+      newStock = removeFromPile(newStock, card.id);
     }
 
     // add to target
     if (targetPileId.startsWith("tableau-")) {
       const idx = parseInt(targetPileId.split("-")[1]);
-      newTableau[idx].push(card);
+      newTableau[idx] = [...newTableau[idx], card];
     }
 
     if (targetPileId.startsWith("foundation-")) {
       const idx = parseInt(targetPileId.split("-")[1]);
-      newFoundation[idx].push(card);
+      newFoundation[idx] = [...newFoundation[idx], card];
     }
 
     if (targetPileId === "stock") {
-      newStock.push(card);
+      newStock = [...newStock, card];
     }
 
     setTableau(newTableau);
@@ -195,26 +144,29 @@ export default function SolitaireDemo() {
     setStock(newStock);
   }
 
+  // ✅ Prevent hydration mismatch
   if (!tableau || !foundation || !stock) {
     return <div className="p-6 text-white">Loading game...</div>;
   }
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="p-6 bg-green-900 min-h-screen text-white">
-        <h1 className="text-2xl mb-6 font-bold">
-          Solitaire Drag & Drop
+      <div className="p-6">
+        <h1 className="text-2xl mb-4">
+          Simple DnD Solitaire (No Rules)
         </h1>
 
-        <div className="mb-6">
-          <h2 className="mb-2">Stock</h2>
+        {/* Stock */}
+        <div className="mb-4">
+          <h2>Stock</h2>
           <Pile id="stock" cards={stock} moveCard={moveCard} />
         </div>
 
-        <div className="flex gap-4 mb-6">
+        {/* Foundation */}
+        <div className="flex gap-4 mb-4">
           {foundation.map((pile, i) => (
             <div key={i}>
-              <h2 className="mb-2">Foundation {i + 1}</h2>
+              <h2>Foundation {i + 1}</h2>
               <Pile
                 id={`foundation-${i}`}
                 cards={pile}
@@ -224,10 +176,11 @@ export default function SolitaireDemo() {
           ))}
         </div>
 
+        {/* Tableau */}
         <div className="grid grid-cols-7 gap-4">
           {tableau.map((pile, i) => (
             <div key={i}>
-              <h2 className="mb-2 text-sm">Tableau {i + 1}</h2>
+              <h2 className="text-sm">Tableau {i + 1}</h2>
               <Pile
                 id={`tableau-${i}`}
                 cards={pile}
