@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -9,233 +9,104 @@ const ItemTypes = {
 };
 
 const suits = ["♠", "♥", "♦", "♣"];
-const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
-const valueRank = Object.fromEntries(values.map((v, i) => [v, i + 1]));
-const isRed = (suit) => suit === "♥" || suit === "♦";
-
-function canDrop(card, targetPile, targetId) {
-  const top = targetPile[targetPile.length - 1];
-
-  // Foundation rules
-  if (targetId.startsWith("foundation-")) {
-    if (!top) return card.value === "A";
-
-    return (
-      top.suit === card.suit &&
-      valueRank[card.value] === valueRank[top.value] + 1
-    );
-  }
-
-  // Tableau rules
-  if (targetId.startsWith("tableau-")) {
-    if (!top) return card.value === "K";
-
-    return (
-      isRed(top.suit) !== isRed(card.suit) &&
-      valueRank[card.value] === valueRank[top.value] - 1
-    );
-  }
-
-  return true;
-}
-
+// Generate a standard 52-card deck
 function createDeck() {
-  const deck = [];
-
-  for (let suit of suits) {
-    for (let value of values) {
-      deck.push({ id: `${value}${suit}`, suit, value });
-    }
-  }
-
-  return deck.sort(() => Math.random() - 0.5);
+  return suits.flatMap((suit) => ranks.map((rank) => ({ suit, rank, id: `${rank}${suit}` })));
 }
 
-/* ---------------- CARD ---------------- */
-
-function Card({ card, index, pileId }) {
+// Single Card component
+function Card({ card, moveCard }) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.CARD,
-    item: { card, from: pileId, index },
+    item: { card },
     collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
+      isDragging: !!monitor.isDragging(),
     }),
   }));
 
   return (
     <div
       ref={drag}
-      className="w-16 h-24 border rounded bg-white flex items-center justify-center cursor-move shadow text-black"
-      style={{ opacity: isDragging ? 0.5 : 1 }}
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+        cursor: "grab",
+        border: "1px solid black",
+        borderRadius: "4px",
+        padding: "8px",
+        backgroundColor: "white",
+        width: "60px",
+        textAlign: "center",
+        margin: "4px",
+      }}
     >
-      {card.id}
+      {card.rank}{card.suit}
     </div>
   );
 }
 
-/* ---------------- PILE ---------------- */
-
-function Pile({ id, cards, moveCard }) {
+// Drop zone (foundation, tableau, etc.)
+function DropZone({ cards, moveCard }) {
   const [, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-    drop: (item) => {
-      moveCard(item, id);
-    },
+    drop: (item) => moveCard(item.card),
   }));
 
   return (
     <div
       ref={drop}
-      className="w-20 min-h-32 border rounded p-2 flex flex-col gap-2 bg-green-700"
+      style={{
+        minHeight: "80px",
+        minWidth: "70px",
+        border: "2px dashed gray",
+        borderRadius: "6px",
+        margin: "8px",
+        padding: "4px",
+        display: "flex",
+        flexWrap: "wrap",
+      }}
     >
-      {cards.map((card, idx) => (
-        <Card
-          key={card.id}
-          card={card}
-          index={idx}
-          pileId={id}
-        />
+      {cards.map((card) => (
+        <Card key={card.id} card={card} moveCard={moveCard} />
       ))}
     </div>
   );
 }
 
-/* ---------------- MAIN GAME ---------------- */
+export default function Page() {
+  const [deck, setDeck] = useState(createDeck());
+  const [foundations, setFoundations] = useState([[], [], [], []]);
 
-export default function SolitaireDemo() {
-  const [tableau, setTableau] = useState(null);
-  const [foundation, setFoundation] = useState(null);
-  const [stock, setStock] = useState(null);
-
-  useEffect(() => {
-    const deck = createDeck();
-
-    const t = [[], [], [], [], [], [], []];
-
-    for (let i = 0; i < 7; i++) {
-      for (let j = 0; j <= i; j++) {
-        t[i].push(deck.pop());
-      }
-    }
-
-    setTableau(t);
-    setFoundation([[], [], [], []]);
-    setStock(deck.slice(0, 24));
-  }, []);
-
-  function moveCard(item, targetPileId) {
-    if (!tableau || !foundation || !stock) return;
-
-    const { card, from } = item;
-
-    // prevent dropping onto same pile
-    if (from === targetPileId) return;
-
-    let newTableau = tableau.map((pile) => [...pile]);
-    let newFoundation = foundation.map((pile) => [...pile]);
-    let newStock = [...stock];
-
-    const removeCard = (pile) => pile.filter((c) => c.id !== card.id);
-
-    // remove from source first
-    if (from.startsWith("tableau-")) {
-      const idx = parseInt(from.split("-")[1]);
-      newTableau[idx] = removeCard(newTableau[idx]);
-    }
-
-    if (from.startsWith("foundation-")) {
-      const idx = parseInt(from.split("-")[1]);
-      newFoundation[idx] = removeCard(newFoundation[idx]);
-    }
-
-    if (from === "stock") {
-      newStock = removeCard(newStock);
-    }
-
-    // get updated target pile after removal
-    let targetPile = [];
-
-    if (targetPileId.startsWith("tableau-")) {
-      const idx = parseInt(targetPileId.split("-")[1]);
-      targetPile = newTableau[idx];
-    }
-
-    if (targetPileId.startsWith("foundation-")) {
-      const idx = parseInt(targetPileId.split("-")[1]);
-      targetPile = newFoundation[idx];
-    }
-
-    if (targetPileId === "stock") {
-      targetPile = newStock;
-    }
-
-    // invalid move -> revert nothing
-    if (!canDrop(card, targetPile, targetPileId)) {
-      return;
-    }
-
-    // add to target
-    if (targetPileId.startsWith("tableau-")) {
-      const idx = parseInt(targetPileId.split("-")[1]);
-      newTableau[idx].push(card);
-    }
-
-    if (targetPileId.startsWith("foundation-")) {
-      const idx = parseInt(targetPileId.split("-")[1]);
-      newFoundation[idx].push(card);
-    }
-
-    if (targetPileId === "stock") {
-      newStock.push(card);
-    }
-
-    setTableau(newTableau);
-    setFoundation(newFoundation);
-    setStock(newStock);
-  }
-
-  if (!tableau || !foundation || !stock) {
-    return <div className="p-6 text-white">Loading game...</div>;
-  }
+  // Move a card to the first available foundation (for simplicity)
+  const moveCard = (card, foundationIndex = 0) => {
+    setDeck((prev) => prev.filter((c) => c.id !== card.id));
+    setFoundations((prev) => {
+      const newFoundations = [...prev];
+      newFoundations[foundationIndex] = [...newFoundations[foundationIndex], card];
+      return newFoundations;
+    });
+  };
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="p-6 bg-green-900 min-h-screen text-white">
-        <h1 className="text-2xl mb-6 font-bold">
-          Solitaire Drag & Drop
-        </h1>
+      <h1 style={{ textAlign: "center" }}>Simple Drag & Drop Solitaire (No Rules)</h1>
 
-        <div className="mb-6">
-          <h2 className="mb-2">Stock</h2>
-          <Pile id="stock" cards={stock} moveCard={moveCard} />
-        </div>
+      <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
+        {foundations.map((cards, i) => (
+          <DropZone
+            key={i}
+            cards={cards}
+            moveCard={(card) => moveCard(card, i)}
+          />
+        ))}
+      </div>
 
-        <div className="flex gap-4 mb-6">
-          {foundation.map((pile, i) => (
-            <div key={i}>
-              <h2 className="mb-2">Foundation {i + 1}</h2>
-              <Pile
-                id={`foundation-${i}`}
-                cards={pile}
-                moveCard={moveCard}
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-7 gap-4">
-          {tableau.map((pile, i) => (
-            <div key={i}>
-              <h2 className="mb-2 text-sm">Tableau {i + 1}</h2>
-              <Pile
-                id={`tableau-${i}`}
-                cards={pile}
-                moveCard={moveCard}
-              />
-            </div>
-          ))}
-        </div>
+      <h2 style={{ textAlign: "center" }}>Deck</h2>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
+        {deck.map((card) => (
+          <Card key={card.id} card={card} moveCard={moveCard} />
+        ))}
       </div>
     </DndProvider>
   );
