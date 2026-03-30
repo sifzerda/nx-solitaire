@@ -28,7 +28,7 @@ export default function Navigation() {
       <div className="h-[2px] bg-yellow-500 w-full" />
       <div className="flex justify-center py-3">
         <ul className="flex gap-3">
-          {links.map((href, label, onClick) => {
+          {links.map(({ href, label, onClick }) => {
             const isActive = href === pathname;
 
             // Define logout click here where router is available
