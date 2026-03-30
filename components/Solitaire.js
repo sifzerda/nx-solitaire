@@ -1,5 +1,6 @@
 "use client";
 
+import { Black_And_White_Picture } from "next/font/google";
 import { useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -36,6 +37,7 @@ function Card({ card, moveCard }) {
         borderRadius: "4px",
         padding: "8px",
         backgroundColor: "white",
+        color: card.suit === "♥" || card.suit === "♦" ? "red" : "black",
         width: "60px",
         textAlign: "center",
         margin: "4px",
