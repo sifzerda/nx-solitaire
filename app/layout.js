@@ -32,8 +32,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${unifraktur.variable} h-full antialiased`}
-    >
+      className={`${geistSans.variable} ${geistMono.variable} ${unifraktur.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
 
         <AuthProvider>
@@ -44,7 +43,7 @@ export default function RootLayout({ children }) {
           <main className="flex-grow">
 
 
-<UnderConstructionBanner />
+            <UnderConstructionBanner />
 
 
             {children}
