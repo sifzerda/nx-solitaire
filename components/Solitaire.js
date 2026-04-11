@@ -22,9 +22,15 @@ function createDeck() {
   );
 }
 
-// Shuffle deck
+// Fisher–Yates Shuffle 
 function shuffle(array) {
-  return [...array].sort(() => Math.random() - 0.5);
+  const arr = [...array]; // don't mutate original
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    // swap
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 // Create starting game state

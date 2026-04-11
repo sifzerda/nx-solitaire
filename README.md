@@ -1,22 +1,14 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
 ## Getting Started
 
 First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+TO DO:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- Move Styling into another file, e.g. globals
 
 //////////////////////////////////////////////
 
@@ -316,9 +308,6 @@ Create a JWT secret inside .env file:
 
 ```bash
 ## generate a secret by gitbash: openssl rand -base64 32
-## etc:
-
-JWT_SECRET=DCN4BAiQxd6jGPh4aTiBPT/2aZIXmGjlll/+ociYuv0=
 ```
 
 and add this to environment variables on your vercel/postgres/neon db (under settings -> environment variables)
