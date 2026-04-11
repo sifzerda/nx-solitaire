@@ -9,6 +9,8 @@ npm run dev
 TO DO:
 
 - Move Styling into another file, e.g. globals
+- Add solitaire rules
+- Make a highscores page and db storage like minesweeper, recording user name/ref + time taken + number of moves
 
 //////////////////////////////////////////////
 
