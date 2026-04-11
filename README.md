@@ -30,9 +30,22 @@ TECH:
 In Prisma 7 (updated) you now need an adapter, or Accelerate (which requires Prisma Accelerate setup)
 For a neon db (vercel):
 
+```bash
 npm install @prisma/adapter-neon
+```
+for a prisma postgres (not neon):
+```bash
+npm install @prisma/adapter-pg
+```
 
-create a prisma.js and paste this into your prisma.js:
+also install
+```bash
+npm install @prisma/client
+npm install @auth/prisma-adapter
+npm install next-auth
+ ```
+
+create a lib folder in root, and inside make a prisma.js and paste this into your NEON prisma.js:
 
 ```bash
 import { PrismaClient } from '@prisma/client';
@@ -58,13 +71,35 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 ```
+for PG/ PRISMA POSTGRES:
+
+```bash
+// lib/prisma.js
+import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from "@prisma/adapter-pg";
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const globalForPrisma = globalThis;
+
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({ adapter });
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}
+```
+
 then in terminal
 
 ```bash
 npx prisma init
 ```
-
-inside your prisma.config.ts:
+this will create a prisma.config.ts in root. 
+Then, inside your prisma.config.ts:
 
 ```bash
 npm install --save-dev prisma dotenv
@@ -81,11 +116,11 @@ npx prisma generate
 ////////////////////////////////////////
 
 Install Auth System:
-
+```bash
 npm install jsonwebtoken
 npm install jose
 npm install bcrypt
-
+```
 Create signup and login routes/pages
 
 Create a 'lib' folder at root add files 'auth.js' and 'serverAuth.js'
@@ -276,3 +311,22 @@ you can't use @ imports. Unless you paste baseUrl into the jsconfig.json:
   }
 }
 ```
+
+Create a JWT secret inside .env file:
+
+```bash
+## generate a secret by gitbash: openssl rand -base64 32
+## etc:
+
+JWT_SECRET=DCN4BAiQxd6jGPh4aTiBPT/2aZIXmGjlll/+ociYuv0=
+```
+
+and add this to environment variables on your vercel/postgres/neon db (under settings -> environment variables)
+
+Then paste this for your build command inside package.json:
+
+```bash
+    "build": "prisma generate && next build",
+```
+
+this tells vercel to generate prisma on build, otherwise deployment will fail.

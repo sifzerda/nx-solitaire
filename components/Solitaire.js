@@ -72,7 +72,7 @@ function Card({ card }) {
     <div
       ref={drag}
       style={{
-        opacity: isDragging ? 0.5 : 1,
+        opacity: isDragging ? "0.5" : "1",
         cursor: "grab",
         border: "1px solid black",
         borderRadius: "6px",
@@ -202,7 +202,7 @@ export default function Page() {
       <div
         style={{
           minHeight: "100vh",
-          backgroundColor: "#0b5d2a",
+          backgroundColor: "#00a2ff",
           padding: "20px",
         }}
       >
