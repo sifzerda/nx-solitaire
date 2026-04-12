@@ -105,20 +105,12 @@ function Card({ card }) {
 }
 
 // Generic drop zone
-function DropZone({ cards, onDrop, title, canDropCard }) {
-  const [{ isOver, canDrop }, drop] = useDrop(() => ({
+function DropZone({ cards, onDrop, title }) {
+  const [{ isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-    canDrop: (item) => {
-      return canDropCard ? canDropCard(item.card) : true;
-    },
-
-    drop: (item, monitor) => {
-      if (!monitor.canDrop()) return; // reject invalid drop
-      onDrop(item.card);
-    },
+    drop: (item) => onDrop(item.card),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
-      canDrop: !!monitor.canDrop(),
     }),
   }));
 
@@ -147,15 +139,10 @@ function DropZone({ cards, onDrop, title, canDropCard }) {
         style={{
           minHeight: "100px",
           minWidth: "80px",
-          border: `2px dashed ${isOver ? (canDrop ? "#4caf50" : "#f44336") : "#999"
-            }`,
+          border: `2px dashed ${isOver ? "#4caf50" : "#999"}`,
           borderRadius: "8px",
           padding: "6px",
-          backgroundColor: isOver
-            ? canDrop
-              ? "rgba(76,175,80,0.15)"
-              : "rgba(244,67,54,0.15)"
-            : "rgba(255,255,255,0.05)",
+          backgroundColor: isOver ? "rgba(76,175,80,0.15)" : "rgba(255,255,255,0.05)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -252,7 +239,6 @@ export default function Page() {
               cards={cards}
               title={`Foundation ${i + 1}`}
               onDrop={(card) => moveToFoundation(card, i)}
-              canDropCard={(card) => card.rank === "A"} // 👈 ONLY Aces allowed
             />
           ))}
         </div>

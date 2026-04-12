@@ -12,6 +12,14 @@ TO DO:
 - Add solitaire rules
 - Make a highscores page and db storage like minesweeper, recording user name/ref + time taken + number of moves
 
+
+
+
+- create dnd game rules for foundation
+- create dnd rules for tableau
+- front and back/flip cards
+- cards are stacked in pile
+
 //////////////////////////////////////////////
 
 TECH:
