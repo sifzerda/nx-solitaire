@@ -77,29 +77,15 @@ function Card({ card }) {
   return (
     <div
       ref={drag}
-      style={{
-        opacity: isDragging ? "0.5" : "1",
-        cursor: "grab",
-        border: "1px solid black",
-        borderRadius: "6px",
-        padding: "8px",
-        backgroundColor: "white",
-        color: card.suit === "♥" || card.suit === "♦" ? "red" : "black",
-        width: "60px",
-        height: "80px",
-        textAlign: "center",
-        margin: "4px",
-        fontSize: "18px",
-        fontWeight: "bold",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-        userSelect: "none",
-      }}
+      className={`
+        w-[60px] h-[80px] m-1 flex items-center justify-center
+        rounded-md border border-black bg-white font-bold text-lg
+        shadow-md cursor-grab select-none
+        ${card.suit === "♥" || card.suit === "♦" ? "text-red-500" : "text-black"}
+        ${isDragging ? "opacity-50" : "opacity-100"}
+      `}
     >
-      {card.rank}
-      {card.suit}
+      {card.rank}{card.suit}
     </div>
   );
 }
@@ -108,59 +94,43 @@ function Card({ card }) {
 function DropZone({ cards, onDrop, title, canDropCard }) {
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
+
     canDrop: (item) => {
       return canDropCard ? canDropCard(item.card) : true;
     },
 
     drop: (item, monitor) => {
-      if (!monitor.canDrop()) return; // reject invalid drop
+      if (!monitor.canDrop()) return;
       onDrop(item.card);
     },
+
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop(),
     }),
   }));
 
+  const borderColor = isOver
+    ? canDrop
+      ? "border-green-500 bg-green-100/20"
+      : "border-red-500 bg-red-100/20"
+    : "border-gray-400";
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
+    <div className="flex flex-col items-center">
       {title && (
-        <div
-          style={{
-            color: "white",
-            marginBottom: "6px",
-            fontWeight: "bold",
-          }}
-        >
+        <div className="text-white mb-1 font-bold">
           {title}
         </div>
       )}
 
       <div
         ref={drop}
-        style={{
-          minHeight: "100px",
-          minWidth: "80px",
-          border: `2px dashed ${isOver ? (canDrop ? "#4caf50" : "#f44336") : "#999"
-            }`,
-          borderRadius: "8px",
-          padding: "6px",
-          backgroundColor: isOver
-            ? canDrop
-              ? "rgba(76,175,80,0.15)"
-              : "rgba(244,67,54,0.15)"
-            : "rgba(255,255,255,0.05)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          transition: "all 0.15s ease",
-        }}
+        className={`
+          min-h-[100px] min-w-[80px] p-1 flex flex-col items-center
+          rounded-lg border-2 border-dashed transition-all
+          ${borderColor}
+        `}
       >
         {cards.map((card) => (
           <Card key={card.id} card={card} />
@@ -218,34 +188,15 @@ export default function Page() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div
-        style={{
-          minHeight: "100vh",
-          backgroundColor: "#00a2ff",
-          padding: "20px",
-        }}
-      >
-        <h1
-          style={{
-            textAlign: "center",
-            color: "white",
-            marginBottom: "30px",
-          }}
-        >
+      <div className="min-h-screen bg-sky-500 p-5">
+        <h1 className="text-center text-white mb-8 text-2xl font-bold">
           Simple Drag & Drop Solitaire
         </h1>
 
         <h2 style={{ textAlign: "center", color: "white" }}>Foundations</h2>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "16px",
-            marginBottom: "30px",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="flex justify-center gap-4 mb-8 flex-wrap">
+
           {foundations.map((cards, i) => (
             <DropZone
               key={i}
@@ -257,17 +208,10 @@ export default function Page() {
           ))}
         </div>
 
-        <h2 style={{ textAlign: "center", color: "white" }}>Tableau</h2>
+        <h2 className="text-center text-white">Tableau</h2>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "16px",
-            marginBottom: "30px",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="flex justify-center gap-4 mb-8 flex-wrap">
+
           {tableau.map((cards, i) => (
             <DropZone
               key={i}
@@ -278,14 +222,9 @@ export default function Page() {
           ))}
         </div>
 
-        <h2 style={{ textAlign: "center", color: "white" }}>Deck / Stock</h2>
+        <h2 className="text-center text-white">Deck / Stock</h2>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
+        <div className="flex justify-center gap-4">
           <DropZone
             cards={stock}
             title="Stock"
