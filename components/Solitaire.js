@@ -11,6 +11,10 @@ const ItemTypes = {
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
+
+// Each foundation is tied to a suit
+const foundationSuits = ["♠", "♥", "♦", "♣"];
+
 // Generate a standard 52-card deck
 function createDeck() {
   return suits.flatMap((suit) =>
@@ -22,12 +26,11 @@ function createDeck() {
   );
 }
 
-// Fisher–Yates Shuffle 
+// Fisher–Yates shuffle
 function shuffle(array) {
-  const arr = [...array]; // don't mutate original
+  const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    // swap
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
@@ -41,12 +44,6 @@ function createGame() {
 
   let currentIndex = 0;
 
-  // Solitaire-style tableau:
-  // Column 1 = 1 card
-  // Column 2 = 2 cards
-  // Column 3 = 3 cards
-  // ...
-  // Column 7 = 7 cards
   for (let col = 0; col < 7; col++) {
     for (let row = 0; row <= col; row++) {
       tableau[col].push(shuffled[currentIndex]);
@@ -54,7 +51,6 @@ function createGame() {
     }
   }
 
-  // Remaining cards go into stock/deck
   const stock = shuffled.slice(currentIndex);
 
   return {
@@ -90,7 +86,7 @@ function Card({ card }) {
   );
 }
 
-// Generic drop zone
+// Drop zone
 function DropZone({ cards, onDrop, title, canDropCard }) {
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
@@ -147,7 +143,7 @@ export default function Page() {
   const [tableau, setTableau] = useState(initialGame.tableau);
   const [foundations, setFoundations] = useState(initialGame.foundations);
 
-  // Remove a card from every pile before adding it somewhere else
+  // Remove card everywhere
   const removeCardFromAll = (cardId) => {
     setStock((prev) => prev.filter((c) => c.id !== cardId));
 
@@ -160,11 +156,16 @@ export default function Page() {
     );
   };
 
+  // Move to foundation (SUIT RULE ENFORCED HERE)
   const moveToFoundation = (card, foundationIndex) => {
     removeCardFromAll(card.id);
 
     setFoundations((prev) => {
       const next = [...prev];
+
+      // safety check: only allow correct suit
+      if (card.suit !== foundationSuits[foundationIndex]) return prev;
+
       next[foundationIndex] = [...next[foundationIndex], card];
       return next;
     });
@@ -193,17 +194,16 @@ export default function Page() {
           Simple Drag & Drop Solitaire
         </h1>
 
-        <h2 style={{ textAlign: "center", color: "white" }}>Foundations</h2>
+        <h2 className="text-center text-white mb-2">Foundations</h2>
 
         <div className="flex justify-center gap-4 mb-8 flex-wrap">
-
           {foundations.map((cards, i) => (
             <DropZone
               key={i}
               cards={cards}
-              title={`Foundation ${i + 1}`}
+              title={`Foundation ${foundationSuits[i]}`}
               onDrop={(card) => moveToFoundation(card, i)}
-              canDropCard={(card) => card.rank === "A"} // 👈 ONLY Aces allowed
+              canDropCard={(card) => card.suit === foundationSuits[i]}
             />
           ))}
         </div>
@@ -211,7 +211,6 @@ export default function Page() {
         <h2 className="text-center text-white">Tableau</h2>
 
         <div className="flex justify-center gap-4 mb-8 flex-wrap">
-
           {tableau.map((cards, i) => (
             <DropZone
               key={i}
@@ -222,7 +221,7 @@ export default function Page() {
           ))}
         </div>
 
-        <h2 className="text-center text-white">Deck / Stock</h2>
+        <h2 className="text-center text-white">Stock</h2>
 
         <div className="flex justify-center gap-4">
           <DropZone
