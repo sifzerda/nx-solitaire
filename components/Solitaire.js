@@ -11,9 +11,8 @@ const ItemTypes = {
 
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-const foundationSuits = ["♠", "♥", "♦", "♣"];
 
-/* -------------------- GAME HELPERS -------------------- */
+/* -------------------- HELPERS -------------------- */
 
 function createDeck() {
   return suits.flatMap((suit) =>
@@ -75,7 +74,9 @@ const rankValue = (rank) => {
   return map[rank];
 };
 
-/* -------------------- ZUSTAND STORE -------------------- */
+const isRed = (suit) => suit === "♥" || suit === "♦";
+
+/* -------------------- STORE -------------------- */
 
 const useGameStore = create((set, get) => ({
   stock: [],
@@ -84,11 +85,7 @@ const useGameStore = create((set, get) => ({
 
   initializeGame: () => {
     const game = createGame();
-    set({
-      stock: game.stock,
-      tableau: game.tableau,
-      foundations: game.foundations,
-    });
+    set(game);
   },
 
   removeCardFromAll: (cardId) => {
@@ -103,22 +100,17 @@ const useGameStore = create((set, get) => ({
     }));
   },
 
+  /* -------- FOUNDATION LOGIC -------- */
+
   canPlaceOnFoundation: (card, index) => {
-    const foundationPile = get().foundations[index];
-    const topCard = foundationPile[foundationPile.length - 1];
-    const requiredSuit = foundationSuits[index];
+    const pile = get().foundations[index];
+    const topCard = pile[pile.length - 1];
+    const requiredSuit = suits[index];
 
-    // ❗ Must match the foundation's suit ALWAYS
-    if (card.suit !== requiredSuit) {
-      return false;
-    }
+    if (card.suit !== requiredSuit) return false;
 
-    // First card must be Ace of that suit
-    if (!topCard) {
-      return card.rank === "A";
-    }
+    if (!topCard) return card.rank === "A";
 
-    // Must be next rank in same suit
     return rankValue(card.rank) === rankValue(topCard.rank) + 1;
   },
 
@@ -137,7 +129,32 @@ const useGameStore = create((set, get) => ({
     });
   },
 
+  /* -------- TABLEAU LOGIC -------- */
+
+  canPlaceOnTableau: (card, index) => {
+    const pile = get().tableau[index];
+    const bottomCard = pile[pile.length - 1];
+
+    // Empty column → only King
+    if (!bottomCard) {
+      return card.rank === "K";
+    }
+
+    const isOppositeColor =
+      isRed(card.suit) !== isRed(bottomCard.suit);
+
+    const isOneLower =
+      rankValue(card.rank) === rankValue(bottomCard.rank) - 1;
+
+    return isOppositeColor && isOneLower;
+  },
+
   moveToTableau: (card, index) => {
+    if (!get().canPlaceOnTableau(card, index)) {
+      console.log("Invalid tableau move", card);
+      return;
+    }
+
     get().removeCardFromAll(card.id);
 
     set((state) => {
@@ -147,6 +164,8 @@ const useGameStore = create((set, get) => ({
     });
   },
 
+  /* -------- STOCK -------- */
+
   moveToStock: (card) => {
     get().removeCardFromAll(card.id);
 
@@ -154,11 +173,9 @@ const useGameStore = create((set, get) => ({
       stock: [...state.stock, card],
     }));
   },
-
 }));
 
-
-/* -------------------- UI COMPONENTS -------------------- */
+/* -------------------- UI -------------------- */
 
 function Card({ card }) {
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -173,24 +190,20 @@ function Card({ card }) {
     <div
       ref={drag}
       style={{
-        opacity: isDragging ? "0.5" : "1",
+        opacity: isDragging ? 0.5 : 1,
         cursor: "grab",
         border: "1px solid black",
         borderRadius: "6px",
         padding: "8px",
         backgroundColor: "white",
-        color: card.suit === "♥" || card.suit === "♦" ? "red" : "black",
+        color: isRed(card.suit) ? "red" : "black",
         width: "60px",
         height: "80px",
-        textAlign: "center",
         margin: "4px",
-        fontSize: "18px",
-        fontWeight: "bold",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-        userSelect: "none",
+        fontWeight: "bold",
       }}
     >
       {card.rank}
@@ -202,15 +215,8 @@ function Card({ card }) {
 function DropZone({ cards, onDrop, canDropCard, title }) {
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-
-    canDrop: (item) => {
-      return canDropCard ? canDropCard(item.card) : true;
-    },
-
-    drop: (item) => {
-      onDrop(item.card);
-    },
-
+    canDrop: (item) => (canDropCard ? canDropCard(item.card) : true),
+    drop: (item) => onDrop(item.card),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop(),
@@ -220,7 +226,7 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       {title && (
-        <div style={{ color: "white", marginBottom: "6px", fontWeight: "bold" }}>
+        <div style={{ color: "white", marginBottom: 6 }}>
           {title}
         </div>
       )}
@@ -230,18 +236,10 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
         style={{
           minHeight: "100px",
           minWidth: "80px",
-          border: `2px dashed ${isOver ? (canDrop ? "#4caf50" : "red") : "#999"
-            }`,
-          borderRadius: "8px",
+          border: `2px dashed ${
+            isOver ? (canDrop ? "green" : "red") : "#999"
+          }`,
           padding: "6px",
-          backgroundColor: isOver
-            ? canDrop
-              ? "rgba(76,175,80,0.15)"
-              : "rgba(255,0,0,0.15)"
-            : "rgba(255,255,255,0.05)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
         }}
       >
         {cards.map((card) => (
@@ -264,6 +262,7 @@ export default function Page() {
     moveToTableau,
     moveToStock,
     canPlaceOnFoundation,
+    canPlaceOnTableau,
   } = useGameStore();
 
   useEffect(() => {
@@ -272,40 +271,38 @@ export default function Page() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div style={{ minHeight: "100vh", backgroundColor: "#00a2ff", padding: "20px" }}>
-        <h1 style={{ textAlign: "center", color: "white" }}>
-          Simple Drag & Drop Solitaire (Zustand)
-        </h1>
+      <div style={{ padding: 20, background: "#0b5", minHeight: "100vh" }}>
+        <h2 style={{ color: "white" }}>Foundations</h2>
 
-        <h2 style={{ textAlign: "center", color: "white" }}>Foundations</h2>
-        <div style={{ display: "flex", justifyContent: "center", gap: "16px" }}>
+        <div style={{ display: "flex", gap: 10 }}>
           {foundations.map((cards, i) => (
             <DropZone
               key={i}
               cards={cards}
-              title={`Foundation ${foundationSuits[i]}`}
+              title={`Foundation ${suits[i]}`}
               onDrop={(card) => moveToFoundation(card, i)}
               canDropCard={(card) => canPlaceOnFoundation(card, i)}
             />
           ))}
         </div>
 
-        <h2 style={{ textAlign: "center", color: "white" }}>Tableau</h2>
-        <div style={{ display: "flex", justifyContent: "center", gap: "16px" }}>
+        <h2 style={{ color: "white" }}>Tableau</h2>
+
+        <div style={{ display: "flex", gap: 10 }}>
           {tableau.map((cards, i) => (
             <DropZone
               key={i}
               cards={cards}
               title={`Column ${i + 1}`}
               onDrop={(card) => moveToTableau(card, i)}
+              canDropCard={(card) => canPlaceOnTableau(card, i)}
             />
           ))}
         </div>
 
-        <h2 style={{ textAlign: "center", color: "white" }}>Stock</h2>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <DropZone cards={stock} title="Stock" onDrop={moveToStock} />
-        </div>
+        <h2 style={{ color: "white" }}>Stock</h2>
+
+        <DropZone cards={stock} title="Stock" onDrop={moveToStock} />
       </div>
     </DndProvider>
   );
