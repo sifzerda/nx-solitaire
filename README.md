@@ -12,7 +12,8 @@ TO DO:
 - Add solitaire rules
 - Make a highscores page and db storage like minesweeper, recording user name/ref + time taken + number of moves
 
-
+- [x] foundation dnd order
+- [ ] 
 
 
 - create dnd game rules for foundation
@@ -27,7 +28,8 @@ TECH:
 - SPA App Router in Next.js
 - Auth using jose, JWT, bcrypt, AuthContext Provider wrapping Layout
 - Prisma Neon DB
-- Deployed over Vercel
+- Zustand for game state management
+- Vercel
 
 In Prisma 7 (updated) you now need an adapter, or Accelerate (which requires Prisma Accelerate setup)
 For a neon db (vercel):

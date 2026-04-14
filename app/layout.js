@@ -24,14 +24,12 @@ const unifraktur = UnifrakturCook({
 
 export const metadata = {
   title: "Solitaire",
-  description: "A game of Solitaire built with React Next",
+  description: "A game of Solitaire built with Next.js",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${unifraktur.variable} h-full antialiased`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${unifraktur.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
 
         <AuthProvider>
@@ -40,7 +38,6 @@ export default function RootLayout({ children }) {
           <Navigation />
 
           <main className="flex-grow">
-
 
             <UnderConstructionBanner />
 

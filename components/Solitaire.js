@@ -11,6 +11,7 @@ const ItemTypes = {
 
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const foundationSuits = ["♠", "♥", "♦", "♣"];
 
 /* -------------------- GAME HELPERS -------------------- */
 
@@ -103,37 +104,38 @@ const useGameStore = create((set, get) => ({
   },
 
   canPlaceOnFoundation: (card, index) => {
-  const foundationPile = get().foundations[index];
-  const topCard = foundationPile[foundationPile.length - 1];
+    const foundationPile = get().foundations[index];
+    const topCard = foundationPile[foundationPile.length - 1];
+    const requiredSuit = foundationSuits[index];
 
-  // First card must be Ace
-  if (!topCard) {
-    return card.rank === "A";
-  }
+    // ❗ Must match the foundation's suit ALWAYS
+    if (card.suit !== requiredSuit) {
+      return false;
+    }
 
-  // Must match suit
-  if (card.suit !== topCard.suit) {
-    return false;
-  }
+    // First card must be Ace of that suit
+    if (!topCard) {
+      return card.rank === "A";
+    }
 
-  // Must be next rank
-  return rankValue(card.rank) === rankValue(topCard.rank) + 1;
-},
+    // Must be next rank in same suit
+    return rankValue(card.rank) === rankValue(topCard.rank) + 1;
+  },
 
-moveToFoundation: (card, index) => {
-  if (!get().canPlaceOnFoundation(card, index)) {
-    console.log("Invalid foundation move", card);
-    return;
-  }
+  moveToFoundation: (card, index) => {
+    if (!get().canPlaceOnFoundation(card, index)) {
+      console.log("Invalid foundation move", card);
+      return;
+    }
 
-  get().removeCardFromAll(card.id);
+    get().removeCardFromAll(card.id);
 
-  set((state) => {
-    const next = [...state.foundations];
-    next[index] = [...next[index], card];
-    return { foundations: next };
-  });
-},
+    set((state) => {
+      const next = [...state.foundations];
+      next[index] = [...next[index], card];
+      return { foundations: next };
+    });
+  },
 
   moveToTableau: (card, index) => {
     get().removeCardFromAll(card.id);
@@ -281,9 +283,9 @@ export default function Page() {
             <DropZone
               key={i}
               cards={cards}
-              title={`Foundation ${i + 1}`}
+              title={`Foundation ${foundationSuits[i]}`}
               onDrop={(card) => moveToFoundation(card, i)}
-              canDropCard={(card) => canPlaceOnFoundation(card, i)} // 👈 HERE
+              canDropCard={(card) => canPlaceOnFoundation(card, i)}
             />
           ))}
         </div>
