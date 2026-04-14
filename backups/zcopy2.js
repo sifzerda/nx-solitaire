@@ -1,3 +1,5 @@
+// facedown are navy
+
 "use client";
 
 import { useEffect } from "react";
@@ -41,13 +43,7 @@ function createGame() {
 
   for (let col = 0; col < 7; col++) {
     for (let row = 0; row <= col; row++) {
-      const card = shuffled[currentIndex];
-
-      tableau[col].push({
-        ...card,
-        faceUp: row === col, // only top card face-up
-      });
-
+      tableau[col].push(shuffled[currentIndex]);
       currentIndex++;
     }
   }
@@ -159,10 +155,7 @@ const useGameStore = create((set, get) => ({
 
     set((state) => {
       const next = [...state.tableau];
-      next[index] = [
-        ...next[index],
-        { ...card, faceUp: true },
-      ];
+      next[index] = [...next[index], card];
       return { tableau: next };
     });
   },
@@ -269,17 +262,17 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
           padding: "6px",
         }}
       >
-        {cards.map((card, idx) => {
-          const isFaceUp = card.faceUp;
+        {(cards || []).map((card, idx) => {
+          const isTop = idx === cards.length - 1;
 
           return (
             <div
               key={card.id}
               style={{
-                marginTop: idx === 0 ? 0 : -60,
+                marginTop: idx === 0 ? 0 : -60, // makes stack overlap nicely
               }}
             >
-              {isFaceUp ? (
+              {isTop ? (
                 <Card card={card} />
               ) : (
                 <div

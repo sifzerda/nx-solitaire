@@ -3,7 +3,7 @@
 First, run the development server:
 
 ```bash
-npm run dev
+npm run start
 ```
 
 TO DO:
@@ -15,7 +15,6 @@ TO DO:
 - [x] foundation dnd order
 - [x] foundations have suits
 - [ ] 
-
 
 -  [x] create dnd game rules for foundation
 - create dnd rules for tableau
