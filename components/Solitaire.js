@@ -236,9 +236,8 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
         style={{
           minHeight: "100px",
           minWidth: "80px",
-          border: `2px dashed ${
-            isOver ? (canDrop ? "green" : "red") : "#999"
-          }`,
+          border: `2px dashed ${isOver ? (canDrop ? "green" : "red") : "#999"
+            }`,
           padding: "6px",
         }}
       >
@@ -302,7 +301,12 @@ export default function Page() {
 
         <h2 style={{ color: "white" }}>Stock</h2>
 
-        <DropZone cards={stock} title="Stock" onDrop={moveToStock} />
+        <DropZone
+          cards={stock}
+          title="Stock"
+          onDrop={moveToStock}
+          canDropCard={() => false} // 🚫 block all drops to stockpile
+        />
       </div>
     </DndProvider>
   );
