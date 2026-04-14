@@ -55,6 +55,25 @@ function createGame() {
   };
 }
 
+const rankValue = (rank) => {
+  const map = {
+    A: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 8,
+    9: 9,
+    10: 10,
+    J: 11,
+    Q: 12,
+    K: 13,
+  };
+  return map[rank];
+};
+
 /* -------------------- ZUSTAND STORE -------------------- */
 
 const useGameStore = create((set, get) => ({
@@ -83,7 +102,82 @@ const useGameStore = create((set, get) => ({
     }));
   },
 
+  canPlaceOnFoundation: (card, index) => {
+    const state = get();
+    const foundationPile = state.foundations[index];
+
+    const topCard = foundationPile[foundationPile.length - 1];
+
+    // Must start with Ace
+    if (!topCard) {
+      return card.rank === "A";
+    }
+
+    // Must match suit
+    if (card.suit !== topCard.suit) {
+      return false;
+    }
+
+    // Must be next rank in sequence
+    const rankValue = (rank) => {
+      const map = {
+        A: 1,
+        2: 2,
+        3: 3,
+        4: 4,
+        5: 5,
+        6: 6,
+        7: 7,
+        8: 8,
+        9: 9,
+        10: 10,
+        J: 11,
+        Q: 12,
+        K: 13,
+      };
+      return map[rank];
+    };
+
+    return rankValue(card.rank) === rankValue(topCard.rank) + 1;
+  },
+
   moveToFoundation: (card, index) => {
+    const state = get();
+    const foundationPile = state.foundations[index];
+
+    const topCard = foundationPile[foundationPile.length - 1];
+
+    // ❌ INVALID MOVE CASES
+    if (!topCard) {
+      if (card.rank !== "A") {
+        console.log("Invalid foundation move", {
+          card,
+          expected: "A required",
+        });
+        return;
+      }
+    } else {
+      if (card.suit !== topCard.suit) {
+        console.log("Invalid foundation move", {
+          card,
+          expected: `Same suit as ${topCard.suit}`,
+        });
+        return;
+      }
+
+      const expected = rankValue(topCard.rank) + 1;
+      const incoming = rankValue(card.rank);
+
+      if (incoming !== expected) {
+        console.log("Invalid foundation move", {
+          card,
+          expected: `${topCard.rank} → next (${expected})`,
+        });
+        return;
+      }
+    }
+
+    // ✅ VALID MOVE → remove + add
     get().removeCardFromAll(card.id);
 
     set((state) => {
@@ -110,7 +204,9 @@ const useGameStore = create((set, get) => ({
       stock: [...state.stock, card],
     }));
   },
+
 }));
+
 
 /* -------------------- UI COMPONENTS -------------------- */
 
@@ -153,12 +249,21 @@ function Card({ card }) {
   );
 }
 
-function DropZone({ cards, onDrop, title }) {
-  const [{ isOver }, drop] = useDrop(() => ({
+function DropZone({ cards, onDrop, canDropCard, title }) {
+  const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-    drop: (item) => onDrop(item.card),
+
+    canDrop: (item) => {
+      return canDropCard ? canDropCard(item.card) : true;
+    },
+
+    drop: (item) => {
+      onDrop(item.card);
+    },
+
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
+      canDrop: !!monitor.canDrop(),
     }),
   }));
 
@@ -175,11 +280,14 @@ function DropZone({ cards, onDrop, title }) {
         style={{
           minHeight: "100px",
           minWidth: "80px",
-          border: `2px dashed ${isOver ? "#4caf50" : "#999"}`,
+          border: `2px dashed ${isOver ? (canDrop ? "#4caf50" : "red") : "#999"
+            }`,
           borderRadius: "8px",
           padding: "6px",
           backgroundColor: isOver
-            ? "rgba(76,175,80,0.15)"
+            ? canDrop
+              ? "rgba(76,175,80,0.15)"
+              : "rgba(255,0,0,0.15)"
             : "rgba(255,255,255,0.05)",
           display: "flex",
           flexDirection: "column",
@@ -205,6 +313,7 @@ export default function Page() {
     moveToFoundation,
     moveToTableau,
     moveToStock,
+    canPlaceOnFoundation,
   } = useGameStore();
 
   useEffect(() => {
@@ -226,6 +335,7 @@ export default function Page() {
               cards={cards}
               title={`Foundation ${i + 1}`}
               onDrop={(card) => moveToFoundation(card, i)}
+              canDropCard={(card) => canPlaceOnFoundation(card, i)} // 👈 HERE
             />
           ))}
         </div>
