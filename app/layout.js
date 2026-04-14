@@ -4,9 +4,6 @@ import { AuthProvider } from "../lib/authContext";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-
-import ReduxProvider from "../redux/ReduxProvider";
-
 import UnderConstructionBanner from "../components/Construction";
 
 const geistSans = Geist({
@@ -47,9 +44,7 @@ export default function RootLayout({ children }) {
 
             <UnderConstructionBanner />
 
-            <ReduxProvider>
               {children}
-            </ReduxProvider>
 
           </main>
 
