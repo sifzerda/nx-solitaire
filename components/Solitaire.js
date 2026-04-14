@@ -103,89 +103,37 @@ const useGameStore = create((set, get) => ({
   },
 
   canPlaceOnFoundation: (card, index) => {
-    const state = get();
-    const foundationPile = state.foundations[index];
+  const foundationPile = get().foundations[index];
+  const topCard = foundationPile[foundationPile.length - 1];
 
-    const topCard = foundationPile[foundationPile.length - 1];
+  // First card must be Ace
+  if (!topCard) {
+    return card.rank === "A";
+  }
 
-    // Must start with Ace
-    if (!topCard) {
-      return card.rank === "A";
-    }
+  // Must match suit
+  if (card.suit !== topCard.suit) {
+    return false;
+  }
 
-    // Must match suit
-    if (card.suit !== topCard.suit) {
-      return false;
-    }
+  // Must be next rank
+  return rankValue(card.rank) === rankValue(topCard.rank) + 1;
+},
 
-    // Must be next rank in sequence
-    const rankValue = (rank) => {
-      const map = {
-        A: 1,
-        2: 2,
-        3: 3,
-        4: 4,
-        5: 5,
-        6: 6,
-        7: 7,
-        8: 8,
-        9: 9,
-        10: 10,
-        J: 11,
-        Q: 12,
-        K: 13,
-      };
-      return map[rank];
-    };
+moveToFoundation: (card, index) => {
+  if (!get().canPlaceOnFoundation(card, index)) {
+    console.log("Invalid foundation move", card);
+    return;
+  }
 
-    return rankValue(card.rank) === rankValue(topCard.rank) + 1;
-  },
+  get().removeCardFromAll(card.id);
 
-  moveToFoundation: (card, index) => {
-    const state = get();
-    const foundationPile = state.foundations[index];
-
-    const topCard = foundationPile[foundationPile.length - 1];
-
-    // ❌ INVALID MOVE CASES
-    if (!topCard) {
-      if (card.rank !== "A") {
-        console.log("Invalid foundation move", {
-          card,
-          expected: "A required",
-        });
-        return;
-      }
-    } else {
-      if (card.suit !== topCard.suit) {
-        console.log("Invalid foundation move", {
-          card,
-          expected: `Same suit as ${topCard.suit}`,
-        });
-        return;
-      }
-
-      const expected = rankValue(topCard.rank) + 1;
-      const incoming = rankValue(card.rank);
-
-      if (incoming !== expected) {
-        console.log("Invalid foundation move", {
-          card,
-          expected: `${topCard.rank} → next (${expected})`,
-        });
-        return;
-      }
-    }
-
-    // ✅ VALID MOVE → remove + add
-    get().removeCardFromAll(card.id);
-
-    set((state) => {
-      const next = [...state.foundations];
-      next[index] = [...next[index], card];
-      return { foundations: next };
-    });
-  },
+  set((state) => {
+    const next = [...state.foundations];
+    next[index] = [...next[index], card];
+    return { foundations: next };
+  });
+},
 
   moveToTableau: (card, index) => {
     get().removeCardFromAll(card.id);
