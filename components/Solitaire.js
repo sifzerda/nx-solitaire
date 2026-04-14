@@ -52,27 +52,26 @@ function createGame() {
     stock,
     tableau,
     foundations: [[], [], [], []],
+    trash: [], // 🆕 include in initial state
   };
 }
 
-const rankValue = (rank) => {
-  const map = {
-    A: 1,
-    2: 2,
-    3: 3,
-    4: 4,
-    5: 5,
-    6: 6,
-    7: 7,
-    8: 8,
-    9: 9,
-    10: 10,
-    J: 11,
-    Q: 12,
-    K: 13,
-  };
-  return map[rank];
-};
+const rankValue = (rank) =>
+({
+  A: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
+  8: 8,
+  9: 9,
+  10: 10,
+  J: 11,
+  Q: 12,
+  K: 13,
+}[rank]);
 
 const isRed = (suit) => suit === "♥" || suit === "♦";
 
@@ -82,11 +81,14 @@ const useGameStore = create((set, get) => ({
   stock: [],
   tableau: [],
   foundations: [],
+  trash: [], // 🆕
 
   initializeGame: () => {
     const game = createGame();
     set(game);
   },
+
+  /* -------- REMOVE FROM ALL PILES -------- */
 
   removeCardFromAll: (cardId) => {
     set((state) => ({
@@ -97,6 +99,7 @@ const useGameStore = create((set, get) => ({
       foundations: state.foundations.map((pile) =>
         pile.filter((c) => c.id !== cardId)
       ),
+      trash: state.trash.filter((c) => c.id !== cardId), // 🆕 keep consistent
     }));
   },
 
@@ -115,10 +118,7 @@ const useGameStore = create((set, get) => ({
   },
 
   moveToFoundation: (card, index) => {
-    if (!get().canPlaceOnFoundation(card, index)) {
-      console.log("Invalid foundation move", card);
-      return;
-    }
+    if (!get().canPlaceOnFoundation(card, index)) return;
 
     get().removeCardFromAll(card.id);
 
@@ -135,10 +135,7 @@ const useGameStore = create((set, get) => ({
     const pile = get().tableau[index];
     const bottomCard = pile[pile.length - 1];
 
-    // Empty column → only King
-    if (!bottomCard) {
-      return card.rank === "K";
-    }
+    if (!bottomCard) return card.rank === "K";
 
     const isOppositeColor =
       isRed(card.suit) !== isRed(bottomCard.suit);
@@ -150,10 +147,7 @@ const useGameStore = create((set, get) => ({
   },
 
   moveToTableau: (card, index) => {
-    if (!get().canPlaceOnTableau(card, index)) {
-      console.log("Invalid tableau move", card);
-      return;
-    }
+    if (!get().canPlaceOnTableau(card, index)) return;
 
     get().removeCardFromAll(card.id);
 
@@ -171,6 +165,16 @@ const useGameStore = create((set, get) => ({
 
     set((state) => ({
       stock: [...state.stock, card],
+    }));
+  },
+
+  /* -------- TRASH -------- */
+
+  trashCard: (card) => {
+    get().removeCardFromAll(card.id);
+
+    set((state) => ({
+      trash: [...state.trash, card], // 🆕 store instead of delete
     }));
   },
 }));
@@ -213,10 +217,16 @@ function Card({ card }) {
 }
 
 function DropZone({ cards, onDrop, canDropCard, title }) {
+  const isTrash = title?.includes("Trash");
+
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-    canDrop: (item) => (canDropCard ? canDropCard(item.card) : true),
+
+    canDrop: (item) =>
+      isTrash ? true : canDropCard ? canDropCard(item.card) : true,
+
     drop: (item) => onDrop(item.card),
+
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop(),
@@ -236,12 +246,19 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
         style={{
           minHeight: "100px",
           minWidth: "80px",
-          border: `2px dashed ${isOver ? (canDrop ? "green" : "red") : "#999"
+          border: `2px dashed ${isTrash ? "red" : isOver ? (canDrop ? "green" : "red") : "#999"
             }`,
+          backgroundColor: isTrash
+            ? "rgba(255,0,0,0.15)"
+            : isOver
+              ? canDrop
+                ? "rgba(0,255,0,0.15)"
+                : "rgba(255,0,0,0.15)"
+              : "transparent",
           padding: "6px",
         }}
       >
-        {cards.map((card) => (
+        {(cards || []).map((card) => (
           <Card key={card.id} card={card} />
         ))}
       </div>
@@ -256,12 +273,14 @@ export default function Page() {
     stock,
     tableau,
     foundations,
+    trash,
     initializeGame,
     moveToFoundation,
     moveToTableau,
     moveToStock,
     canPlaceOnFoundation,
     canPlaceOnTableau,
+    trashCard,
   } = useGameStore();
 
   useEffect(() => {
@@ -271,6 +290,7 @@ export default function Page() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={{ padding: 20, background: "#0b5", minHeight: "100vh" }}>
+
         <h2 style={{ color: "white" }}>Foundations</h2>
 
         <div style={{ display: "flex", gap: 10 }}>
@@ -284,6 +304,18 @@ export default function Page() {
             />
           ))}
         </div>
+
+        {/* 🗑️ TRASH MOVED HERE */}
+        <h2 style={{ color: "white", marginTop: 20 }}>
+          Trash (Debug)
+        </h2>
+
+        <DropZone
+          cards={trash}
+          title="🗑️ Trash"
+          onDrop={(card) => trashCard(card)}
+          canDropCard={() => true}
+        />
 
         <h2 style={{ color: "white" }}>Tableau</h2>
 
@@ -305,8 +337,9 @@ export default function Page() {
           cards={stock}
           title="Stock"
           onDrop={moveToStock}
-          canDropCard={() => false} // 🚫 block all drops to stockpile
+          canDropCard={() => false}
         />
+
       </div>
     </DndProvider>
   );
