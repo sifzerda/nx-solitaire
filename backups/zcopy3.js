@@ -1,4 +1,4 @@
-// stockpile works properly, is a stack, cycles/ obeys rules
+// stockpile facedown, non draggable
 
 "use client";
 
@@ -227,9 +227,12 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
+
     canDrop: (item) =>
       isTrash ? true : canDropCard ? canDropCard(item.card) : true,
+
     drop: (item) => onDrop(item.card),
+
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop(),
@@ -314,9 +317,6 @@ export default function Page() {
     initializeGame();
   }, [initializeGame]);
 
-  const topStockCard = stock[stock.length - 1];
-  const remainingStockCount = stock.length;
-
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={{ padding: 20, background: "#0b5", minHeight: "100vh" }}>
@@ -361,46 +361,14 @@ export default function Page() {
         </div>
 
         <h2 style={{ color: "white" }}>Stock</h2>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
 
-          {/* 🔵 STOCK PILE (face-down stack) */}
+        <DropZone
+          cards={stock}
+          title="Stock"
+          onDrop={moveToStock}
+          canDropCard={() => false}
+        />
 
-          <div
-            onClick={() => { }}
-
-            style={{
-              width: "80px",
-              height: "100px",
-              borderRadius: "6px",
-              backgroundColor: "#001f3f", // navy pile
-              border: "2px solid black",
-              cursor: "pointer",
-              position: "relative",
-            }}
-          >
-            {/* small indicator of how many cards remain */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: 4,
-                right: 6,
-                color: "white",
-                fontSize: "12px",
-              }}>
-              {remainingStockCount}
-            </div>
-          </div>
-
-          {/* 🟢 TOP STOCK CARD (FACE UP) */}
-          {topStockCard && (
-          <DropZone
-            cards={[{ ...topStockCard, faceUp: true }]}
-            title="Top Card"
-            onDrop={() => { }}
-            canDropCard={() => false}
-          />
-          )}
-        </div>
       </div>
     </DndProvider>
   );
