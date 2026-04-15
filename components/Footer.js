@@ -20,7 +20,7 @@ export default function Footer() {
                 <a href="https://github.com/sifzerda/nx-solitaire"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mb-2 hover:text-gray-400 transition"
+                    className="mb-2 text-white hover:text-blue-400 transition"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -32,7 +32,7 @@ export default function Footer() {
                 </a>
 
                 {/* Year */}
-                <p className="text-sm text-gray-400">sifzerda 2026</p>
+                <p className="text-sm text-white">sifzerda 2026</p>
 
                 {/* Bottom blue line */}
             </div>
