@@ -1,4 +1,5 @@
 // stockpile works properly, is a stack, cycles/ obeys rules
+// revealed cards on tableau auto-flip faceup
 
 "use client";
 
@@ -159,7 +160,14 @@ const useGameStore = create((set, get) => ({
     });
 
     // 🔥 AFTER state update, flip newly exposed cards
+    const tableau = get().tableau;
 
+    tableau.forEach((pile, i) => {
+      const top = pile[pile.length - 1];
+      if (top && !top.faceUp) {
+        get().flipTopTableauCard(i);
+      }
+    });
   },
 
   /* -------- FOUNDATION LOGIC -------- */
@@ -338,7 +346,7 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
                     backgroundColor: "navy",
                     border: "1px solid black",
                     margin: "4px",
-                    cursor: isTop && !card.faceUp ? "pointer" : "default",
+                    cursor: isTop ? "pointer" : "default",
                   }}
                 />
               )}

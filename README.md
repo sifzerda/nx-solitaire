@@ -9,7 +9,6 @@ npm run start
 TO DO:
 
 - Move Styling into another file, e.g. globals
-- Add solitaire rules
 - Make a highscores page and db storage like minesweeper, recording user name/ref + time taken + number of moves
 
 - [x] foundation dnd order
@@ -17,11 +16,9 @@ TO DO:
 - [x] dnd rules for stockpile
 - [x] stockpile cycles
 - [x] create dnd game rules for foundation
-
-- create dnd rules for tableau
-- front and back/flip cards
+- [x] create dnd rules for tableau
+- [x] front and back/flip cards
 - [x] cards are stacked in pile
-
 - [x] Memoized game
 
 - [ ] change inline styling to tailwind classes
