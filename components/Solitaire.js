@@ -1,4 +1,4 @@
-// stockpile works properly, is a stack, cycles/ obeys rules
+// components/Solitaire.js
 
 "use client";
 
@@ -132,9 +132,7 @@ const useGameStore = create((set, get) => ({
           faceUp: true,
         };
       }
-
       next[colIndex] = pile;
-
       return { tableau: next };
     });
   },
@@ -157,8 +155,6 @@ const useGameStore = create((set, get) => ({
         trash: state.trash.filter((c) => c.id !== cardId),
       };
     });
-
-    // 🔥 AFTER state update, flip newly exposed cards
 
   },
 
@@ -248,25 +244,12 @@ function Card({ card }) {
   }));
 
   return (
-    <div
-      ref={drag}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: "grab",
-        border: "1px solid black",
-        borderRadius: "6px",
-        padding: "8px",
-        backgroundColor: "white",
-        color: isRed(card.suit) ? "red" : "black",
-        width: "60px",
-        height: "80px",
-        margin: "4px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: "bold",
-      }}
-    >
+    <div ref={drag}
+      className={`w-[60px] h-[80px] m-1 flex items-center justify-center
+      rounded-md border border-black bg-white font-bold cursor-grab
+      ${isDragging ? "opacity-50" : "opacity-100"}
+      ${isRed(card.suit) ? "text-red-500" : "text-black"}
+    `}>
       {card.rank}
       {card.suit}
     </div>
@@ -288,58 +271,47 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
   }));
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div className="flex flex-col items-center">
       {title && (
-        <div style={{ color: "white", marginBottom: 6 }}>
+        <div className="text-white mb-1.5">
           {title}
         </div>
       )}
 
-      <div
-        ref={drop}
-        style={{
-          minHeight: "100px",
-          minWidth: "80px",
-          border: `2px dashed ${isTrash ? "red" : isOver ? (canDrop ? "green" : "red") : "#999"
-            }`,
-          backgroundColor: isTrash
-            ? "rgba(255,0,0,0.15)"
+      <div ref={drop}
+        className={`min-h-[100px] min-w-[80px] p-1.5 border-2 border-dashed
+        ${isTrash
+            ? "border-red-500 bg-red-500/15"
             : isOver
               ? canDrop
-                ? "rgba(0,255,0,0.15)"
-                : "rgba(255,0,0,0.15)"
-              : "transparent",
-          padding: "6px",
-        }}
+                ? "border-green-500 bg-green-500/15"
+                : "border-red-500 bg-red-500/15"
+              : "border-gray-400"
+          }
+      `}
       >
         {cards.map((card, idx) => {
           const isFaceUp = card.faceUp;
           const isTop = idx === cards.length - 1;
+
           return (
-            <div
-              key={card.id}
-              style={{
-                marginTop: idx === 0 ? 0 : -60,
-              }}
-            >
+            <div key={card.id} className={idx === 0 ? "" : "-mt-[60px]"}>
               {isFaceUp ? (
                 <Card card={card} />
               ) : (
-                <div
-                  onClick={() => {
+                <div onClick={() => {
                     if (isTop && !card.faceUp) {
-                      useGameStore.getState().flipTopTableauCard(columnIndex);
+                      useGameStore
+                        .getState()
+                        .flipTopTableauCard(columnIndex);
                     }
                   }}
-                  style={{
-                    width: "60px",
-                    height: "80px",
-                    borderRadius: "6px",
-                    backgroundColor: "navy",
-                    border: "1px solid black",
-                    margin: "4px",
-                    cursor: isTop && !card.faceUp ? "pointer" : "default",
-                  }}
+                  className={`w-[60px] h-[80px] m-1 rounded-md border border-black bg-blue-900
+                  ${isTop && !card.faceUp
+                      ? "cursor-pointer"
+                      : "cursor-default"
+                    }
+                `}
                 />
               )}
             </div>
@@ -362,7 +334,6 @@ export default function Page() {
     initializeGame,
     moveToFoundation,
     moveToTableau,
-    moveToStock,
     canPlaceOnFoundation,
     canPlaceOnTableau,
   } = useGameStore();
@@ -382,10 +353,12 @@ export default function Page() {
 
   return (
     <DndProvider backend={backend}>
-      <div style={{ padding: 20, background: "#0b5", minHeight: "100vh" }}>
-        <h2 style={{ color: "white" }}>Foundations</h2>
+      <div className="p-5 bg-green-700 min-h-screen">
+        <h2 className="text-white text-xl font-semibold mb-2">
+          Foundations
+        </h2>
 
-        <div style={{ display: "flex", gap: 10 }}>
+        <div className="flex gap-2.5">
           {foundations.map((cards, i) => (
             <DropZone
               key={i}
@@ -399,7 +372,7 @@ export default function Page() {
         </div>
 
         {/* 🗑️ TRASH MOVED HERE */}
-        <h2 style={{ color: "white", marginTop: 20 }}>
+        <h2 className="text-white mt-5">
           Trash (Debug)
         </h2>
 
@@ -410,9 +383,9 @@ export default function Page() {
           canDropCard={() => true}
         />
 
-        <h2 style={{ color: "white" }}>Tableau</h2>
+        <h2 className="text-white">Tableau</h2>
 
-        <div style={{ display: "flex", gap: 10 }}>
+        <div className="flex gap-2.5">
           {tableau.map((cards, i) => (
             <DropZone
               key={i}
@@ -425,32 +398,15 @@ export default function Page() {
           ))}
         </div>
 
-        <h2 style={{ color: "white" }}>Stock</h2>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <h2 className="text-white">Stock</h2>
+        <div className="flex gap-3 items-center">
 
           {/* 🔵 STOCK PILE (face-down stack) */}
-
-          <div onClick={() => nextStockCard()}
-
-            style={{
-              width: "80px",
-              height: "100px",
-              borderRadius: "6px",
-              backgroundColor: "#001f3f", // navy pile
-              border: "2px solid black",
-              cursor: "pointer",
-              position: "relative",
-            }}
-          >
+          <div onClick={() => nextStockCard()} 
+          className="w-[80px] h-[100px] rounded-md bg-[#001f3f] border-2 border-black cursor-pointer relative">
+            
             {/* small indicator of how many cards remain */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: 4,
-                right: 6,
-                color: "white",
-                fontSize: "12px",
-              }}>
+            <div className="absolute bottom-1 right-1 text-white text-xs">
               {remainingStockCount}
             </div>
           </div>
@@ -465,20 +421,11 @@ export default function Page() {
             />
           )}
 
-          {/* 🔁 RESET BUTTON (PUT IT HERE) */}
+          {/* 🔁 RESET BUTTON */}
           {isAtEnd && (
             <button
               onClick={resetStockCycle}
-              style={{
-                marginLeft: 10,
-                padding: "8px 12px",
-                background: "gold",
-                border: "none",
-                borderRadius: 6,
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
+              className="ml-2 px-3 py-2 bg-yellow-400 rounded-md font-bold cursor-pointer hover:bg-yellow-300 transition">
               Reset Cycle
             </button>
           )}

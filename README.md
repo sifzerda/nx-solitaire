@@ -22,6 +22,7 @@ TO DO:
 - [x] Memoized game
 
 - [ ] change inline styling to tailwind classes
+- [ ] optimize memory and efficiency
 
 //////////////////////////////////////////////
 
