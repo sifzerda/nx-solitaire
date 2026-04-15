@@ -21,7 +21,7 @@ TO DO:
 - [x] cards are stacked in pile
 - [x] Memoized game
 
-- [ ] change inline styling to tailwind classes
+- [x] change inline styling to tailwind classes
 - [ ] optimize memory and efficiency
 
 //////////////////////////////////////////////
