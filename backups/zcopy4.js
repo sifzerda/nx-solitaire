@@ -1,3 +1,4 @@
+// like zcopy3 but stockpile cycles and loops
 // stockpile works properly, is a stack, cycles/ obeys rules
 
 "use client";
