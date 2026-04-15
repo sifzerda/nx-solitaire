@@ -33,19 +33,21 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
 
         <AuthProvider>
-          <Header />
 
-          <Navigation />
+            <Header />
 
-          <main className="flex-grow">
+            <Navigation />
 
-            <UnderConstructionBanner />
+            <main className="flex-grow">
+
+              <UnderConstructionBanner />
 
               {children}
 
-          </main>
+            </main>
 
-          <Footer />
+            <Footer />
+
         </AuthProvider>
 
       </body>
