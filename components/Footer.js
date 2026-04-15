@@ -3,7 +3,7 @@
 export default function Footer() {
     return (
         <footer className="w-full bg-black text-white">
-            <div className="flex flex-col items-center py-0">
+            <div className="flex flex-col items-center mb-2">
 
                 {/* Top gold line */}
                 <div className="w-full h-[2px] bg-yellow-500 mb-2"></div>
