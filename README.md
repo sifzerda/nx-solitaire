@@ -22,6 +22,8 @@ TO DO:
 - front and back/flip cards
 - [x] cards are stacked in pile
 
+- [ ] change inline styling to tailwind classes
+
 //////////////////////////////////////////////
 
 TECH:

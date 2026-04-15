@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { create } from "zustand";
@@ -329,9 +329,11 @@ export default function Page() {
     canPlaceOnTableau,
   } = useGameStore();
 
+  const backend = useMemo(() => HTML5Backend, []);
+
   useEffect(() => {
     initializeGame();
-  }, [initializeGame]);
+  }, []);
 
   const stockIndex = useGameStore((s) => s.stockIndex);
   const topStockCard = stock[stockIndex];
@@ -341,7 +343,7 @@ export default function Page() {
   const remainingStockCount = stock.length;
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={backend}>
       <div style={{ padding: 20, background: "#0b5", minHeight: "100vh" }}>
         <h2 style={{ color: "white" }}>Foundations</h2>
 
