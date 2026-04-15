@@ -58,7 +58,7 @@ function createGame() {
     stock,
     tableau,
     foundations: [[], [], [], []],
-    trash: [], // 🆕 include in initial state
+    trash: [], // debug feature
   };
 }
 
@@ -87,7 +87,7 @@ const useGameStore = create((set, get) => ({
   stock: [],
   tableau: [],
   foundations: [],
-  trash: [], // 🆕
+  trash: [], // debug feature
 
   initializeGame: () => {
     const game = createGame();
@@ -105,7 +105,7 @@ const useGameStore = create((set, get) => ({
       foundations: state.foundations.map((pile) =>
         pile.filter((c) => c.id !== cardId)
       ),
-      trash: state.trash.filter((c) => c.id !== cardId), // 🆕 keep consistent
+      trash: state.trash.filter((c) => c.id !== cardId), // debug feature
     }));
   },
 
@@ -117,9 +117,7 @@ const useGameStore = create((set, get) => ({
     const requiredSuit = suits[index];
 
     if (card.suit !== requiredSuit) return false;
-
     if (!topCard) return card.rank === "A";
-
     return rankValue(card.rank) === rankValue(topCard.rank) + 1;
   },
 
@@ -142,13 +140,10 @@ const useGameStore = create((set, get) => ({
     const bottomCard = pile[pile.length - 1];
 
     if (!bottomCard) return card.rank === "K";
-
     const isOppositeColor =
       isRed(card.suit) !== isRed(bottomCard.suit);
-
     const isOneLower =
       rankValue(card.rank) === rankValue(bottomCard.rank) - 1;
-
     return isOppositeColor && isOneLower;
   },
 
@@ -177,7 +172,7 @@ const useGameStore = create((set, get) => ({
     }));
   },
 
-  /* -------- TRASH -------- */
+  /* -------- TRASH (debug)-------- */
 
   trashCard: (card) => {
     get().removeCardFromAll(card.id);
@@ -241,8 +236,6 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
       canDrop: !!monitor.canDrop(),
     }),
   }));
-
-  const topCard = cards?.[cards.length - 1];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -308,14 +301,14 @@ export default function Page() {
     stock,
     tableau,
     foundations,
-    trash,
+    trash, // debug
+    trashCard, // debug
     initializeGame,
     moveToFoundation,
     moveToTableau,
     moveToStock,
     canPlaceOnFoundation,
     canPlaceOnTableau,
-    trashCard,
   } = useGameStore();
 
   useEffect(() => {
@@ -325,7 +318,6 @@ export default function Page() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={{ padding: 20, background: "#0b5", minHeight: "100vh" }}>
-
         <h2 style={{ color: "white" }}>Foundations</h2>
 
         <div style={{ display: "flex", gap: 10 }}>
