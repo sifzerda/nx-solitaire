@@ -22,6 +22,8 @@ TO DO:
 - front and back/flip cards
 - [x] cards are stacked in pile
 
+- [ ] Memoized game
+
 - [ ] change inline styling to tailwind classes
 
 //////////////////////////////////////////////
@@ -32,6 +34,8 @@ TECH:
 - Auth using jose, JWT, bcrypt, AuthContext Provider wrapping Layout
 - Prisma Neon DB
 - Zustand for game state management
+- useMemo to avoid memory leaks
+- react-draggable
 - Vercel
 
 In Prisma 7 (updated) you now need an adapter, or Accelerate (which requires Prisma Accelerate setup)
