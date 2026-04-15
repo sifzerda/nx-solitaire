@@ -115,19 +115,58 @@ const useGameStore = create((set, get) => ({
     }));
   },
 
+  // enable flipping of top card on a tableau column
+
+  flipTopTableauCard: (colIndex) => {
+    set((state) => {
+      const next = [...state.tableau];
+      const pile = [...next[colIndex]];
+
+      if (pile.length === 0) return state;
+
+      const topIndex = pile.length - 1;
+
+      if (!pile[topIndex].faceUp) {
+        pile[topIndex] = {
+          ...pile[topIndex],
+          faceUp: true,
+        };
+      }
+
+      next[colIndex] = pile;
+
+      return { tableau: next };
+    });
+  },
+
   /* -------- REMOVE FROM ALL PILES -------- */
 
   removeCardFromAll: (cardId) => {
-    set((state) => ({
-      stock: state.stock.filter((c) => c.id !== cardId),
-      tableau: state.tableau.map((pile) =>
-        pile.filter((c) => c.id !== cardId)
-      ),
-      foundations: state.foundations.map((pile) =>
-        pile.filter((c) => c.id !== cardId)
-      ),
-      trash: state.trash.filter((c) => c.id !== cardId), // debug feature
-    }));
+    set((state) => {
+      const newTableau = state.tableau.map((pile) => {
+        const filtered = pile.filter((c) => c.id !== cardId);
+        return filtered;
+      });
+
+      return {
+        stock: state.stock.filter((c) => c.id !== cardId),
+        tableau: newTableau,
+        foundations: state.foundations.map((pile) =>
+          pile.filter((c) => c.id !== cardId)
+        ),
+        trash: state.trash.filter((c) => c.id !== cardId),
+      };
+    });
+
+    // 🔥 AFTER state update, flip newly exposed cards
+    const tableau = get().tableau;
+
+    tableau.forEach((pile, i) => {
+      const top = pile[pile.length - 1];
+      if (top && !top.faceUp) {
+        get().flipTopTableauCard(i);
+      }
+    });
   },
 
   /* -------- FOUNDATION LOGIC -------- */
@@ -241,7 +280,7 @@ function Card({ card }) {
   );
 }
 
-function DropZone({ cards, onDrop, canDropCard, title }) {
+function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
   const isTrash = title?.includes("Trash");
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
@@ -282,7 +321,7 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
       >
         {cards.map((card, idx) => {
           const isFaceUp = card.faceUp;
-
+          const isTop = idx === cards.length - 1;
           return (
             <div
               key={card.id}
@@ -294,6 +333,11 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
                 <Card card={card} />
               ) : (
                 <div
+                  onClick={() => {
+                    if (isTop && !card.faceUp) {
+                      useGameStore.getState().flipTopTableauCard(columnIndex);
+                    }
+                  }}
                   style={{
                     width: "60px",
                     height: "80px",
@@ -301,6 +345,7 @@ function DropZone({ cards, onDrop, canDropCard, title }) {
                     backgroundColor: "navy",
                     border: "1px solid black",
                     margin: "4px",
+                    cursor: isTop ? "pointer" : "default",
                   }}
                 />
               )}
@@ -352,6 +397,7 @@ export default function Page() {
             <DropZone
               key={i}
               cards={cards}
+              columnIndex={i}
               title={`Foundation ${suits[i]}`}
               onDrop={(card) => moveToFoundation(card, i)}
               canDropCard={(card) => canPlaceOnFoundation(card, i)}
@@ -378,6 +424,7 @@ export default function Page() {
             <DropZone
               key={i}
               cards={cards}
+              columnIndex={i}
               title={`Column ${i + 1}`}
               onDrop={(card) => moveToTableau(card, i)}
               canDropCard={(card) => canPlaceOnTableau(card, i)}
