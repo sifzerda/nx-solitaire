@@ -14,12 +14,13 @@ TO DO:
 
 - [x] foundation dnd order
 - [x] foundations have suits
-- [ ] 
+- [x] dnd rules for stockpile
+- [x] stockpile cycles
+- [x] create dnd game rules for foundation
 
--  [x] create dnd game rules for foundation
 - create dnd rules for tableau
 - front and back/flip cards
-- cards are stacked in pile
+- [x] cards are stacked in pile
 
 //////////////////////////////////////////////
 
