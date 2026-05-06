@@ -3,8 +3,8 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { DndProvider, useDrag, useDrop, useDragLayer } from "react-dnd";
+import { HTML5Backend, getEmptyImage } from "react-dnd-html5-backend";
 import { create } from "zustand";
 
 const ItemTypes = {
@@ -273,7 +273,7 @@ const useGameStore = create((set, get) => ({
 /* -------------------- UI -------------------- */
 
 function Card({ card, columnIndex, cardIndex }) {
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: ItemTypes.CARD,
     canDrag: () => {
       if (columnIndex === undefined) return true;
@@ -309,11 +309,15 @@ function Card({ card, columnIndex, cardIndex }) {
     }),
   }));
 
+  useEffect(() => {
+  preview(getEmptyImage(), { captureDraggingState: true });
+}, [preview]);
+
   return (
     <div ref={drag}
       className={`w-15 h-20 flex items-center justify-center 
       rounded-md border border-black bg-white font-bold cursor-grab
-      ${isDragging ? "opacity-50" : "opacity-100"} 
+     ${isDragging ? "opacity-0" : "opacity-100"}
       ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
       {card.rank}
       {card.suit}
@@ -390,6 +394,44 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
   );
 }
 
+/* -------------------- UI for dragging card stack -------------------- */
+
+function CustomDragLayer() {
+  const { item, isDragging, currentOffset } = useDragLayer((monitor) => ({
+    item: monitor.getItem(),
+    isDragging: monitor.isDragging(),
+    currentOffset: monitor.getSourceClientOffset(),
+  }));
+
+  if (!isDragging || !item?.cards) return null;
+
+  return (
+    <div className="fixed top-0 left-0 pointer-events-none z-50">
+      <div
+        style={{
+          transform: `translate(${currentOffset?.x || 0}px, ${currentOffset?.y || 0}px)`
+        }}
+      >
+        {item.cards.map((card, idx) => (
+          <div
+            key={card.id}
+            style={{
+              marginTop: idx === 0 ? 0 : -50,
+              position: "relative",
+              zIndex: idx,
+            }}
+            className={`w-15 h-20 flex items-center justify-center 
+              rounded-md border border-black bg-white font-bold
+              ${isRed(card.suit) ? "text-red-500" : "text-black"}`}
+          >
+            {card.rank}{card.suit}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* -------------------- PAGE -------------------- */
 
 export default function Page() {
@@ -421,6 +463,8 @@ export default function Page() {
 
   return (
     <DndProvider backend={backend}>
+      <CustomDragLayer />
+
       <div className="p-5 bg-green-700 min-h-screen">
         <h2 className="text-white text-xl font-semibold mb-2">
           Foundations
