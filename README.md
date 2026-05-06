@@ -26,6 +26,14 @@ TO DO:
 
 - [x] enable dragging tableau stacks
 
+- [ ] change card appearance to enable display stacked for card stack dnd
+- [ ] remove trash debug dropzone
+
+- [ ] remove 'column...', 'waste', 'tableau'
+- [ ] move foundation icon into box
+- [ ] restart/redraw game
+- [ ] win screen, move count, time taken.
+
 //////////////////////////////////////////////
 
 TECH:

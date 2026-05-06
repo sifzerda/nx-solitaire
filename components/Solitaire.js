@@ -117,9 +117,7 @@ const useGameStore = create((set, get) => ({
   nextStockCard: () => {
     set((state) => {
       if (state.stock.length === 0) return state;
-
       const nextIndex = state.stockIndex - 1;
-
       return {
         stockIndex: nextIndex >= 0 ? nextIndex : 0,
       };
@@ -314,8 +312,7 @@ function Card({ card, columnIndex, cardIndex }) {
   }, [preview]);
 
   return (
-    <div ref={drag}
-      className={`w-15 h-20 flex items-center justify-center 
+    <div ref={drag} className={`w-15 h-20 flex items-center justify-center 
       rounded-md border border-black bg-white font-bold cursor-grab
      ${isDragging ? "opacity-0" : "opacity-100"}
       ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
@@ -346,12 +343,9 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
 
   return (
     <div className="flex flex-col items-center">
-      {title && (
-        <div className="text-white mb-1.5">{title}</div>
-      )}
+      {title && ( <div className="text-white mb-1.5">{title}</div> )}
 
-      <div ref={drop}
-        className={`min-h-25 min-w-20 p-1.5 border-2 border-dashed
+      <div ref={drop} className={`min-h-25 min-w-20 p-1.5 border-2 border-dashed
         ${isTrash
             ? "border-red-500 bg-red-500/15"
             : isOver
@@ -405,9 +399,7 @@ function CustomDragLayer() {
     if (!item?.cards) return null;
 
     return item.cards.map((card, idx) => (
-      <div
-        key={card.id}
-        style={{ marginTop: idx === 0 ? 0 : -50, position: "relative", zIndex: idx, }}
+      <div key={card.id} style={{ marginTop: idx === 0 ? 0 : -50, position: "relative", zIndex: idx, }}
         className={`w-15 h-20 flex items-center justify-center 
           rounded-md border border-black bg-white font-bold
           ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
@@ -496,8 +488,7 @@ export default function Page() {
 
             {/* Reset */}
             {isAtEnd && (
-              <button
-                onClick={resetStockCycle}
+              <button onClick={resetStockCycle}
                 className="px-3 py-2 bg-yellow-400 rounded-md font-bold hover:bg-yellow-300 transition">
                 Reset
               </button>
