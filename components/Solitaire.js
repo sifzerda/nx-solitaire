@@ -403,6 +403,26 @@ function CustomDragLayer() {
     currentOffset: monitor.getSourceClientOffset(),
   }));
 
+  const renderedStack = useMemo(() => {
+    if (!item?.cards) return null;
+
+    return item.cards.map((card, idx) => (
+      <div
+        key={card.id}
+        style={{
+          marginTop: idx === 0 ? 0 : -50,
+          position: "relative",
+          zIndex: idx,
+        }}
+        className={`w-15 h-20 flex items-center justify-center 
+          rounded-md border border-black bg-white font-bold
+          ${isRed(card.suit) ? "text-red-500" : "text-black"}`}
+      >
+        {card.rank}{card.suit}
+      </div>
+    ));
+  }, [item]);
+
   if (!isDragging || !item?.cards) return null;
 
   return (
@@ -412,21 +432,7 @@ function CustomDragLayer() {
           transform: `translate(${currentOffset?.x || 0}px, ${currentOffset?.y || 0}px)`
         }}
       >
-        {item.cards.map((card, idx) => (
-          <div
-            key={card.id}
-            style={{
-              marginTop: idx === 0 ? 0 : -50,
-              position: "relative",
-              zIndex: idx,
-            }}
-            className={`w-15 h-20 flex items-center justify-center 
-              rounded-md border border-black bg-white font-bold
-              ${isRed(card.suit) ? "text-red-500" : "text-black"}`}
-          >
-            {card.rank}{card.suit}
-          </div>
-        ))}
+        {renderedStack}
       </div>
     </div>
   );
