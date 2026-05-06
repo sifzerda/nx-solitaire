@@ -4,7 +4,6 @@ import { AuthProvider } from "../lib/authContext";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import UnderConstructionBanner from "../components/Construction";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,13 +37,7 @@ export default function RootLayout({ children }) {
 
             <Navigation />
 
-            <main className="grow">
-
-              <UnderConstructionBanner />
-
-              {children}
-
-            </main>
+            <main className="grow">{children}</main>
 
             <Footer />
 
