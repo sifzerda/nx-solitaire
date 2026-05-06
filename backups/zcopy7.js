@@ -1,3 +1,4 @@
+// finished working game 
 // components/Solitaire.js
 
 "use client";
@@ -310,8 +311,8 @@ function Card({ card, columnIndex, cardIndex }) {
   }));
 
   useEffect(() => {
-    preview(getEmptyImage(), { captureDraggingState: true });
-  }, [preview]);
+  preview(getEmptyImage(), { captureDraggingState: true });
+}, [preview]);
 
   return (
     <div ref={drag}
@@ -347,7 +348,9 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
   return (
     <div className="flex flex-col items-center">
       {title && (
-        <div className="text-white mb-1.5">{title}</div>
+        <div className="text-white mb-1.5">
+          {title}
+        </div>
       )}
 
       <div ref={drop}
@@ -365,7 +368,7 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
           const isTop = idx === cards.length - 1;
 
           return (
-            <div key={card.id} style={{ marginTop: idx === 0 ? 0 : -60, zIndex: idx, position: "relative", }}>
+            <div key={card.id} style={{ marginTop: idx === 0 ? 0 : -50, zIndex: idx, position: "relative", }}>
               {isFaceUp ? (
                 <Card card={card} origin="tableau" columnIndex={columnIndex} cardIndex={idx} />
               ) : (
@@ -407,10 +410,15 @@ function CustomDragLayer() {
     return item.cards.map((card, idx) => (
       <div
         key={card.id}
-        style={{ marginTop: idx === 0 ? 0 : -50, position: "relative", zIndex: idx, }}
+        style={{
+          marginTop: idx === 0 ? 0 : -50,
+          position: "relative",
+          zIndex: idx,
+        }}
         className={`w-15 h-20 flex items-center justify-center 
           rounded-md border border-black bg-white font-bold
-          ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
+          ${isRed(card.suit) ? "text-red-500" : "text-black"}`}
+      >
         {card.rank}{card.suit}
       </div>
     ));
@@ -420,7 +428,11 @@ function CustomDragLayer() {
 
   return (
     <div className="fixed top-0 left-0 pointer-events-none z-50">
-      <div style={{ transform: `translate(${currentOffset?.x || 0}px, ${currentOffset?.y || 0}px)` }}>
+      <div
+        style={{
+          transform: `translate(${currentOffset?.x || 0}px, ${currentOffset?.y || 0}px)`
+        }}
+      >
         {renderedStack}
       </div>
     </div>
@@ -461,70 +473,27 @@ export default function Page() {
       <CustomDragLayer />
 
       <div className="p-5 bg-green-700 min-h-screen">
+        <h2 className="text-white text-xl font-semibold mb-2">
+          Foundations
+        </h2>
 
-        {/* TOP BAR: STOCK (LEFT) + FOUNDATIONS (RIGHT) */}
-        <div className="flex justify-between items-start mb-4">
-
-          {/* LEFT GROUP: STOCK + WASTE */}
-          <div className="flex items-start gap-3">
-
-            <div onClick={() => nextStockCard()}>
-              <div className="flex flex-col items-center">
-                <div className="text-white mb-1.5">Stockpile</div>
-                <div className="min-h-25 min-w-20 p-1.5 border-2 border-dashed border-gray-400 rounded-md relative cursor-pointer">
-                  <div className="w-15 h-20 rounded-md bg-blue-900 border-2 border-black relative">
-                    <div className="absolute bottom-1 right-1 text-white text-xs">
-                      {remainingStockCount}
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Waste (top stock card) */}
-            <div>
-              {topStockCard && (
-                <DropZone
-                  cards={[{ ...topStockCard, faceUp: true }]}
-                  title="Waste"
-                  onDrop={() => { }}
-                  canDropCard={() => false}
-                />
-              )}
-            </div>
-
-            {/* Reset */}
-            {isAtEnd && (
-              <button
-                onClick={resetStockCycle}
-                className="px-3 py-2 bg-yellow-400 rounded-md font-bold hover:bg-yellow-300 transition">
-                Reset
-              </button>
-            )}
-
-          </div>
-
-          {/* RIGHT GROUP: FOUNDATIONS */}
-          <div className="flex items-start">
-
-            {foundations.map((cards, i) => (
-              <DropZone
-                key={i}
-                cards={cards.length ? [cards[cards.length - 1]] : []}
-                columnIndex={i}
-                title={`Foundation ${suits[i]}`}
-                onDrop={(cards) => moveToFoundation(cards[0], i)}
-                canDropCard={(card) => canPlaceOnFoundation(card, i)}
-              />
-            ))}
-
-          </div>
-
+        <div className="flex gap-2.5">
+          {foundations.map((cards, i) => (
+            <DropZone
+              key={i}
+              cards={cards}
+              columnIndex={i}
+              title={`Foundation ${suits[i]}`}
+              onDrop={(cards) => moveToFoundation(cards[0], i)}
+              canDropCard={(card) => canPlaceOnFoundation(card, i)}
+            />
+          ))}
         </div>
 
         {/* TRASH MOVED HERE */}
-        <h2 className="text-white mt-5">Trash (Debug)</h2>
+        <h2 className="text-white mt-5">
+          Trash (Debug)
+        </h2>
 
         <DropZone
           cards={trash}
@@ -549,6 +518,39 @@ export default function Page() {
           ))}
         </div>
 
+        <h2 className="text-white">Stock</h2>
+        <div className="flex gap-3 items-center">
+
+          {/* STOCK PILE (face-down stack) */}
+          <div onClick={() => nextStockCard()}
+            className="w-20 h-25 rounded-md bg-blue-900 border-2 border-black cursor-pointer relative">
+
+            {/* small indicator of how many cards remain */}
+            <div className="absolute bottom-1 right-1 text-white text-xs">
+              {remainingStockCount}
+            </div>
+          </div>
+
+          {/* TOP STOCK CARD (FACE UP) */}
+          {topStockCard && (
+            <DropZone
+              cards={[{ ...topStockCard, faceUp: true }]}
+              title="Top Card"
+              onDrop={() => { }}
+              canDropCard={() => false}
+            />
+          )}
+
+          {/* RESET BUTTON */}
+          {isAtEnd && (
+            <button
+              onClick={resetStockCycle}
+              className="ml-2 px-3 py-2 bg-yellow-400 rounded-md font-bold cursor-pointer hover:bg-yellow-300 transition">
+              Reset Cycle
+            </button>
+          )}
+
+        </div>
       </div>
     </DndProvider>
   );

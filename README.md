@@ -24,7 +24,7 @@ TO DO:
 - [x] change inline styling to tailwind classes
 - [ ] optimize memory and efficiency
 
-- [ ] enable dragging tableau stacks
+- [x] enable dragging tableau stacks
 
 //////////////////////////////////////////////
 
