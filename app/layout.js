@@ -24,7 +24,7 @@ const unifraktur = UnifrakturCook({
 
 export const metadata = {
   title: "Solitaire",
-  description: "A game of Solitaire built with Next.js",
+  description: "A game of Solitaire built with Next.js and Zustand",
 };
 
 export default function RootLayout({ children }) {
@@ -38,7 +38,7 @@ export default function RootLayout({ children }) {
 
             <Navigation />
 
-            <main className="flex-grow">
+            <main className="grow">
 
               <UnderConstructionBanner />
 

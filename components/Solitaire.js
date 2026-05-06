@@ -58,7 +58,7 @@ function createGame() {
 
   return {
     stock,
-    stockIndex: 0, // stock cycle loop
+    stockIndex: 0, 
     tableau,
     foundations: [[], [], [], []],
     trash: [], // debug feature
@@ -245,7 +245,7 @@ function Card({ card }) {
 
   return (
     <div ref={drag}
-      className={`w-[60px] h-[80px] flex items-center justify-center 
+      className={`w-15 h-20 flex items-center justify-center 
       rounded-md border border-black bg-white font-bold cursor-grab
       ${isDragging ? "opacity-50" : "opacity-100"} 
       ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
@@ -278,7 +278,7 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
       )}
 
       <div ref={drop}
-        className={`min-h-[100px] min-w-[80px] p-1.5 border-2 border-dashed
+        className={`min-h-25 min-w-20 p-1.5 border-2 border-dashed
         ${isTrash
             ? "border-red-500 bg-red-500/15"
             : isOver
@@ -303,7 +303,7 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
                       .flipTopTableauCard(columnIndex);
                   }
                 }}
-                  className={`w-[60px] h-[80px] flex items-center justify-center rounded-md border border-black bg-blue-900 font-bold cursor-grab
+                  className={`w-15 h-20 flex items-center justify-center rounded-md border border-black bg-blue-900 font-bold cursor-grab
                   ${isTop && !card.faceUp
                       ? "cursor-pointer"
                       : "cursor-default"
@@ -400,7 +400,7 @@ export default function Page() {
 
           {/* STOCK PILE (face-down stack) */}
           <div onClick={() => nextStockCard()}
-            className="w-[80px] h-[100px] rounded-md bg-blue-900 border-2 border-black cursor-pointer relative">
+            className="w-20 h-25 rounded-md bg-blue-900 border-2 border-black cursor-pointer relative">
 
             {/* small indicator of how many cards remain */}
             <div className="absolute bottom-1 right-1 text-white text-xs">
