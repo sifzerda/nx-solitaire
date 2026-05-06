@@ -245,14 +245,13 @@ function Card({ card }) {
 
   return (
     <div ref={drag}
-      className={`w-[60px] h-[80px] m-1 flex items-center justify-center
+      className={`w-[60px] h-[80px] flex items-center justify-center 
       rounded-md border border-black bg-white font-bold cursor-grab
-      ${isDragging ? "opacity-50" : "opacity-100"}
-      ${isRed(card.suit) ? "text-red-500" : "text-black"}
-    `}>
+      ${isDragging ? "opacity-50" : "opacity-100"} 
+      ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
       {card.rank}
       {card.suit}
-    </div>
+    </div> // above is faceUp card display
   );
 }
 
@@ -286,27 +285,25 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
               ? canDrop
                 ? "border-green-500 bg-green-500/15"
                 : "border-red-500 bg-red-500/15"
-              : "border-gray-400"
-          }
-      `}
-      >
+              : "border-gray-400"    // this is dragging styling
+          }`}>
         {cards.map((card, idx) => {
           const isFaceUp = card.faceUp;
           const isTop = idx === cards.length - 1;
 
           return (
-            <div key={card.id} className={idx === 0 ? "" : "-mt-[60px]"}>
+            <div key={card.id} style={{ marginTop: idx === 0 ? 0 : -50, zIndex: idx, position: "relative", }}>
               {isFaceUp ? (
                 <Card card={card} />
               ) : (
                 <div onClick={() => {
-                    if (isTop && !card.faceUp) {
-                      useGameStore
-                        .getState()
-                        .flipTopTableauCard(columnIndex);
-                    }
-                  }}
-                  className={`w-[60px] h-[80px] m-1 rounded-md border border-black bg-blue-900
+                  if (isTop && !card.faceUp) {
+                    useGameStore
+                      .getState()
+                      .flipTopTableauCard(columnIndex);
+                  }
+                }}
+                  className={`w-[60px] h-[80px] flex items-center justify-center rounded-md border border-black bg-blue-900 font-bold cursor-grab
                   ${isTop && !card.faceUp
                       ? "cursor-pointer"
                       : "cursor-default"
@@ -371,7 +368,7 @@ export default function Page() {
           ))}
         </div>
 
-        {/* 🗑️ TRASH MOVED HERE */}
+        {/* TRASH MOVED HERE */}
         <h2 className="text-white mt-5">
           Trash (Debug)
         </h2>
@@ -401,17 +398,17 @@ export default function Page() {
         <h2 className="text-white">Stock</h2>
         <div className="flex gap-3 items-center">
 
-          {/* 🔵 STOCK PILE (face-down stack) */}
-          <div onClick={() => nextStockCard()} 
-          className="w-[80px] h-[100px] rounded-md bg-[#001f3f] border-2 border-black cursor-pointer relative">
-            
+          {/* STOCK PILE (face-down stack) */}
+          <div onClick={() => nextStockCard()}
+            className="w-[80px] h-[100px] rounded-md bg-blue-900 border-2 border-black cursor-pointer relative">
+
             {/* small indicator of how many cards remain */}
             <div className="absolute bottom-1 right-1 text-white text-xs">
               {remainingStockCount}
             </div>
           </div>
 
-          {/* 🟢 TOP STOCK CARD (FACE UP) */}
+          {/* TOP STOCK CARD (FACE UP) */}
           {topStockCard && (
             <DropZone
               cards={[{ ...topStockCard, faceUp: true }]}
@@ -421,7 +418,7 @@ export default function Page() {
             />
           )}
 
-          {/* 🔁 RESET BUTTON */}
+          {/* RESET BUTTON */}
           {isAtEnd && (
             <button
               onClick={resetStockCycle}
