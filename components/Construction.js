@@ -1,44 +1,17 @@
 // components/UnderConstructionBanner.js
-{/* ----------------------------------------------- */}
-
-const stripeStyle = {
-  flex: 1,
-  maxWidth: "150px",
-  height: "14px",
-  borderRadius: "4px",
-  background:
-    "repeating-linear-gradient(45deg, #facc15 0 10px, #000 10px 20px)",
-};
 
 export default function UnderConstructionBanner() {
   return (
-    <div
-      style={{
-        width: "100%",
-        background: "#111",
-        padding: "12px 16px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: "12px",
-      }}
-    >
-      <div style={stripeStyle} />
+    <div className="w-full bg-[#111] px-4 py-3 flex items-center justify-center gap-3">
+      
+      <div className="flex-1 max-w-[150px] h-[14px] rounded-[4px] bg-[repeating-linear-gradient(45deg,#facc15_0_10px,#000_10px_20px)]" />
 
-      <div
-        style={{
-          fontSize: "clamp(1rem, 3vw, 2.5rem)",
-          fontWeight: 900,
-          letterSpacing: "0.12em",
-          color: "#facc15",
-          textShadow: "2px 2px 0 #000",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <div className="text-[clamp(1rem,3vw,2.5rem)] font-black tracking-[0.12em] text-yellow-400 whitespace-nowrap [text-shadow:2px_2px_0_#000]">
         UNDER CONSTRUCTION
       </div>
 
-      <div style={stripeStyle} />
+      <div className="flex-1 max-w-[150px] h-[14px] rounded-[4px] bg-[repeating-linear-gradient(45deg,#facc15_0_10px,#000_10px_20px)]" />
+
     </div>
   );
 }

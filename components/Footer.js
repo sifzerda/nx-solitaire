@@ -14,25 +14,33 @@ export default function Footer() {
                 <div className="flex items-center gap-3 text-lg mb-1">
                     <span className="text-blue-400">♠</span>
                     <span className="text-red-500">♥</span>
+
+
+                    <span className="text-blue-400">
+
+                        {/* GitHub icon (simple inline SVG to avoid deps) */}
+                        <a
+                            href="https://github.com/sifzerda/nx-solitaire"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mb-2 text-white hover:text-blue-400 transition">
+                            <FaGithub className="w-4 h-4" />
+                        </a>
+                    </span>
+
                     <span className="text-blue-400">♣</span>
                     <span className="text-red-500">♦</span>
                 </div>
 
-                {/* GitHub icon (simple inline SVG to avoid deps) */}
-                <a
-                    href="https://github.com/sifzerda/nx-solitaire"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mb-2 text-white hover:text-blue-400 transition"
-                >
-                    <FaGithub className="w-6 h-6" />
-                </a>
-
                 {/* Year */}
-                <p className="text-sm text-white">sifzerda 2026</p>
+                <p className="text-md text-white font-[UnifrakturCook]">sifzerda 2026</p>
 
-                {/* Bottom blue line */}
             </div>
         </footer>
     );
 }
+
+
+
+
+
