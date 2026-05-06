@@ -32,7 +32,6 @@ TECH:
 - Auth using jose, JWT, bcrypt, AuthContext Provider wrapping Layout
 - Prisma Neon DB
 - Zustand for game state management
-- reduxjs
 - useMemo to avoid memory leaks
 - react-draggable
 - Vercel
