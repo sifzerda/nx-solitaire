@@ -58,7 +58,7 @@ function createGame() {
 
   return {
     stock,
-    stockIndex: 0, 
+    stockIndex: 0,
     tableau,
     foundations: [[], [], [], []],
     trash: [], // debug feature
@@ -83,6 +83,23 @@ const rankValue = (rank) =>
 }[rank]);
 
 const isRed = (suit) => suit === "♥" || suit === "♦";
+
+// validate stack drops
+function isValidStack(stack) {
+  for (let i = 0; i < stack.length - 1; i++) {
+    const current = stack[i];
+    const next = stack[i + 1];
+
+    const oppositeColor =
+      isRed(current.suit) !== isRed(next.suit);
+
+    const correctOrder =
+      rankValue(current.rank) === rankValue(next.rank) + 1;
+
+    if (!oppositeColor || !correctOrder) return false;
+  }
+  return true;
+}
 
 /* -------------------- STORE -------------------- */
 
@@ -196,19 +213,40 @@ const useGameStore = create((set, get) => ({
     return isOppositeColor && isOneLower;
   },
 
-  moveToTableau: (card, index) => {
-    if (!get().canPlaceOnTableau(card, index)) return;
+  moveStackToTableau: (cards, fromColumn, toColumn) => {
+    const firstCard = cards[0];
 
-    get().removeCardFromAll(card.id);
+    if (!get().canPlaceOnTableau(firstCard, toColumn)) return;
+
+    if (fromColumn === null || fromColumn === undefined) {
+      // remove from stock / elsewhere
+      cards.forEach(c => get().removeCardFromAll(c.id));
+    }
 
     set((state) => {
-      const next = [...state.tableau];
-      next[index] = [
-        ...next[index],
-        { ...card, faceUp: true },
+      const newTableau = [...state.tableau];
+
+      // ONLY remove if coming from tableau
+      if (fromColumn !== null && fromColumn !== undefined) {
+        newTableau[fromColumn] = newTableau[fromColumn].slice(
+          0,
+          newTableau[fromColumn].length - cards.length
+        );
+      }
+
+      // always add to destination
+      newTableau[toColumn] = [
+        ...newTableau[toColumn],
+        ...cards.map(c => ({ ...c, faceUp: true })),
       ];
-      return { tableau: next };
+
+      return { tableau: newTableau };
     });
+
+    // only flip if it came from tableau
+    if (fromColumn !== null && fromColumn !== undefined) {
+      get().flipTopTableauCard(fromColumn);
+    }
   },
 
   /* -------- STOCK -------- */
@@ -234,10 +272,38 @@ const useGameStore = create((set, get) => ({
 
 /* -------------------- UI -------------------- */
 
-function Card({ card }) {
+function Card({ card, columnIndex, cardIndex }) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.CARD,
-    item: { card },
+    canDrag: () => {
+      if (columnIndex === undefined) return true;
+      const state = useGameStore.getState();
+      const column = state.tableau[columnIndex];
+
+      if (!column) return false;
+
+      const rawStack = column.slice(cardIndex);
+      const stack = rawStack.filter(c => c.faceUp);
+
+      return isValidStack(stack);
+    },
+    item: () => {
+      if (columnIndex === undefined) {
+        return {
+          cards: [card],
+          fromColumn: null,
+        };
+      }
+      const state = useGameStore.getState();
+      const column = state.tableau[columnIndex];
+
+      const stack = column.slice(cardIndex).filter(c => c.faceUp);
+
+      return {
+        cards: stack,
+        fromColumn: columnIndex,
+      };
+    },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -260,9 +326,14 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-    canDrop: (item) =>
-      isTrash ? true : canDropCard ? canDropCard(item.card) : true,
-    drop: (item) => onDrop(item.card),
+    canDrop: (item) => {
+      if (isTrash) return true;
+      if (!canDropCard) return true;
+
+      const firstCard = item.cards[0];
+      return canDropCard(firstCard);
+    },
+    drop: (item) => onDrop(item.cards, item.fromColumn),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop(),
@@ -294,7 +365,7 @@ function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
           return (
             <div key={card.id} style={{ marginTop: idx === 0 ? 0 : -50, zIndex: idx, position: "relative", }}>
               {isFaceUp ? (
-                <Card card={card} />
+                <Card card={card} origin="tableau" columnIndex={columnIndex} cardIndex={idx} />
               ) : (
                 <div onClick={() => {
                   if (isTop && !card.faceUp) {
@@ -330,7 +401,7 @@ export default function Page() {
     trashCard, // debug
     initializeGame,
     moveToFoundation,
-    moveToTableau,
+    moveStackToTableau,
     canPlaceOnFoundation,
     canPlaceOnTableau,
   } = useGameStore();
@@ -362,7 +433,7 @@ export default function Page() {
               cards={cards}
               columnIndex={i}
               title={`Foundation ${suits[i]}`}
-              onDrop={(card) => moveToFoundation(card, i)}
+              onDrop={(cards) => moveToFoundation(cards[0], i)}
               canDropCard={(card) => canPlaceOnFoundation(card, i)}
             />
           ))}
@@ -376,7 +447,7 @@ export default function Page() {
         <DropZone
           cards={trash}
           title="🗑️ Trash"
-          onDrop={(card) => trashCard(card)}
+          onDrop={(cards) => trashCard(cards[0])}
           canDropCard={() => true}
         />
 
@@ -389,7 +460,8 @@ export default function Page() {
               cards={cards}
               columnIndex={i}
               title={`Column ${i + 1}`}
-              onDrop={(card) => moveToTableau(card, i)}
+              onDrop={(cards, fromColumn) =>
+                moveStackToTableau(cards, fromColumn, i)}
               canDropCard={(card) => canPlaceOnTableau(card, i)}
             />
           ))}
