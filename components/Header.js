@@ -24,13 +24,11 @@ export default function Header() {
     return (
         <div className="flex md:grid md:grid-cols-3 items-center py-2 px-4">
 
-        {/* LEFT — only exists on md+ to balance the grid */}
-        <div className="hidden md:block" />
+            {/* LEFT — only exists on md+ to balance the grid */}
+            <div className="hidden md:block" />
 
-        {/* TITLE — left on mobile, centered on md+ */}
-        <h1 className="text-2xl md:text-4xl md:text-center font-bold tracking-wide font-[UnifrakturCook] whitespace-nowrap">
-            solitaire
-        </h1>
+            {/* TITLE — left on mobile, centered on md+ */}
+            <h1 className="text-2xl md:text-4xl md:text-center font-bold tracking-wide font-[UnifrakturCook] whitespace-nowrap">solitaire</h1>
 
             {/* NAV — right-aligned in the third column */}
             <div className="ml-auto md:ml-0 flex items-center justify-end gap-3">
@@ -42,16 +40,13 @@ export default function Header() {
                             ? () => {
                                 logout();
                                 router.push("/");
-                              }
+                            }
                             : null;
 
                     return (
                         <div key={item.label}>
                             {handleLogout ? (
-                                <button
-                                    onClick={handleLogout}
-                                    className="px-3 py-1 text-sm border border-yellow-500 rounded-sm hover:text-yellow-400"
-                                >
+                                <button onClick={handleLogout} className="px-3 py-1 text-sm border border-yellow-500 rounded-sm hover:text-yellow-400">
                                     Logout
                                 </button>
                             ) : (
@@ -61,8 +56,7 @@ export default function Header() {
                                         ${isActive
                                             ? "border-red-500 text-red-500"
                                             : "border-yellow-500 text-white hover:text-yellow-400"
-                                        }`}
-                                >
+                                        }`}>
                                     {item.label}
                                 </Link>
                             )}
