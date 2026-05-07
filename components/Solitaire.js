@@ -5,7 +5,8 @@
 import { useEffect, useMemo, memo, useCallback } from "react";
 import { DndProvider, useDrag, useDrop, useDragLayer } from "react-dnd";
 import { HTML5Backend, getEmptyImage } from "react-dnd-html5-backend";
-import { create } from "zustand";
+
+import useGameStore from "./useGameStore"
 
 const ItemTypes = { CARD: "card" };
 
@@ -100,159 +101,7 @@ function isValidStack(stack) {
 
 /* -------------------- STORE -------------------- */
 
-const useGameStore = create((set, get) => ({
-  stock: [],
-  tableau: [],
-  foundations: [],
 
-  initializeGame: () => {
-    const game = createGame();
-    set({ ...game, stockIndex: game.stock.length - 1 }); // start at top
-  },
-
-  nextStockCard: () => {
-    set((state) => {
-      if (state.stock.length === 0) return state;
-      const nextIndex = state.stockIndex - 1;
-      return {
-        stockIndex: nextIndex >= 0 ? nextIndex : 0,
-      };
-    });
-  },
-
-  resetStockCycle: () => {
-    set((state) => ({
-      stockIndex: state.stock.length - 1,
-    }));
-  },
-
-  // enable flipping of top card on a tableau column
-
-  flipTopTableauCard: (colIndex) => {
-    set((state) => {
-      const next = [...state.tableau];
-      const pile = [...next[colIndex]];
-
-      if (pile.length === 0) return state;
-
-      const topIndex = pile.length - 1;
-
-      if (!pile[topIndex].faceUp) {
-        pile[topIndex] = {
-          ...pile[topIndex],
-          faceUp: true,
-        };
-      }
-      next[colIndex] = pile;
-      return { tableau: next };
-    });
-  },
-
-  /* -------- REMOVE FROM ALL PILES -------- */
-
-  removeCardFromAll: (cardId) => {
-    set((state) => {
-      const newTableau = state.tableau.map((pile) => {
-        const filtered = pile.filter((c) => c.id !== cardId);
-        return filtered;
-      });
-
-      return {
-        stock: state.stock.filter((c) => c.id !== cardId),
-        tableau: newTableau,
-        foundations: state.foundations.map((pile) =>
-          pile.filter((c) => c.id !== cardId)
-        ),
-      };
-    });
-
-  },
-
-  /* -------- FOUNDATION LOGIC -------- */
-
-  canPlaceOnFoundation: (card, index) => {
-    const pile = get().foundations[index];
-    const topCard = pile[pile.length - 1];
-    const requiredSuit = suits[index];
-
-    if (card.suit !== requiredSuit) return false;
-    if (!topCard) return card.rank === "A";
-    return rankValue(card.rank) === rankValue(topCard.rank) + 1;
-  },
-
-  moveToFoundation: (card, index) => {
-    if (!get().canPlaceOnFoundation(card, index)) return;
-
-    get().removeCardFromAll(card.id);
-
-    set((state) => {
-      const next = [...state.foundations];
-      next[index] = [...next[index], card];
-      return { foundations: next };
-    });
-  },
-
-  /* -------- TABLEAU LOGIC -------- */
-
-  canPlaceOnTableau: (card, index) => {
-    const pile = get().tableau[index];
-    const bottomCard = pile[pile.length - 1];
-
-    if (!bottomCard) return card.rank === "K";
-    const isOppositeColor =
-      isRed(card.suit) !== isRed(bottomCard.suit);
-    const isOneLower =
-      rankValue(card.rank) === rankValue(bottomCard.rank) - 1;
-    return isOppositeColor && isOneLower;
-  },
-
-  moveStackToTableau: (cards, fromColumn, toColumn) => {
-    const firstCard = cards[0];
-
-    if (!get().canPlaceOnTableau(firstCard, toColumn)) return;
-
-    if (fromColumn === null || fromColumn === undefined) {
-      // remove from stock / elsewhere
-      cards.forEach(c => get().removeCardFromAll(c.id));
-    }
-
-    set((state) => {
-      const newTableau = [...state.tableau];
-
-      // ONLY remove if coming from tableau
-      if (fromColumn !== null && fromColumn !== undefined) {
-        newTableau[fromColumn] = newTableau[fromColumn].slice(
-          0,
-          newTableau[fromColumn].length - cards.length
-        );
-      }
-
-      // always add to destination
-      newTableau[toColumn] = [
-        ...newTableau[toColumn],
-        ...cards.map(c => ({ ...c, faceUp: true })),
-      ];
-
-      return { tableau: newTableau };
-    });
-
-    // only flip if it came from tableau
-    if (fromColumn !== null && fromColumn !== undefined) {
-      get().flipTopTableauCard(fromColumn);
-    }
-  },
-
-  /* -------- STOCK -------- */
-
-  moveToStock: (card) => {
-    get().removeCardFromAll(card.id);
-
-    set((state) => ({
-      stock: [...state.stock, card],
-    }));
-  },
-
-}));
 
 /* -------------------- UI -------------------- */
 
@@ -479,7 +328,7 @@ export default function Page() {
   const backend = useMemo(() => HTML5Backend, []);
 
   useEffect(() => {
-    initializeGame();
+    initializeGame(createGame());
   }, []);
 
   const stockIndex = useGameStore((s) => s.stockIndex);
