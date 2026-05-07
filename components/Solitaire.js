@@ -511,7 +511,7 @@ export default function Page() {
 
             {/* STOCKPILE */}
             <div onClick={nextStockCard}
-              className="relative w-20 h-25 border-2 border-dashed bg-green-500 border-gray-400 rounded-md relative cursor-pointer flex items-center justify-center">
+              className="relative w-20 h-25 border-2 border-dashed bg-green-500 border-gray-400 rounded-md cursor-pointer flex items-center justify-center">
               <div className="w-15 h-20 rounded-md bg-blue-900 border-2 border-black relative">
                 <div className="absolute bottom-1 right-1 text-white text-xs">
                   {remainingStockCount}
