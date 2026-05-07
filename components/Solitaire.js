@@ -326,6 +326,7 @@ function DropZone({
   canDropCard,
   title,
   columnIndex,
+  suit,
 }) {
   const isTrash = title?.includes("Trash");
 
@@ -360,33 +361,29 @@ function DropZone({
 
       <div
         ref={drop}
-        className={`
-          w-20
-          rounded-md
-          border-2
-          border-dashed
-          relative
-          transition-colors
-
+        className={`w-20 rounded-md border-2 border-dashed bg-green-500 relative transition-colors
           ${isTrash
             ? "border-red-500 bg-red-500/15"
             : isOver
               ? canDrop
-                ? "border-green-500 bg-green-500/15"
+                ? "border-yellow-500 bg-yellow-500/15"
                 : "border-red-500 bg-red-500/15"
               : "border-gray-400"
           }
         `}
-        style={{
-          minHeight: `${pileHeight}px`,
-        }}
-      >
+        style={{ minHeight: `${pileHeight}px` }}>
+
+        {cards.length === 0 && suit && (
+          <div
+            className={`absolute inset-0 flex items-center justify-center text-3xl pointer-events-none 
+              ${suit === "♥" || suit === "♦" ? "text-red-500" : "text-blue-500"} opacity-90`}>
+            {suit}
+          </div>
+        )}
 
         {cards.map((card, idx) => {
           const isFaceUp = card.faceUp;
-
-          const isTop =
-            idx === cards.length - 1;
+          const isTop = idx === cards.length - 1;
 
           return (
             <div
@@ -475,8 +472,6 @@ function CustomDragLayer() {
 
 /* -------------------- PAGE -------------------- */
 
-/* -------------------- PAGE -------------------- */
-
 export default function Page() {
   const {
     stock,
@@ -496,22 +491,17 @@ export default function Page() {
   }, []);
 
   const stockIndex = useGameStore((s) => s.stockIndex);
-
   const topStockCard = stock[stockIndex];
-
   const isAtEnd = stockIndex === 0;
-
   const resetStockCycle = useGameStore((s) => s.resetStockCycle);
-
   const nextStockCard = useGameStore((s) => s.nextStockCard);
-
   const remainingStockCount = stock.length;
 
   return (
     <DndProvider backend={backend}>
       <CustomDragLayer />
 
-      <div className="p-5 bg-green-700 min-h-screen">
+      <div className="p-5 bg-green-600 min-h-175 max-h-full">
 
         {/* ---------------- TOP ROW ---------------- */}
         <div className="flex justify-between items-start mb-6">
@@ -520,24 +510,9 @@ export default function Page() {
           <div className="flex gap-3 items-start">
 
             {/* STOCKPILE */}
-            <div
-              onClick={nextStockCard}
-              className="
-                w-20
-                h-25
-                border-2
-                border-dashed
-                border-gray-400
-                rounded-md
-                relative
-                cursor-pointer
-                flex
-                items-center
-                justify-center
-              "
-            >
+            <div onClick={nextStockCard}
+              className="relative w-20 h-25 border-2 border-dashed bg-green-500 border-gray-400 rounded-md relative cursor-pointer flex items-center justify-center">
               <div className="w-15 h-20 rounded-md bg-blue-900 border-2 border-black relative">
-
                 <div className="absolute bottom-1 right-1 text-white text-xs">
                   {remainingStockCount}
                 </div>
@@ -546,31 +521,18 @@ export default function Page() {
             </div>
 
             {/* WASTE */}
-            <DropZone
-              cards={
-                topStockCard
-                  ? [{ ...topStockCard, faceUp: true }]
-                  : []
-              }
+            <DropZone cards={
+              topStockCard
+                ? [{ ...topStockCard, faceUp: true }]
+                : []
+            }
               onDrop={() => { }}
               canDropCard={() => false}
             />
 
             {/* RESET */}
             {isAtEnd && (
-              <button
-                onClick={resetStockCycle}
-                className="
-                  px-3
-                  py-2
-                  bg-yellow-400
-                  rounded-md
-                  font-bold
-                  hover:bg-yellow-300
-                  transition
-                  self-center
-                "
-              >
+              <button onClick={resetStockCycle} className=" px-3 py-2 bg-yellow-400 rounded-md font-bold hover:bg-yellow-300 transition self-center">
                 Reset
               </button>
             )}
@@ -583,18 +545,11 @@ export default function Page() {
             {foundations.map((cards, i) => (
               <DropZone
                 key={i}
-                cards={
-                  cards.length
-                    ? [cards[cards.length - 1]]
-                    : []
-                }
+                cards={cards.length ? [cards[cards.length - 1]] : []}
                 columnIndex={i}
-                onDrop={(cards) =>
-                  moveToFoundation(cards[0], i)
-                }
-                canDropCard={(card) =>
-                  canPlaceOnFoundation(card, i)
-                }
+                suit={suits[i]}
+                onDrop={(cards) => moveToFoundation(cards[0], i)}
+                canDropCard={(card) => canPlaceOnFoundation(card, i)}
               />
             ))}
 
