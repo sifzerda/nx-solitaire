@@ -374,8 +374,7 @@ function DropZone({
                 top: `${idx * 28}px`,
                 zIndex: idx,
                 transform: "translateX(-50%)",
-              }}
-            >
+              }}>
               {isFaceUp ? (
                 <Card
                   card={card}
