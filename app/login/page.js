@@ -45,9 +45,7 @@ export default function LoginPage() {
 
           {/* Title */}
           <h1 className="text-3xl tracking-wide mb-6 text-black dark:text-white flex items-center gap-2">
-            <span className="text-red-500">♦</span>
             <span className="font-[UnifrakturCook]">Login</span>
-            <span className="text-red-500">♥</span>
           </h1>
 
           {/* Form */}
