@@ -10,7 +10,7 @@ export default function Header() {
     const router = useRouter();
     const { isLoggedIn, logout } = useAuth();
 
-    const links = [{ href: "/", label: "Solitaire" }];
+    const links = [{ href: "/", label: "Play" }];
 
     if (isLoggedIn) {
         links.push({ label: "Logout", action: "logout" });
@@ -20,9 +20,9 @@ export default function Header() {
             { href: "/login", label: "Login" }
         );
     }
-
+              
     return (
-        <div className="flex md:grid md:grid-cols-3 items-center py-2 px-4">
+        <div className="flex md:grid md:grid-cols-3 items-center py-2 px-4 border-b-2 border-yellow-500">
 
             {/* LEFT — only exists on md+ to balance the grid */}
             <div className="hidden md:block" />
@@ -54,7 +54,7 @@ export default function Header() {
                                     href={item.href}
                                     className={`px-3 py-1 text-sm border rounded-sm transition inline-block
                                         ${isActive
-                                            ? "border-red-500 text-red-500"
+                                            ? "border-green-400 text-green-400"
                                             : "border-yellow-500 text-white hover:text-yellow-400"
                                         }`}>
                                     {item.label}

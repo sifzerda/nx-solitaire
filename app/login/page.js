@@ -18,7 +18,7 @@ export default function LoginPage() {
 
     const res = await fetch('/api/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }, // <-- Add this to ensure JSON is parsed properly on server
+      headers: { 'Content-Type': 'application/json' }, 
       body: JSON.stringify({ email, password }),
     });
 
@@ -41,12 +41,12 @@ export default function LoginPage() {
         <div className="w-full max-w-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black p-8 flex flex-col items-center">
 
           {/* Top gold line */}
-          <div className="w-full h-[2px] bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 mb-6" />
+          <div className="w-full h-0.5 bg-linear-to-r from-yellow-600 via-yellow-400 to-yellow-600 mb-6" />
 
           {/* Title */}
           <h1 className="text-3xl tracking-wide mb-6 text-black dark:text-white flex items-center gap-2">
             <span className="text-red-500">♦</span>
-            <span className="font-[var(--font-cinzel)]">Login</span>
+            <span className="font-[UnifrakturCook]">Login</span>
             <span className="text-red-500">♥</span>
           </h1>
 
@@ -100,7 +100,7 @@ export default function LoginPage() {
           </p>
 
           {/* Bottom blue line */}
-          <div className="w-full h-[2px] bg-gradient-to-r from-blue-900 via-blue-600 to-blue-900 mt-6" />
+          <div className="w-full h-0.5 bg-linear-to-r from-blue-900 via-blue-600 to-blue-900 mt-6" />
 
         </div>
 

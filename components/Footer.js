@@ -5,13 +5,10 @@ import { FaGithub } from "react-icons/fa";
 export default function Footer() {
     return (
         <footer className="w-full bg-black text-white">
-            <div className="flex flex-col items-center mb-2">
-
-                {/* Top gold line */}
-                <div className="w-full h-[2px] bg-yellow-500 mb-2"></div>
+            <div className="flex flex-col items-center mb-2 border-t-2 border-yellow-500">
 
                 {/* Suits row */}
-                <div className="flex items-center gap-3 text-lg mb-1">
+                <div className="flex items-center gap-3 text-lg mb-1 mt-2">
                     <span className="text-blue-400">♠</span>
                     <span className="text-red-500">♥</span>
 

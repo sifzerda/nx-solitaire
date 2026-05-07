@@ -52,12 +52,12 @@ export default function Signup() {
                 <div className="w-full max-w-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black p-8 flex flex-col items-center">
 
                     {/* Top gold line */}
-                    <div className="w-full h-[2px] bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 mb-6" />
+                    <div className="w-full h-0.5 bg-linear-to-r from-yellow-600 via-yellow-400 to-yellow-600 mb-6" />
 
                     {/* Title */}
                     <h1 className="text-3xl tracking-wide mb-6 text-black dark:text-white flex items-center gap-2">
                         <span className="text-red-500">♦</span>
-                        <span className="font-[var(--font-cinzel)]">Sign Up</span>
+                        <span className="font-[UnifrakturCook]">Sign Up</span>
                         <span className="text-red-500">♥</span>
                     </h1>
 
@@ -117,7 +117,7 @@ export default function Signup() {
                     </p>
 
                     {/* Bottom blue line */}
-                    <div className="w-full h-[2px] bg-gradient-to-r from-blue-900 via-blue-600 to-blue-900 mt-6" />
+                    <div className="w-full h-0.5 bg-linear-to-r from-blue-900 via-blue-600 to-blue-900 mt-6" />
 
                 </div>
 
