@@ -1,27 +1,77 @@
 // src/components/Header.js
 'use client';
 
+import Link from "next/link";
+import { useAuth } from "../lib/authContext";
+import { usePathname, useRouter } from "next/navigation";
+
 export default function Header() {
+    const pathname = usePathname();
+    const router = useRouter();
+    const { isLoggedIn, logout } = useAuth();
+
+    const links = [{ href: "/", label: "Solitaire" }];
+
+    if (isLoggedIn) {
+        links.push({ label: "Logout", action: "logout" });
+    } else {
+        links.push(
+            { href: "/signup", label: "Signup" },
+            { href: "/login", label: "Login" }
+        );
+    }
+
     return (
-        <header className="w-full bg-black text-white">
-            <div className="flex flex-col items-center py-2">
+        <div className="relative flex items-center py-2 px-4">
 
-                {/* Top suit */}
-                <div className="text-blue-400 text-xl md:text-3xl leading-none">♠</div>
+            {/* LEFT (optional spacer / future use) */}
+            <div className="flex-1" />
 
-                {/* Title */}
-                <h1 className="text-2xl md:text-4xl font-bold tracking-wide flex items-center gap-2">
-                    <span className="text-red-500 text-xl md:text-3xl">♦</span>
+            {/* TITLE (true visual center) */}
+            <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl md:text-4xl font-bold tracking-wide font-[UnifrakturCook] whitespace-nowrap">
+                solitaire
+            </h1>
 
-                    <span className="font-[UnifrakturCook]">solitaire</span>
+            {/* NAV (right aligned, does NOT affect center) */}
+            <div className="ml-auto flex items-center gap-3">
+                {links.map((item) => {
+                    const isActive = item.href === pathname;
 
-                    <span className="text-red-500 text-xl md:text-3xl">♥</span>
-                </h1>
+                    const handleLogout =
+                        item.action === "logout"
+                            ? () => {
+                                logout();
+                                router.push("/");
+                            }
+                            : null;
 
-                {/* Bottom suit */}
-                <div className="text-blue-400 text-xl md:text-3xl leading-none">♣</div>
-
+                    return (
+                        <div key={item.label}>
+                            {handleLogout ? (
+                                <button
+                                    onClick={handleLogout}
+                                    className="px-3 py-1 text-sm border border-yellow-500 rounded-sm hover:text-yellow-400"
+                                >
+                                    Logout
+                                </button>
+                            ) : (
+                                <Link
+                                    href={item.href}
+                                    className={`px-3 py-1 text-sm border rounded-sm transition inline-block
+                ${isActive
+                                            ? "border-red-500 text-red-500"
+                                            : "border-yellow-500 text-white hover:text-yellow-400"
+                                        }
+              `}
+                                >
+                                    {item.label}
+                                </Link>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
-        </header>
+
+        </div>
     );
 }

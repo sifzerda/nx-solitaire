@@ -2,7 +2,6 @@ import { Geist, Geist_Mono, UnifrakturCook } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../lib/authContext";
 import Header from "../components/Header";
-import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
 const geistSans = Geist({
@@ -34,8 +33,6 @@ export default function RootLayout({ children }) {
         <AuthProvider>
 
             <Header />
-
-            <Navigation />
 
             <main className="grow">{children}</main>
 
