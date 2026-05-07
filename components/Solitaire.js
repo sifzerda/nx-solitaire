@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, memo, useCallback } from "react";
 import { DndProvider, useDrag, useDrop, useDragLayer } from "react-dnd";
 import { HTML5Backend, getEmptyImage } from "react-dnd-html5-backend";
 import { create } from "zustand";
@@ -256,7 +256,11 @@ const useGameStore = create((set, get) => ({
 
 /* -------------------- UI -------------------- */
 
-function Card({ card, columnIndex, cardIndex }) {
+const Card = memo(function Card({
+  card,
+  columnIndex,
+  cardIndex,
+}) {
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: ItemTypes.CARD,
     canDrag: () => {
@@ -306,9 +310,9 @@ function Card({ card, columnIndex, cardIndex }) {
       {card.suit}
     </div> // above is faceUp card display
   );
-}
+});
 
-function DropZone({
+const DropZone = memo(function DropZone({
   cards,
   onDrop,
   canDropCard,
@@ -415,7 +419,7 @@ function DropZone({
       </div>
     </div>
   );
-}
+});
 
 /* -------------------- UI for dragging card stack -------------------- */
 
@@ -453,16 +457,24 @@ function CustomDragLayer() {
 /* -------------------- PAGE -------------------- */
 
 export default function Page() {
-  const {
-    stock,
-    tableau,
-    foundations,
-    initializeGame,
-    moveToFoundation,
-    moveStackToTableau,
-    canPlaceOnFoundation,
-    canPlaceOnTableau,
-  } = useGameStore();
+  const stock = useGameStore((s) => s.stock);
+  const tableau = useGameStore((s) => s.tableau);
+  const foundations = useGameStore((s) => s.foundations);
+  const initializeGame = useGameStore(
+    (s) => s.initializeGame
+  );
+  const moveToFoundation = useGameStore(
+    (s) => s.moveToFoundation
+  );
+  const moveStackToTableau = useGameStore(
+    (s) => s.moveStackToTableau
+  );
+  const canPlaceOnFoundation = useGameStore(
+    (s) => s.canPlaceOnFoundation
+  );
+  const canPlaceOnTableau = useGameStore(
+    (s) => s.canPlaceOnTableau
+  );
 
   const backend = useMemo(() => HTML5Backend, []);
 
@@ -476,6 +488,18 @@ export default function Page() {
   const resetStockCycle = useGameStore((s) => s.resetStockCycle);
   const nextStockCard = useGameStore((s) => s.nextStockCard);
   const remainingStockCount = stock.length;
+
+  const createTableauDropHandler = useCallback(
+    (index) => (cards, fromColumn) =>
+      moveStackToTableau(cards, fromColumn, index),
+    [moveStackToTableau]
+  );
+
+  const createTableauCanDrop = useCallback(
+    (index) => (card) =>
+      canPlaceOnTableau(card, index),
+    [canPlaceOnTableau]
+  );
 
   return (
     <DndProvider backend={backend}>
@@ -529,7 +553,9 @@ export default function Page() {
                 columnIndex={i}
                 suit={suits[i]}
                 onDrop={(cards) => moveToFoundation(cards[0], i)}
-                canDropCard={(card) => canPlaceOnFoundation(card, i)}
+                canDropCard={(card) =>
+                  canPlaceOnFoundation(card, i)
+                }
               />
             ))}
 
@@ -545,12 +571,8 @@ export default function Page() {
               key={i}
               cards={cards}
               columnIndex={i}
-              onDrop={(cards, fromColumn) =>
-                moveStackToTableau(cards, fromColumn, i)
-              }
-              canDropCard={(card) =>
-                canPlaceOnTableau(card, i)
-              }
+              onDrop={createTableauDropHandler(i)}
+              canDropCard={createTableauCanDrop(i)}
             />
           ))}
 
