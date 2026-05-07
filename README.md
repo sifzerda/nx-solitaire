@@ -44,7 +44,7 @@ TECH:
 - SPA App Router in Next.js
 - Auth using jose, JWT, bcrypt, AuthContext Provider wrapping Layout
 - Prisma Neon DB
-- Zustand for game state management
+- Zustand for store, game state management
 - useMemo to avoid memory leaks
 - react-draggable
 - Vercel
