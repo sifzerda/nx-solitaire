@@ -22,18 +22,18 @@ export default function Header() {
     }
 
     return (
-        <div className="relative flex items-center py-2 px-4">
+        <div className="flex md:grid md:grid-cols-3 items-center py-2 px-4">
 
-            {/* LEFT (optional spacer / future use) */}
-            <div className="flex-1" />
+        {/* LEFT — only exists on md+ to balance the grid */}
+        <div className="hidden md:block" />
 
-            {/* TITLE (true visual center) */}
-            <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl md:text-4xl font-bold tracking-wide font-[UnifrakturCook] whitespace-nowrap">
-                solitaire
-            </h1>
+        {/* TITLE — left on mobile, centered on md+ */}
+        <h1 className="text-2xl md:text-4xl md:text-center font-bold tracking-wide font-[UnifrakturCook] whitespace-nowrap">
+            solitaire
+        </h1>
 
-            {/* NAV (right aligned, does NOT affect center) */}
-            <div className="ml-auto flex items-center gap-3">
+            {/* NAV — right-aligned in the third column */}
+            <div className="ml-auto md:ml-0 flex items-center justify-end gap-3">
                 {links.map((item) => {
                     const isActive = item.href === pathname;
 
@@ -42,7 +42,7 @@ export default function Header() {
                             ? () => {
                                 logout();
                                 router.push("/");
-                            }
+                              }
                             : null;
 
                     return (
@@ -58,11 +58,10 @@ export default function Header() {
                                 <Link
                                     href={item.href}
                                     className={`px-3 py-1 text-sm border rounded-sm transition inline-block
-                ${isActive
+                                        ${isActive
                                             ? "border-red-500 text-red-500"
                                             : "border-yellow-500 text-white hover:text-yellow-400"
-                                        }
-              `}
+                                        }`}
                                 >
                                     {item.label}
                                 </Link>
