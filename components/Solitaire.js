@@ -347,9 +347,9 @@ function DropZone({
         className={`w-20 rounded-md border-2 border-dashed bg-green-500 relative transition-colors
           ${isOver
             ? canDrop
-              ? "border-green-500 bg-green-500/15"
-              : "border-red-500 bg-red-500/15"
-            : "border-gray-400"
+              ? "border-green-300 bg-green-800/50"
+              : "border-red-500 bg-red-500/50"
+            : "border-green-600"
           }
         `}
         style={{ minHeight: `${pileHeight}px` }}>
@@ -492,7 +492,7 @@ export default function Page() {
 
             {/* STOCKPILE */}
             <div onClick={nextStockCard}
-              className="relative w-20 h-25 border-2 border-dashed bg-green-500 border-black rounded-md cursor-pointer flex items-center justify-center">
+              className="relative w-20 h-25 border-2 border-dashed bg-green-500 border-green-600 rounded-md cursor-pointer flex items-center justify-center">
               <div className="w-15 h-20 rounded-md bg-blue-900 border-2 border-black relative">
                 <div className="absolute bottom-1 right-1 text-white text-xs">
                   {remainingStockCount}
