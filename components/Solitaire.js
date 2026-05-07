@@ -59,7 +59,6 @@ function createGame() {
     stockIndex: 0,
     tableau,
     foundations: [[], [], [], []],
-    trash: [], // debug feature
   };
 }
 
@@ -105,7 +104,6 @@ const useGameStore = create((set, get) => ({
   stock: [],
   tableau: [],
   foundations: [],
-  trash: [], // debug feature
 
   initializeGame: () => {
     const game = createGame();
@@ -165,7 +163,6 @@ const useGameStore = create((set, get) => ({
         foundations: state.foundations.map((pile) =>
           pile.filter((c) => c.id !== cardId)
         ),
-        trash: state.trash.filter((c) => c.id !== cardId),
       };
     });
 
@@ -255,15 +252,6 @@ const useGameStore = create((set, get) => ({
     }));
   },
 
-  /* -------- TRASH (debug)-------- */
-
-  trashCard: (card) => {
-    get().removeCardFromAll(card.id);
-
-    set((state) => ({
-      trash: [...state.trash, card], // 🆕 store instead of delete
-    }));
-  },
 }));
 
 /* -------------------- UI -------------------- */
@@ -324,21 +312,16 @@ function DropZone({
   cards,
   onDrop,
   canDropCard,
-  title,
   columnIndex,
   suit,
 }) {
-  const isTrash = title?.includes("Trash");
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
 
     canDrop: (item) => {
-      if (isTrash) return true;
       if (!canDropCard) return true;
-
       const firstCard = item.cards[0];
-
       return canDropCard(firstCard);
     },
 
@@ -362,13 +345,11 @@ function DropZone({
       <div
         ref={drop}
         className={`w-20 rounded-md border-2 border-dashed bg-green-500 relative transition-colors
-          ${isTrash
-            ? "border-red-500 bg-red-500/15"
-            : isOver
-              ? canDrop
-                ? "border-yellow-500 bg-yellow-500/15"
-                : "border-red-500 bg-red-500/15"
-              : "border-gray-400"
+          ${isOver
+            ? canDrop
+              ? "border-green-500 bg-green-500/15"
+              : "border-red-500 bg-red-500/15"
+            : "border-gray-400"
           }
         `}
         style={{ minHeight: `${pileHeight}px` }}>
@@ -511,7 +492,7 @@ export default function Page() {
 
             {/* STOCKPILE */}
             <div onClick={nextStockCard}
-              className="relative w-20 h-25 border-2 border-dashed bg-green-500 border-gray-400 rounded-md cursor-pointer flex items-center justify-center">
+              className="relative w-20 h-25 border-2 border-dashed bg-green-500 border-black rounded-md cursor-pointer flex items-center justify-center">
               <div className="w-15 h-20 rounded-md bg-blue-900 border-2 border-black relative">
                 <div className="absolute bottom-1 right-1 text-white text-xs">
                   {remainingStockCount}
