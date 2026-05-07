@@ -1,5 +1,7 @@
 // components/Solitaire.js
 
+// debug trash box
+
 "use client";
 
 import { useEffect, useMemo } from "react";
@@ -7,7 +9,9 @@ import { DndProvider, useDrag, useDrop, useDragLayer } from "react-dnd";
 import { HTML5Backend, getEmptyImage } from "react-dnd-html5-backend";
 import { create } from "zustand";
 
-const ItemTypes = { CARD: "card" };
+const ItemTypes = {
+  CARD: "card",
+};
 
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
@@ -320,121 +324,65 @@ function Card({ card, columnIndex, cardIndex }) {
   );
 }
 
-function DropZone({
-  cards,
-  onDrop,
-  canDropCard,
-  title,
-  columnIndex,
-}) {
+function DropZone({ cards, onDrop, canDropCard, title, columnIndex }) {
   const isTrash = title?.includes("Trash");
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-
     canDrop: (item) => {
       if (isTrash) return true;
       if (!canDropCard) return true;
 
       const firstCard = item.cards[0];
-
       return canDropCard(firstCard);
     },
-
-    drop: (item) =>
-      onDrop(item.cards, item.fromColumn),
-
+    drop: (item) => onDrop(item.cards, item.fromColumn),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop(),
     }),
   }));
 
-  const pileHeight =
-    cards.length <= 1
-      ? 100
-      : 100 + (cards.length - 1) * 28;
-
   return (
     <div className="flex flex-col items-center">
+      {title && ( <div className="text-white mb-1.5">{title}</div> )}
 
-      <div
-        ref={drop}
-        className={`
-          w-20
-          rounded-md
-          border-2
-          border-dashed
-          relative
-          transition-colors
-
-          ${isTrash
+      <div ref={drop} className={`min-h-25 min-w-20 p-1.5 border-2 border-dashed
+        ${isTrash
             ? "border-red-500 bg-red-500/15"
             : isOver
               ? canDrop
                 ? "border-green-500 bg-green-500/15"
                 : "border-red-500 bg-red-500/15"
-              : "border-gray-400"
-          }
-        `}
-        style={{
-          minHeight: `${pileHeight}px`,
-        }}
-      >
-
+              : "border-gray-400"    // this is dragging styling
+          }`}>
         {cards.map((card, idx) => {
           const isFaceUp = card.faceUp;
-
-          const isTop =
-            idx === cards.length - 1;
+          const isTop = idx === cards.length - 1;
 
           return (
-            <div
-              key={card.id}
-              className="absolute left-1/2"
-              style={{
-                top: `${idx * 28}px`,
-                zIndex: idx,
-                transform: "translateX(-50%)",
-              }}
-            >
+            <div key={card.id} style={{ marginTop: idx === 0 ? 0 : -60, zIndex: idx, position: "relative", }}>
               {isFaceUp ? (
-                <Card
-                  card={card}
-                  origin="tableau"
-                  columnIndex={columnIndex}
-                  cardIndex={idx}
-                />
+                <Card card={card} origin="tableau" columnIndex={columnIndex} cardIndex={idx} />
               ) : (
-                <div
-                  onClick={() => {
-                    if (isTop && !card.faceUp) {
-                      useGameStore
-                        .getState()
-                        .flipTopTableauCard(
-                          columnIndex
-                        );
-                    }
-                  }}
-                  className={`
-                    w-15
-                    h-20
-                    rounded-md
-                    border
-                    border-black
-                    bg-blue-900
-                    font-bold
-
-                    ${isTop && !card.faceUp
+                <div onClick={() => {
+                  if (isTop && !card.faceUp) {
+                    useGameStore
+                      .getState()
+                      .flipTopTableauCard(columnIndex);
+                  }
+                }}
+                  className={`w-15 h-20 flex items-center justify-center rounded-md border border-black bg-blue-900 font-bold cursor-grab
+                  ${isTop && !card.faceUp
                       ? "cursor-pointer"
-                      : "cursor-default"}
-                  `}
+                      : "cursor-default"
+                    }
+                `}
                 />
               )}
             </div>
           );
         })}
-
       </div>
     </div>
   );
@@ -475,13 +423,13 @@ function CustomDragLayer() {
 
 /* -------------------- PAGE -------------------- */
 
-/* -------------------- PAGE -------------------- */
-
 export default function Page() {
   const {
     stock,
     tableau,
     foundations,
+    trash, // debug
+    trashCard, // debug
     initializeGame,
     moveToFoundation,
     moveStackToTableau,
@@ -496,15 +444,10 @@ export default function Page() {
   }, []);
 
   const stockIndex = useGameStore((s) => s.stockIndex);
-
   const topStockCard = stock[stockIndex];
-
   const isAtEnd = stockIndex === 0;
-
   const resetStockCycle = useGameStore((s) => s.resetStockCycle);
-
   const nextStockCard = useGameStore((s) => s.nextStockCard);
-
   const remainingStockCount = stock.length;
 
   return (
@@ -513,88 +456,59 @@ export default function Page() {
 
       <div className="p-5 bg-green-700 min-h-screen">
 
-        {/* ---------------- TOP ROW ---------------- */}
-        <div className="flex justify-between items-start mb-6">
+        {/* TOP BAR: STOCK (LEFT) + FOUNDATIONS (RIGHT) */}
+        <div className="flex justify-between items-start mb-4">
 
-          {/* LEFT SIDE */}
-          <div className="flex gap-3 items-start">
+          {/* LEFT GROUP: STOCK + WASTE */}
+          <div className="flex items-start gap-3">
 
-            {/* STOCKPILE */}
-            <div
-              onClick={nextStockCard}
-              className="
-                w-20
-                h-25
-                border-2
-                border-dashed
-                border-gray-400
-                rounded-md
-                relative
-                cursor-pointer
-                flex
-                items-center
-                justify-center
-              "
-            >
-              <div className="w-15 h-20 rounded-md bg-blue-900 border-2 border-black relative">
+            <div onClick={() => nextStockCard()}>
+              <div className="flex flex-col items-center">
+                <div className="text-white mb-1.5">Stockpile</div>
+                <div className="min-h-25 min-w-20 p-1.5 border-2 border-dashed border-gray-400 rounded-md relative cursor-pointer">
+                  <div className="w-15 h-20 rounded-md bg-blue-900 border-2 border-black relative">
+                    <div className="absolute bottom-1 right-1 text-white text-xs">
+                      {remainingStockCount}
+                    </div>
 
-                <div className="absolute bottom-1 right-1 text-white text-xs">
-                  {remainingStockCount}
+                  </div>
                 </div>
-
               </div>
             </div>
 
-            {/* WASTE */}
-            <DropZone
-              cards={
-                topStockCard
-                  ? [{ ...topStockCard, faceUp: true }]
-                  : []
-              }
-              onDrop={() => { }}
-              canDropCard={() => false}
-            />
+            {/* Waste (top stock card) */}
+            <div>
+              {topStockCard && (
+                <DropZone
+                  cards={[{ ...topStockCard, faceUp: true }]}
+                  title="Waste"
+                  onDrop={() => { }}
+                  canDropCard={() => false}
+                />
+              )}
+            </div>
 
-            {/* RESET */}
+            {/* Reset */}
             {isAtEnd && (
-              <button
-                onClick={resetStockCycle}
-                className="
-                  px-3
-                  py-2
-                  bg-yellow-400
-                  rounded-md
-                  font-bold
-                  hover:bg-yellow-300
-                  transition
-                  self-center
-                "
-              >
+              <button onClick={resetStockCycle}
+                className="px-3 py-2 bg-yellow-400 rounded-md font-bold hover:bg-yellow-300 transition">
                 Reset
               </button>
             )}
 
           </div>
 
-          {/* FOUNDATIONS */}
-          <div className="flex gap-3">
+          {/* RIGHT GROUP: FOUNDATIONS */}
+          <div className="flex items-start">
 
             {foundations.map((cards, i) => (
               <DropZone
                 key={i}
-                cards={
-                  cards.length
-                    ? [cards[cards.length - 1]]
-                    : []
-                }
+                cards={cards.length ? [cards[cards.length - 1]] : []}
                 columnIndex={i}
-                onDrop={(cards) =>
-                  moveToFoundation(cards[0], i)
-                }
-                canDropCard={(card) =>
-                  canPlaceOnFoundation(card, i)
-                }
+                title={`Foundation ${suits[i]}`}
+                onDrop={(cards) => moveToFoundation(cards[0], i)}
+                canDropCard={(card) => canPlaceOnFoundation(card, i)}
               />
             ))}
 
@@ -602,23 +516,30 @@ export default function Page() {
 
         </div>
 
-        {/* ---------------- TABLEAU ---------------- */}
-        <div className="flex gap-3 items-start">
+        {/* TRASH MOVED HERE */}
+        <h2 className="text-white mt-5">Trash (Debug)</h2>
 
+        <DropZone
+          cards={trash}
+          title="🗑️ Trash"
+          onDrop={(cards) => trashCard(cards[0])}
+          canDropCard={() => true}
+        />
+
+        <h2 className="text-white">Tableau</h2>
+
+        <div className="flex gap-2.5">
           {tableau.map((cards, i) => (
             <DropZone
               key={i}
               cards={cards}
               columnIndex={i}
+              title={`Column ${i + 1}`}
               onDrop={(cards, fromColumn) =>
-                moveStackToTableau(cards, fromColumn, i)
-              }
-              canDropCard={(card) =>
-                canPlaceOnTableau(card, i)
-              }
+                moveStackToTableau(cards, fromColumn, i)}
+              canDropCard={(card) => canPlaceOnTableau(card, i)}
             />
           ))}
-
         </div>
 
       </div>
