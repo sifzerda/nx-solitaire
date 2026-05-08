@@ -7,8 +7,8 @@ import { create } from "zustand";
 const useGameStore = create((set, get) => ({
   stock: [],
   stockIndex: 0,
-  tableau: [],
-  foundations: [],
+  tableau: [[], [], [], [], [], [], []],
+  foundations: [[], [], [], []],
 
   initializeGame: (game) => {
     set({ ...game, stockIndex: game.stock.length - 1 });

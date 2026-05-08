@@ -24,3 +24,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ===================== custom =====================*/ 
+
+:root {
+  --card-offset: 28px;
+  --card-height: 160px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --card-offset: 14px;
+    --card-height: 96px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  :root {
+    --card-height: 104px;
+  }
+}
