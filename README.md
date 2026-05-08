@@ -1,14 +1,101 @@
-# Solitaire
+# Solitaire 2.0
 
-## Getting Started
+## Table of Contents
 
-First, run the development server:
+- [Description](#description)
+- [Badges](#badges)
+- [Visuals](#visuals)
+- [Installation](#installation)
+- [Tech](#tech)
+- [Support](#support)
+- [Contributing](#contributing)
+- [Authors and Acknowledgment](#authors-and-acknowledgment)
+- [License](#license)
+- [Project Status](#project-status)
+
+## Description
+
+This is a rebuild and refactor of my first fullstack minesweeper game into a serverless Next.js app, using a zustand store. The database of users was removed and styling was enhanced. 
+
+## Badges
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
+
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white) ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white) ![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white) ![Next JS](https://img.shields.io/badge/Next-black.svg?style=for-the-badge&logo=next.js&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1.svg?style=for-the-badge&logo=PostgreSQL&logoColor=white)
+
+## Visuals
+
+This app has been deployed to Vercel. Visit the site: [Solitaire Next.js](https://nx-solitaire.vercel.app/)
+
+![pic1](https://github.com/user-attachments/assets/e15545a2-c388-4fad-a517-22426a19e132)
+![pic2](https://github.com/user-attachments/assets/78a042ff-8b67-4f14-8759-2fcb28dd8bd4)
+![pic4](https://github.com/user-attachments/assets/74a9d0e0-6ab2-4911-9d22-1ddda94e0905)
+
+## Installation
+
+Play through app site, no installation required. Otherwise clone into local machine and open on IDE:
 
 ```bash
+# clone the repo
+git clone https://github.com/sifzerda/nx-solitaire.git
+
+# move into directory
+cd nx-solitaire
+
+# install dependencies
+npm install
+
+# run server
 npm run start
 ```
 
-TO DO:
+## Tech
+
+- SPA App Router in Next.js
+- Auth using jose, JWT, bcrypt, AuthContext Provider wrapping Layout
+- Prisma Neon DB
+- Zustand for store, game state management
+- useMemo to avoid memory leaks
+- react-draggable
+- Vercel
+
+## Support
+
+For support, users can contact me through my portfolio contact form: [here](https://next-portfolio-sifzerdas-projects.vercel.app/contact)
+
+## Contributing
+
+Any contributions you make are greatly appreciated.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement". 
+1.	Fork the Project
+2.	Create your Feature Branch (git checkout -b feature/NewFeature)
+3.	Commit your Changes (git commit -m 'Add some NewFeature')
+4.	Push to the Branch (git push origin feature/NewFeature)
+5.	Open a Pull Request
+
+## Authors and acknowledgment
+
+The author acknowledges and credits those who have contributed to this project.
+
+## License
+
+Distributed under the MIT License. See LICENSE.txt for more information.
+
+## Project status
+
+This project is complete. Currently highscores page, if any, is just for display, further development is needed to allow users to submit their scores.
+
+## Optimization:
+
+## Lighthouse scores:
+
+Performance = 80
+Accessibility = 90
+Best Practices = 100
+SEO = 100
+
+## TO DO:
 
 - Move Styling into another file, e.g. globals
 - Make a highscores page and db storage like minesweeper, recording user name/ref + time taken + number of moves
@@ -37,325 +124,3 @@ TO DO:
 - [ ] restart/redraw game
 - [ ] win screen, move count, time taken.
 - [ ] restyle stockpile reset btn
-
-## Optimization:
-
-Lighthouse scores:
-
-Performance = 80
-Accessibility = 90
-Best Practices = 100
-SEO = 100
-
-//////////////////////////////////////////////
-
-TECH:
-
-- SPA App Router in Next.js
-- Auth using jose, JWT, bcrypt, AuthContext Provider wrapping Layout
-- Prisma Neon DB
-- Zustand for store, game state management
-- useMemo to avoid memory leaks
-- react-draggable
-- Vercel
-
-In Prisma 7 (updated) you now need an adapter, or Accelerate (which requires Prisma Accelerate setup)
-For a neon db (vercel):
-
-```bash
-npm install @prisma/adapter-neon
-```
-for a prisma postgres (not neon):
-```bash
-npm install @prisma/adapter-pg
-```
-
-also install
-```bash
-npm install @prisma/client
-npm install @auth/prisma-adapter
-npm install next-auth
- ```
-
-create a lib folder in root, and inside make a prisma.js and paste this into your NEON prisma.js:
-
-```bash
-import { PrismaClient } from '@prisma/client';
-import { PrismaNeon } from '@prisma/adapter-neon';
-
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-  throw new Error('DATABASE_URL is not defined');
-}
-
-console.log('DATABASE_URL exists:', !!connectionString);
-
-const adapter = new PrismaNeon({ connectionString });
-
-const globalForPrisma = globalThis;
-
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({ adapter });
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
-```
-for PG/ PRISMA POSTGRES:
-
-```bash
-// lib/prisma.js
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from "@prisma/adapter-pg";
-
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const globalForPrisma = globalThis;
-
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({ adapter });
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
-```
-
-then in terminal
-
-```bash
-npx prisma init
-```
-this will create a prisma.config.ts in root. 
-Then, inside your prisma.config.ts:
-
-```bash
-npm install --save-dev prisma dotenv
-```
-
-and under datasource, paste: url: process.env.DATABASE_URL,
-
-Then you can enter models into the schema.prisma inside your prisma folder. Every time you make a change to the schema, run this: 
-
-```bash
-npx prisma generate
-```
-
-////////////////////////////////////////
-
-Install Auth System:
-```bash
-npm install jsonwebtoken
-npm install jose
-npm install bcrypt
-```
-Create signup and login routes/pages
-
-Create a 'lib' folder at root add files 'auth.js' and 'serverAuth.js'
-
-auth.js:
-
-```bash
-
-// lib/auth.js
-import { SignJWT, jwtVerify } from 'jose';
-
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-const alg = 'HS256';
-
-export async function signJWT(payload, options = {}) {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg })
-    .setIssuedAt()
-    .setExpirationTime(options.expiresIn || '7d')
-    .sign(secret);
-}
-
-export async function verifyJWT(token) {
-  try {
-    const { payload } = await jwtVerify(token, secret);
-    return payload;
-  } catch (e) {
-    return null;
-  }
-}
-
-```
-serverAuth.js 
-
-```bash
-
-// lib/serverAuth.js
-import { NextResponse } from 'next/server';
-import { verifyJWT } from './auth';
-
-export async function getUserFromRequest(req) {
-  try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
-    const token = authHeader.split(' ')[1];
-    if (!token) return null;
-    const payload = await verifyJWT(token);
-    return payload; // e.g. { sub: userId, email, iat, exp }
-  } catch {
-    return null;
-  }
-}
-
-// Middleware style helper for protecting routes
-export async function requireUser(req) {
-  const user = await getUserFromRequest(req);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  return user;
-}
-
-
-```
-
-create an 'api' folder inside 'app' directory. Inside Api, make folders: login and signup. Inside those create route.js for each.
-
-route.js (for login)
-
-```bash
-import bcrypt from 'bcrypt';
-import { prisma } from '../../../../lib/prisma';
-import { signJWT } from '../../../../lib/auth';
-
-function jsonResponse(body, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
-
-export async function POST(req) {
-  try {
-    const { email, password } = await req.json();
-
-    if (!email || !password) {
-      return jsonResponse({ error: 'Email and password are required' }, 400);
-    }
-
-    const user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return jsonResponse({ error: 'Invalid credentials' }, 401);
-    }
-
-    // Use your jose-based signJWT helper here
-    const token = await signJWT({ sub: user.id, username: user.username, email: user.email}, { expiresIn: '1h' });
-
-    return jsonResponse({ token }, 200);
-  } catch (error) {
-    console.error('Login error:', error);
-    return jsonResponse({ error: 'Internal server error' }, 500);
-  }
-}
-
-```
-
-route.js for signup
-
-```bash
-import bcrypt from 'bcrypt';
-import { NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
-import { signJWT } from '../../../../lib/auth';
-
-function jsonResponse(body, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
-
-export async function POST(req) {
-  try {
-    const { email, password, username } = await req.json();
-
-    if (!email || !password || !username) {
-      return jsonResponse({ error: 'Email and password are required' }, 400);
-    }
-
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      return jsonResponse({ error: 'Invalid email format' }, 400);
-    }
-
-    if (password.length < 8) {
-      return jsonResponse({ error: 'Password must be at least 8 characters' }, 400);
-    }
-
-    const existingUsername = await prisma.user.findUnique({ where: { username } });
-    if (existingUsername) {
-      return NextResponse.json({ error: 'Username already taken' }, { status: 400 });
-    }
-
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
-      return jsonResponse({ error: 'User already exists' }, 400);
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        username,
-      },
-    });
-
-    // Automatically sign a token after successful signup
-    const token = await signJWT({ sub: user.id, email: user.email, username: user.username }, { expiresIn: '1h' });
-
-    return jsonResponse({ message: 'User created successfully', token }, 201);
-  } catch (error) {
-    console.error('Signup error:', error);
-    return jsonResponse({ error: 'Internal server error' }, 500);
-  }
-}
-
-
-```
-
-when you npx create-next app, if you say no to 'import' question, 
-you can't use @ imports. Unless you paste baseUrl into the jsconfig.json:
-
-```bash
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"]
-    }
-  }
-}
-```
-
-Create a JWT secret inside .env file:
-
-```bash
-## generate a secret by gitbash: openssl rand -base64 32
-```
-
-and add this to environment variables on your vercel/postgres/neon db (under settings -> environment variables)
-
-Then paste this for your build command inside package.json:
-
-```bash
-    "build": "prisma generate && next build",
-```
-
-this tells vercel to generate prisma on build, otherwise deployment will fail.
