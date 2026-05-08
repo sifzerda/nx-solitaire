@@ -10,15 +10,12 @@ import { TouchBackend } from "react-dnd-touch-backend"; // mobile swipe input
 import useGameStore from "./useGameStore"
 
 const ItemTypes = { CARD: "card" };
-
 const suitLetter = { "♠": "S", "♥": "H", "♦": "D", "♣": "C" };
-
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 // responsive dimensions:
 const CARD_OFFSET = typeof window !== "undefined" && window.innerWidth < 640 ? 14 : 28;
-
 const CARD_WIDTH = `w-15 sm:w-18 md:w-22 lg:w-28`;
 const CARD_HEIGHT = `h-24 sm:h-26 md:h-30 lg:h-40`;
 const CARD_TEXT = `text-md sm:text-md md:text-base lg:text-lg`;
@@ -28,7 +25,9 @@ const ALL_CARDS = suits.flatMap(suit => ranks.map(rank => ({ rank, suit })));
 
 // For customDragLayer
 const CARD_HEIGHT_PX = typeof window !== "undefined" &&
-  window.innerWidth < 640 ? 96 : window.innerWidth < 768 ? 104 : window.innerWidth < 1024 ? 104 : 160;
+  window.innerWidth < 640 ? 96 : 
+  window.innerWidth < 768 ? 104 : 
+  window.innerWidth < 1024 ? 104 : 160;
 
 /* -------------------- HELPERS -------------------- */
 

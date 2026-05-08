@@ -29,7 +29,7 @@ TO DO:
 - [x] enable dragging tableau stacks
 
 - [x] make responsive and enable mobile play
-- [ ] change card appearance to enable display stacked for card stack dnd
+- [x] change card appearance to enable display stacked for card stack dnd
 - [x] remove trash debug dropzone
 
 - [x] remove 'column...', 'waste', 'tableau'
