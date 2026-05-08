@@ -11,6 +11,8 @@ import useGameStore from "./useGameStore"
 
 const ItemTypes = { CARD: "card" };
 
+const suitLetter = { "♠": "S", "♥": "H", "♦": "D", "♣": "C" };
+
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
@@ -21,9 +23,12 @@ const CARD_WIDTH = `w-15 sm:w-18 md:w-22 lg:w-28`;
 const CARD_HEIGHT = `h-24 sm:h-26 md:h-30 lg:h-40`;
 const CARD_TEXT = `text-md sm:text-md md:text-base lg:text-lg`;
 
+// card preloader
+const ALL_CARDS = suits.flatMap(suit => ranks.map(rank => ({ rank, suit })));
+
 // For customDragLayer
-const CARD_HEIGHT_PX = typeof window !== "undefined" && 
-window.innerWidth < 640 ? 96 : window.innerWidth < 768 ? 104 : window.innerWidth < 1024 ? 104 : 160;
+const CARD_HEIGHT_PX = typeof window !== "undefined" &&
+  window.innerWidth < 640 ? 96 : window.innerWidth < 768 ? 104 : window.innerWidth < 1024 ? 104 : 160;
 
 /* -------------------- HELPERS -------------------- */
 
@@ -71,7 +76,7 @@ function createGame() {
 }
 
 const rankValue = (rank) =>
-({ A: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, J: 11, Q: 12, K: 13, }[rank]);
+  ({ A: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, J: 11, Q: 12, K: 13, }[rank]);
 
 const isRed = (suit) => suit === "♥" || suit === "♦";
 
@@ -93,6 +98,21 @@ function isValidStack(stack) {
 }
 
 /* -------------------- UI -------------------- */
+
+function cardImageSrc(card) {
+  return `/cards/${card.rank}${suitLetter[card.suit]}.svg`;
+}
+
+function CardFace({ card }) {
+  return (
+    <img
+      src={cardImageSrc(card)}
+      alt={`${card.rank}${card.suit}`}
+      className="w-full h-full object-contain rounded-md"
+      draggable={false}
+    />
+  );
+}
 
 const Card = memo(function Card({ card, columnIndex, cardIndex }) {
   const [{ isDragging }, drag, preview] = useDrag(() => ({
@@ -130,15 +150,13 @@ const Card = memo(function Card({ card, columnIndex, cardIndex }) {
 
   return (
     <div ref={drag} className={`${CARD_WIDTH} ${CARD_HEIGHT} ${CARD_TEXT} flex items-center justify-center rounded-md border border-black bg-white font-bold cursor-grab
-     ${isDragging ? "opacity-0" : "opacity-100"}
-      ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
-      {card.rank}
-      {card.suit}
+     ${isDragging ? "opacity-0" : "opacity-100"}`}>
+      <CardFace card={card} />
     </div> // above is faceUp card display
   );
 });
 
-const DropZone = memo(function DropZone({ cards, onDrop, canDropCard, columnIndex, suit}) {
+const DropZone = memo(function DropZone({ cards, onDrop, canDropCard, columnIndex, suit }) {
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
@@ -196,7 +214,7 @@ const DropZone = memo(function DropZone({ cards, onDrop, canDropCard, columnInde
                     if (isTop && !card.faceUp) {
                       useGameStore
                         .getState()
-                        .flipTopTableauCard( columnIndex );
+                        .flipTopTableauCard(columnIndex);
                     }
                   }}
                   className={` ${CARD_WIDTH} ${CARD_HEIGHT} rounded-md border border-black bg-blue-900 font-bold
@@ -225,15 +243,11 @@ function CustomDragLayer() {
 
     return item.cards.map((card, idx) => (
       <div
-        key={card.id}
-        style={{
-          marginTop: idx === 0 ? 0 : -(CARD_HEIGHT_PX - CARD_OFFSET),
-          position: "relative",
-          zIndex: idx,
+        key={card.id} style={{
+          marginTop: idx === 0 ? 0 : -(CARD_HEIGHT_PX - CARD_OFFSET), position: "relative", zIndex: idx
         }}
-        className={`${CARD_WIDTH} ${CARD_HEIGHT} ${CARD_TEXT} flex items-center justify-center rounded sm:rounded-md border border-black bg-white font-bold
-      ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
-        {card.rank}{card.suit}
+        className={`${CARD_WIDTH} ${CARD_HEIGHT} ${CARD_TEXT} flex items-center justify-center rounded sm:rounded-md border border-black bg-white font-bold`}>
+        <CardFace card={card} />
       </div>
     ));
   }, [item]);
@@ -255,21 +269,19 @@ export default function Page() {
   const stock = useGameStore((s) => s.stock);
   const tableau = useGameStore((s) => s.tableau);
   const foundations = useGameStore((s) => s.foundations);
-  const initializeGame = useGameStore(
-    (s) => s.initializeGame
-  );
-  const moveToFoundation = useGameStore(
-    (s) => s.moveToFoundation
-  );
-  const moveStackToTableau = useGameStore(
-    (s) => s.moveStackToTableau
-  );
-  const canPlaceOnFoundation = useGameStore(
-    (s) => s.canPlaceOnFoundation
-  );
-  const canPlaceOnTableau = useGameStore(
-    (s) => s.canPlaceOnTableau
-  );
+  const initializeGame = useGameStore((s) => s.initializeGame);
+  const moveToFoundation = useGameStore((s) => s.moveToFoundation);
+  const moveStackToTableau = useGameStore((s) => s.moveStackToTableau);
+  const canPlaceOnFoundation = useGameStore((s) => s.canPlaceOnFoundation);
+  const canPlaceOnTableau = useGameStore((s) => s.canPlaceOnTableau);
+
+  // card preloader:
+  useEffect(() => {
+    ALL_CARDS.forEach(card => {
+      const img = new Image();
+      img.src = cardImageSrc(card);
+    });
+  }, []);
 
   const backend = useMemo(() => TouchBackend, []);
 
@@ -373,6 +385,13 @@ export default function Page() {
         </div>
 
       </div>
+
+      <div className="hidden">
+        {ALL_CARDS.map(card => (
+          <img key={`${card.rank}${card.suit}`} src={cardImageSrc(card)} alt="" />
+        ))}
+      </div>
+
     </DndProvider>
   );
 }
