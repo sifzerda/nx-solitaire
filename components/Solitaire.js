@@ -202,26 +202,22 @@ const DropZone = memo(function DropZone({ cards, onDrop, canDropCard, columnInde
             <div key={card.id} className="absolute left-1/2"
               style={{ top: `${idx * CARD_OFFSET}px`, zIndex: idx, transform: "translateX(-50%)", }}>
               {isFaceUp ? (
-                <Card
-                  card={card}
-                  origin="tableau"
-                  columnIndex={columnIndex}
-                  cardIndex={idx}
-                />
+                <Card card={card} origin="tableau" columnIndex={columnIndex} cardIndex={idx} />
               ) : (
                 <div
                   onClick={() => {
                     if (isTop && !card.faceUp) {
-                      useGameStore
-                        .getState()
-                        .flipTopTableauCard(columnIndex);
+                      useGameStore.getState().flipTopTableauCard(columnIndex);
                     }
                   }}
-                  className={` ${CARD_WIDTH} ${CARD_HEIGHT} rounded-md border border-black bg-blue-900 font-bold
-                    ${isTop && !card.faceUp ? "cursor-pointer" : "cursor-default"} `} />
+                  className={`${CARD_WIDTH} ${CARD_HEIGHT} rounded-md overflow-hidden shrink-0
+          ${isTop && !card.faceUp ? "cursor-pointer" : "cursor-default"}`}>
+                  <img src="/cards/FDC.png" alt="card back" draggable={false} className="w-full h-full object-cover" />
+                </div>
               )}
             </div>
           );
+
         })}
 
       </div>
@@ -312,7 +308,7 @@ export default function Page() {
     <DndProvider backend={backend} options={{ enableMouseEvents: true, delayTouchStart: 120 }}>
       <CustomDragLayer />
 
-      <div className="p-2 sm:p-3 md:p-5 bg-green-600 min-h-200 overflow-auto flex flex-col select-none">
+      <div className="p-2 sm:p-3 md:p-5 bg-green-600 bg-[url('/GBG3.png')] bg-contain min-h-200 overflow-auto flex flex-col select-none">
 
         {/* ---------------- TOP ROW ---------------- */}
         <div className="flex gap-4 lg:flex-row justify-between items-start mb-6">
@@ -324,12 +320,8 @@ export default function Page() {
             <div onClick={nextStockCard}
               className={`relative 
               ${CARD_WIDTH} ${CARD_HEIGHT} border-2 border-dashed bg-green-500 border-green-600 rounded-md cursor-pointer flex items-center justify-center`}>
-              <div className={`${CARD_WIDTH} ${CARD_HEIGHT} rounded-md bg-blue-900 border-2 border-black relative`}>
-                <div className="absolute bottom-1 right-1 text-white text-[10px] sm:text-xs">
-                  {remainingStockCount}
-                </div>
-
-              </div>
+              <img src="/cards/FDC.png" alt="stock" draggable={false} className="w-full h-full object-cover" />
+              <div className="absolute bottom-1 right-1 text-white text-[15px]"> {remainingStockCount}/24 </div>
             </div>
 
             {/* WASTE */}
