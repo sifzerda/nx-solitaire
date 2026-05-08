@@ -1,4 +1,4 @@
-# Zolitaire (Solitaire + Zustand)
+# Solitaire
 
 ## Getting Started
 
@@ -36,6 +36,15 @@ TO DO:
 - [x] move foundation icon into box
 - [ ] restart/redraw game
 - [ ] win screen, move count, time taken.
+
+## Optimization:
+
+Lighthouse scores:
+
+Performance = 80
+Accessibility = 90
+Best Practices = 100
+SEO = 100
 
 //////////////////////////////////////////////
 

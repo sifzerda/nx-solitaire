@@ -66,10 +66,10 @@ const useGameStore = create((set, get) => ({
     const suits = ["♠", "♥", "♦", "♣"];
 
     const rankValue = (rank) =>
-      ({
-        A: 1,2: 2,3: 3,4: 4,5: 5,6: 6,7: 7,
-        8: 8,9: 9,10: 10,J: 11,Q: 12,K: 13,
-      }[rank]);
+    ({
+      A: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7,
+      8: 8, 9: 9, 10: 10, J: 11, Q: 12, K: 13,
+    }[rank]);
 
     const pile = get().foundations[index];
     const topCard = pile[pile.length - 1];
@@ -99,10 +99,10 @@ const useGameStore = create((set, get) => ({
 
     const isRed = (s) => s === "♥" || s === "♦";
     const rankValue = (r) =>
-      ({
-        A: 1,2: 2,3: 3,4: 4,5: 5,6: 6,7: 7,
-        8: 8,9: 9,10: 10,J: 11,Q: 12,K: 13,
-      }[r]);
+    ({
+      A: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7,
+      8: 8, 9: 9, 10: 10, J: 11, Q: 12, K: 13,
+    }[r]);
 
     if (!bottomCard) return card.rank === "K";
 
@@ -120,6 +120,16 @@ const useGameStore = create((set, get) => ({
     set((state) => {
       const tableau = [...state.tableau];
 
+      if (fromColumn === -1) {
+        // Coming from waste — remove from stock
+        const newStock = state.stock.filter((c) => c.id !== cards[0].id);
+        tableau[toColumn] = [
+          ...tableau[toColumn],
+          ...cards.map((c) => ({ ...c, faceUp: true })),
+        ];
+        return { tableau, stock: newStock };
+      }
+
       if (fromColumn !== null && fromColumn !== undefined) {
         tableau[fromColumn] = tableau[fromColumn].slice(
           0,
@@ -135,7 +145,7 @@ const useGameStore = create((set, get) => ({
       return { tableau };
     });
 
-    if (fromColumn !== null && fromColumn !== undefined) {
+    if (fromColumn !== null && fromColumn !== undefined && fromColumn !== -1) {
       get().flipTopTableauCard(fromColumn);
     }
   },

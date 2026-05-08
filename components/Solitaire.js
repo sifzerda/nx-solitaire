@@ -4,7 +4,8 @@
 
 import { useEffect, useMemo, memo, useCallback } from "react";
 import { DndProvider, useDrag, useDrop, useDragLayer } from "react-dnd";
-import { HTML5Backend, getEmptyImage } from "react-dnd-html5-backend";
+import { getEmptyImage } from "react-dnd-html5-backend"; // removed HTML5Backend
+import { TouchBackend } from "react-dnd-touch-backend"; // mobile swipe input
 
 import useGameStore from "./useGameStore"
 
@@ -12,6 +13,17 @@ const ItemTypes = { CARD: "card" };
 
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+
+// responsive dimensions:
+const CARD_OFFSET = typeof window !== "undefined" && window.innerWidth < 640 ? 14 : 28;
+
+const CARD_WIDTH = `w-15 sm:w-18 md:w-22 lg:w-28`;
+const CARD_HEIGHT = `h-24 sm:h-26 md:h-30 lg:h-40`;
+const CARD_TEXT = `text-md sm:text-md md:text-base lg:text-lg`;
+
+// For customDragLayer
+const CARD_HEIGHT_PX = typeof window !== "undefined" && 
+window.innerWidth < 640 ? 96 : window.innerWidth < 768 ? 104 : window.innerWidth < 1024 ? 104 : 160;
 
 /* -------------------- HELPERS -------------------- */
 
@@ -55,30 +67,11 @@ function createGame() {
 
   const stock = shuffled.slice(currentIndex);
 
-  return {
-    stock,
-    stockIndex: 0,
-    tableau,
-    foundations: [[], [], [], []],
-  };
+  return { stock, stockIndex: 0, tableau, foundations: [[], [], [], []] };
 }
 
 const rankValue = (rank) =>
-({
-  A: 1,
-  2: 2,
-  3: 3,
-  4: 4,
-  5: 5,
-  6: 6,
-  7: 7,
-  8: 8,
-  9: 9,
-  10: 10,
-  J: 11,
-  Q: 12,
-  K: 13,
-}[rank]);
+({ A: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, J: 11, Q: 12, K: 13, }[rank]);
 
 const isRed = (suit) => suit === "♥" || suit === "♦";
 
@@ -99,21 +92,13 @@ function isValidStack(stack) {
   return true;
 }
 
-/* -------------------- STORE -------------------- */
-
-
-
 /* -------------------- UI -------------------- */
 
-const Card = memo(function Card({
-  card,
-  columnIndex,
-  cardIndex,
-}) {
+const Card = memo(function Card({ card, columnIndex, cardIndex }) {
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: ItemTypes.CARD,
     canDrag: () => {
-      if (columnIndex === undefined) return true;
+      if (columnIndex === undefined || columnIndex === -1) return true;
       const state = useGameStore.getState();
       const column = state.tableau[columnIndex];
 
@@ -125,24 +110,17 @@ const Card = memo(function Card({
       return isValidStack(stack);
     },
     item: () => {
-      if (columnIndex === undefined) {
-        return {
-          cards: [card],
-          fromColumn: null,
-        };
+      if (columnIndex === undefined || columnIndex === -1) {  // ← add check
+        return { cards: [card], fromColumn: columnIndex ?? null };
       }
       const state = useGameStore.getState();
       const column = state.tableau[columnIndex];
-
       const stack = column.slice(cardIndex).filter(c => c.faceUp);
 
-      return {
-        cards: stack,
-        fromColumn: columnIndex,
-      };
+      return { cards: stack, fromColumn: columnIndex };
     },
     collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
+      isDragging: !!monitor.isDragging()
     }),
   }));
 
@@ -151,8 +129,7 @@ const Card = memo(function Card({
   }, [preview]);
 
   return (
-    <div ref={drag} className={`w-15 h-20 flex items-center justify-center 
-      rounded-md border border-black bg-white font-bold cursor-grab
+    <div ref={drag} className={`${CARD_WIDTH} ${CARD_HEIGHT} ${CARD_TEXT} flex items-center justify-center rounded-md border border-black bg-white font-bold cursor-grab
      ${isDragging ? "opacity-0" : "opacity-100"}
       ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
       {card.rank}
@@ -161,13 +138,7 @@ const Card = memo(function Card({
   );
 });
 
-const DropZone = memo(function DropZone({
-  cards,
-  onDrop,
-  canDropCard,
-  columnIndex,
-  suit,
-}) {
+const DropZone = memo(function DropZone({ cards, onDrop, canDropCard, columnIndex, suit}) {
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
@@ -190,44 +161,28 @@ const DropZone = memo(function DropZone({
   const pileHeight =
     cards.length <= 1
       ? 100
-      : 100 + (cards.length - 1) * 28;
+      : 100 + (cards.length - 1) * CARD_OFFSET;
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center shrink-0">
 
-      <div
-        ref={drop}
-        className={`w-20 rounded-md border-2 border-dashed bg-green-500 relative transition-colors
-          ${isOver
-            ? canDrop
-              ? "border-green-300 bg-green-800/50"
-              : "border-red-500 bg-red-500/50"
-            : "border-green-600"
-          }
-        `}
-        style={{ minHeight: `${pileHeight}px` }}>
+      <div ref={drop} className={`${CARD_WIDTH} ${CARD_HEIGHT} rounded-md border-2 border-dashed bg-green-500 relative transition-colors
+          ${isOver ? canDrop ? "border-green-300 bg-green-800/50" : "border-red-500 bg-red-500/50" : "border-green-600"}`
+      } style={{ minHeight: `${pileHeight}px` }}>
 
         {cards.length === 0 && suit && (
-          <div
-            className={`absolute inset-0 flex items-center justify-center text-3xl pointer-events-none 
+          <div className={`absolute inset-0 flex items-center justify-center text-xl sm:text-2xl md:text-3xl pointer-events-none 
               ${suit === "♥" || suit === "♦" ? "text-red-500" : "text-blue-500"} opacity-90`}>
             {suit}
           </div>
         )}
 
         {cards.map((card, idx) => {
-          const isFaceUp = card.faceUp;
-          const isTop = idx === cards.length - 1;
+          const isFaceUp = card.faceUp; const isTop = idx === cards.length - 1;
 
           return (
-            <div
-              key={card.id}
-              className="absolute left-1/2"
-              style={{
-                top: `${idx * 28}px`,
-                zIndex: idx,
-                transform: "translateX(-50%)",
-              }}>
+            <div key={card.id} className="absolute left-1/2"
+              style={{ top: `${idx * CARD_OFFSET}px`, zIndex: idx, transform: "translateX(-50%)", }}>
               {isFaceUp ? (
                 <Card
                   card={card}
@@ -241,25 +196,11 @@ const DropZone = memo(function DropZone({
                     if (isTop && !card.faceUp) {
                       useGameStore
                         .getState()
-                        .flipTopTableauCard(
-                          columnIndex
-                        );
+                        .flipTopTableauCard( columnIndex );
                     }
                   }}
-                  className={`
-                    w-15
-                    h-20
-                    rounded-md
-                    border
-                    border-black
-                    bg-blue-900
-                    font-bold
-
-                    ${isTop && !card.faceUp
-                      ? "cursor-pointer"
-                      : "cursor-default"}
-                  `}
-                />
+                  className={` ${CARD_WIDTH} ${CARD_HEIGHT} rounded-md border border-black bg-blue-900 font-bold
+                    ${isTop && !card.faceUp ? "cursor-pointer" : "cursor-default"} `} />
               )}
             </div>
           );
@@ -283,10 +224,15 @@ function CustomDragLayer() {
     if (!item?.cards) return null;
 
     return item.cards.map((card, idx) => (
-      <div key={card.id} style={{ marginTop: idx === 0 ? 0 : -50, position: "relative", zIndex: idx, }}
-        className={`w-15 h-20 flex items-center justify-center 
-          rounded-md border border-black bg-white font-bold
-          ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
+      <div
+        key={card.id}
+        style={{
+          marginTop: idx === 0 ? 0 : -(CARD_HEIGHT_PX - CARD_OFFSET),
+          position: "relative",
+          zIndex: idx,
+        }}
+        className={`${CARD_WIDTH} ${CARD_HEIGHT} ${CARD_TEXT} flex items-center justify-center rounded sm:rounded-md border border-black bg-white font-bold
+      ${isRed(card.suit) ? "text-red-500" : "text-black"}`}>
         {card.rank}{card.suit}
       </div>
     ));
@@ -325,7 +271,7 @@ export default function Page() {
     (s) => s.canPlaceOnTableau
   );
 
-  const backend = useMemo(() => HTML5Backend, []);
+  const backend = useMemo(() => TouchBackend, []);
 
   useEffect(() => {
     initializeGame(createGame());
@@ -351,22 +297,23 @@ export default function Page() {
   );
 
   return (
-    <DndProvider backend={backend}>
+    <DndProvider backend={backend} options={{ enableMouseEvents: true, delayTouchStart: 120 }}>
       <CustomDragLayer />
 
-      <div className="p-5 bg-green-600 min-h-175 max-h-full">
+      <div className="p-2 sm:p-3 md:p-5 bg-green-600 min-h-200 overflow-auto flex flex-col select-none">
 
         {/* ---------------- TOP ROW ---------------- */}
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex gap-4 lg:flex-row justify-between items-start mb-6">
 
           {/* LEFT SIDE */}
-          <div className="flex gap-3 items-start">
+          <div className="flex gap-1 sm:gap-2 md:gap-3 items-center">
 
             {/* STOCKPILE */}
             <div onClick={nextStockCard}
-              className="relative w-20 h-25 border-2 border-dashed bg-green-500 border-green-600 rounded-md cursor-pointer flex items-center justify-center">
-              <div className="w-15 h-20 rounded-md bg-blue-900 border-2 border-black relative">
-                <div className="absolute bottom-1 right-1 text-white text-xs">
+              className={`relative 
+              ${CARD_WIDTH} ${CARD_HEIGHT} border-2 border-dashed bg-green-500 border-green-600 rounded-md cursor-pointer flex items-center justify-center`}>
+              <div className={`${CARD_WIDTH} ${CARD_HEIGHT} rounded-md bg-blue-900 border-2 border-black relative`}>
+                <div className="absolute bottom-1 right-1 text-white text-[10px] sm:text-xs">
                   {remainingStockCount}
                 </div>
 
@@ -374,18 +321,16 @@ export default function Page() {
             </div>
 
             {/* WASTE */}
-            <DropZone cards={
-              topStockCard
-                ? [{ ...topStockCard, faceUp: true }]
-                : []
-            }
+            <DropZone
+              cards={topStockCard ? [{ ...topStockCard, faceUp: true }] : []}
+              columnIndex={-1}
               onDrop={() => { }}
               canDropCard={() => false}
             />
 
             {/* RESET */}
             {isAtEnd && (
-              <button onClick={resetStockCycle} className=" px-3 py-2 bg-yellow-400 rounded-md font-bold hover:bg-yellow-300 transition self-center">
+              <button onClick={resetStockCycle} className="px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm bg-yellow-400 rounded-md font-bold hover:bg-yellow-300 transition self-center">
                 Reset
               </button>
             )}
@@ -393,7 +338,7 @@ export default function Page() {
           </div>
 
           {/* FOUNDATIONS */}
-          <div className="flex gap-3">
+          <div className="flex gap-1 sm:gap-2 md:gap-3">
 
             {foundations.map((cards, i) => (
               <DropZone
@@ -413,7 +358,7 @@ export default function Page() {
         </div>
 
         {/* ---------------- TABLEAU ---------------- */}
-        <div className="flex gap-3 items-start">
+        <div className=" flex gap-1 sm:gap-2 md:gap-3 items-start overflow-x-auto flex-1">
 
           {tableau.map((cards, i) => (
             <DropZone
