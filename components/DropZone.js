@@ -158,7 +158,7 @@ const DropZone = memo(function DropZone({ cards, onDrop, canDropCard, columnInde
                                         useGameStore.getState().flipTopTableauCard(columnIndex);
                                     }
                                 }}
-                                    className={`${CARD_WIDTH}${CARD_HEIGHT}
+                                    className={`${CARD_WIDTH} ${CARD_HEIGHT}
                     rounded-md overflow-hidden shrink-0
                     ${isTop && !card.faceUp ? "cursor-pointer" : "cursor-default"}`}>
                                     <div className="w-full h-full rounded-md bg-[url('/cards/FDC.png')] bg-cover bg-center" /></div>
