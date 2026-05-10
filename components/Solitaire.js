@@ -29,10 +29,7 @@ const suitLetter = {
 
 function createDeck() {
   return suits.flatMap((suit) =>
-    ranks.map((rank) => ({
-      suit,
-      rank,
-      id: `${rank}${suit}`,
+    ranks.map((rank) => ({ suit, rank, id: `${rank}${suit}`,
       image: `/cards/${rank}${suitLetter[suit]}.svg`,
     }))
   );
@@ -53,9 +50,7 @@ function shuffle(array) {
 
 function createGame() {
   const shuffled = shuffle(createDeck());
-
   const tableau = Array.from({ length: 7 }, () => []);
-
   let index = 0;
 
   for (let col = 0; col < 7; col++) {
@@ -71,12 +66,7 @@ function createGame() {
 
   const stock = shuffled.slice(index);
 
-  return {
-    stock,
-    stockIndex: 0,
-    tableau,
-    foundations: [[], [], [], []],
-  };
+  return { stock, stockIndex: 0, tableau, foundations: [[], [], [], []] };
 }
 
 /* -------------------- COMPONENT -------------------- */
@@ -114,8 +104,8 @@ export default function Solitaire() {
       select-none touch-none
       min-h-140 sm:min-h-160 md:min-h-200 lg:min-h-220
     "
-    style={{ overscrollBehavior: "contain" }}
-    >
+    style={{ overscrollBehavior: "contain" }}>
+      
       {/* TOP ROW */}
       <div className="flex gap-4 justify-between items-start mb-6">
         <StockArea />

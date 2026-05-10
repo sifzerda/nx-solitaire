@@ -5,30 +5,16 @@
 import { memo, useCallback } from "react";
 import usePointerDrag from "./usePointerDrag";
 
-const Card = memo(function Card({
-  card,
-  stack,
-  index = 0,
-  source,
-}) {
+const Card = memo(function Card({ card, stack, index = 0, source }) {
   const { startDrag } = usePointerDrag();
 
   const onPointerDown = useCallback(
-    (e) => {
-      e.preventDefault();
-
+     (e) => { e.preventDefault();
       if (!card) return;
 
       // SAFE STACK RESOLUTION
-      const resolvedStack =
-        Array.isArray(stack) && stack.length > 0
-          ? stack.slice(index)
-          : [card];
-
-      startDrag(e, {
-        cards: resolvedStack,
-        source,
-      });
+      const resolvedStack = Array.isArray(stack) && stack.length > 0 ? stack.slice(index) : [card];
+      startDrag(e, { cards: resolvedStack, source });
     },
     [startDrag, card, stack, index, source]
   );
@@ -43,15 +29,9 @@ const Card = memo(function Card({
         overflow-hidden
         touch-none
         cursor-grab
-        select-none
-      "
-    >
-      <img
-        src={card.image}
-        alt={card.id}
-        draggable={false}
-        className="w-full h-full object-cover pointer-events-none"
-      />
+        select-none">
+      <img src={card.image} alt={card.id} draggable={false} className=
+      "w-full h-full object-cover pointer-events-none" />
     </div>
   );
 });
