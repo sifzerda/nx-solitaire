@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
-    "@dnd-kit/core": "^6.3.1",
     "@prisma/adapter-neon": "^7.6.0",
     "@prisma/client": "^7.6.0",
     "bcrypt": "^6.0.0",
@@ -20,9 +19,6 @@
     "next": "16.2.1",
     "next-auth": "^4.24.13",
     "react": "19.2.4",
-    "react-dnd": "^16.0.1",
-    "react-dnd-html5-backend": "^16.0.1",
-    "react-dnd-touch-backend": "^16.0.1",
     "react-dom": "19.2.4",
     "react-icons": "^5.6.0",
     "zustand": "^5.0.12"

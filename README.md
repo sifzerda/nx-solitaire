@@ -15,7 +15,7 @@
 
 ## Description
 
-This is a rebuild and refactor of my first fullstack minesweeper game into a serverless Next.js app, using a zustand store. The database of users was removed and styling was enhanced. 
+This is a rebuild and refactor of my first fullstack minesweeper game into a serverless Next.js app, using a zustand store. The database of users was removed and styling was enhanced. I created a first attempt with react-dnd, and then optimized by removing dnd and switching to a DOM-based Pointer Event system.
 
 ## Badges
 
@@ -109,18 +109,16 @@ SEO = 100
 - [x] front and back/flip cards
 - [x] cards are stacked in pile
 - [x] Memoized game
-
 - [x] change inline styling to tailwind classes
-- [ ] optimize memory and efficiency
-
+- [x] optimize memory and efficiency
 - [x] enable dragging tableau stacks
-
 - [x] make responsive and enable mobile play
 - [x] change card appearance to enable display stacked for card stack dnd
 - [x] remove trash debug dropzone
-
 - [x] remove 'column...', 'waste', 'tableau'
 - [x] move foundation icon into box
+
 - [ ] restart/redraw game
 - [ ] win screen, move count, time taken.
 - [ ] restyle stockpile reset btn
+- [ ] fix up GUI for pointer event system

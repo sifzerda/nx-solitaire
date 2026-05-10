@@ -4,9 +4,11 @@ import { create } from "zustand";
 
 const suits = ["♠", "♥", "♦", "♣"];
 const RED_SUITS = new Set(["♥", "♦"]);
+
 function isRed(suit) {
   return RED_SUITS.has(suit);
 }
+
 const rankValue = {
   A: 1,
   2: 2,
@@ -31,14 +33,38 @@ const useGameStore = create((set, get) => ({
   tableau: [[], [], [], [], [], [], []],
   foundations: [[], [], [], []],
 
+  /* ---------------- HISTORY (UNDO / REDO) ---------------- */
+  history: [],
+  future: [],
+
+  /* ---------------- SNAPSHOT ---------------- */
+
+  snapshot: (state) => ({
+    stock: state.stock,
+    stockIndex: state.stockIndex,
+    tableau: state.tableau.map((p) => [...p]),
+    foundations: state.foundations.map((p) => [...p]),
+  }),
+
+  /* ---------------- INIT ---------------- */
+
   initializeGame: (game) => {
-    set({ ...game, stockIndex: game.stock.length - 1 });
+    set({
+      ...game,
+      stockIndex: game.stock.length - 1,
+      history: [],
+      future: [],
+    });
   },
+
+  /* ---------------- STOCK ---------------- */
 
   nextStockCard: () => {
     set((state) => {
       if (state.stock.length === 0) return state;
+
       const nextIndex = state.stockIndex - 1;
+
       return {
         stockIndex: nextIndex >= 0 ? nextIndex : 0,
       };
@@ -51,121 +77,243 @@ const useGameStore = create((set, get) => ({
     }));
   },
 
+  /* ---------------- TABLEAU HELPERS ---------------- */
+
   flipTopTableauCard: (colIndex) => {
     set((state) => {
-      const next = [...state.tableau];
-      const pile = [...next[colIndex]];
-      if (pile.length === 0) return state;
+      const tableau = [...state.tableau];
+      const pile = [...tableau[colIndex]];
 
-      const topIndex = pile.length - 1;
+      if (!pile.length) return state;
 
-      if (!pile[topIndex].faceUp) {
-        pile[topIndex] = {
-          ...pile[topIndex],
+      const top = pile[pile.length - 1];
+
+      if (!top.faceUp) {
+        pile[pile.length - 1] = {
+          ...top,
           faceUp: true,
         };
       }
 
-      next[colIndex] = pile;
-      return { tableau: next };
-    });
-  },
-
-  removeCardFromAll: (cardId) => {
-    set((state) => ({
-      stock: state.stock.filter((c) => c.id !== cardId),
-      tableau: state.tableau.map((pile) =>
-        pile.filter((c) => c.id !== cardId)
-      ),
-      foundations: state.foundations.map((pile) =>
-        pile.filter((c) => c.id !== cardId)
-      ),
-    }));
-  },
-
-  canPlaceOnFoundation: (card, index) => {
-
-
-
-
-    const pile = get().foundations[index];
-    const topCard = pile[pile.length - 1];
-
-    if (card.suit !== suits[index]) return false;
-    if (!topCard) return card.rank === "A";
-
-    return rankValue[card.rank] === rankValue[topCard.rank] + 1;
-  },
-
-  moveToFoundation: (card, index) => {
-    if (!get().canPlaceOnFoundation(card, index)) return;
-
-    get().removeCardFromAll(card.id);
-
-    set((state) => {
-      const next = [...state.foundations];
-      next[index] = [...next[index], card];
-      return { foundations: next };
-    });
-  },
-
-  canPlaceOnTableau: (card, index) => {
-    const state = get();
-    const pile = state.tableau[index];
-    const bottomCard = pile[pile.length - 1];
-
-    if (!bottomCard) return card.rank === "K";
-
-    return (
-      isRed(card.suit) !== isRed(bottomCard.suit) &&
-      rankValue[card.rank] === rankValue[bottomCard.rank] - 1
-    );
-  },
-
-  moveStackToTableau: (cards, fromColumn, toColumn) => {
-    const first = cards[0];
-
-    if (!get().canPlaceOnTableau(first, toColumn)) return;
-
-    set((state) => {
-      const tableau = [...state.tableau];
-
-      if (fromColumn === -1) {
-        // Coming from waste — remove from stock
-        const newStock = state.stock.filter((c) => c.id !== cards[0].id);
-        tableau[toColumn] = [
-          ...tableau[toColumn],
-          ...cards.map((c) => ({ ...c, faceUp: true })),
-        ];
-        return { tableau, stock: newStock };
-      }
-
-      if (fromColumn !== null && fromColumn !== undefined) {
-        tableau[fromColumn] = tableau[fromColumn].slice(
-          0,
-          tableau[fromColumn].length - cards.length
-        );
-      }
-
-      tableau[toColumn] = [
-        ...tableau[toColumn],
-        ...cards.map((c) => ({ ...c, faceUp: true })),
-      ];
+      tableau[colIndex] = pile;
 
       return { tableau };
     });
-
-    if (fromColumn !== null && fromColumn !== undefined && fromColumn !== -1) {
-      get().flipTopTableauCard(fromColumn);
-    }
   },
 
-  moveToStock: (card) => {
-    get().removeCardFromAll(card.id);
-
+  removeCardFromAll: (id) => {
     set((state) => ({
-      stock: [...state.stock, card],
+      stock: state.stock.filter((c) => c.id !== id),
+      tableau: state.tableau.map((p) =>
+        p.filter((c) => c.id !== id)
+      ),
+      foundations: state.foundations.map((p) =>
+        p.filter((c) => c.id !== id)
+      ),
     }));
+  },
+
+  /* ---------------- VALIDATION ---------------- */
+
+  canPlaceOnTableau: (card, col) => {
+    const pile = get().tableau[col];
+    const top = pile[pile.length - 1];
+
+    if (!top) return card.rank === "K";
+
+    return (
+      isRed(card.suit) !== isRed(top.suit) &&
+      rankValue[card.rank] === rankValue[top.rank] - 1
+    );
+  },
+
+  canPlaceOnFoundation: (card, index) => {
+    const pile = get().foundations[index];
+    const top = pile[pile.length - 1];
+
+    console.group("🏛 canPlaceOnFoundation");
+    console.log("card:", card.id, "→ slot", index);
+    console.log("pile:", pile.map(c => c.id));
+    console.log("top:", top?.id ?? "EMPTY");
+    console.groupEnd();
+
+    if (!top) return card.rank === "A";
+    return (
+      card.suit === top.suit &&
+      rankValue[card.rank] === rankValue[top.rank] + 1
+    );
+  },
+
+  /* ---------------- CORE MOVE ENGINE ---------------- */
+
+  moveCards: ({ cards, from, to }) => {
+    if (!cards?.length) return;
+
+    const state = get();
+    const first = cards[0];
+
+    /* ---------------- SAVE HISTORY (IMPORTANT) ---------------- */
+    const snapshot = {
+      stock: state.stock,
+      stockIndex: state.stockIndex,
+      tableau: state.tableau.map((p) => [...p]),
+      foundations: state.foundations.map((p) => [...p]),
+    };
+
+    // helper — only call after validation passes
+    const saveHistory = () =>
+      set({ history: [...get().history, snapshot], future: [] });
+
+    /* ---------------- TABLEAU → TABLEAU ---------------- */
+    if (
+      from.type === "tableau" &&
+      to.type === "tableau"
+    ) {
+      if (!state.canPlaceOnTableau(first, to.column)) return;
+
+      set((state) => {
+        const tableau = [...state.tableau];
+
+        tableau[from.column] = tableau[from.column].slice(
+          0,
+          tableau[from.column].length - cards.length
+        );
+
+        tableau[to.column] = [
+          ...tableau[to.column],
+          ...cards,
+        ];
+
+        return { tableau };
+      });
+
+      state.flipTopTableauCard(from.column);
+      return;
+    }
+
+    /* ---------------- TABLEAU → FOUNDATION ---------------- */
+    if (from.type === "tableau" && to.type === "foundation") {
+      if (!state.canPlaceOnFoundation(first, to.foundation)) return;
+      saveHistory();
+
+      set((state) => {
+        // remove card from source column and flip new top
+        const tableau = state.tableau.map((pile, i) => {
+          if (i !== from.column) return pile;
+          const updated = pile.filter((c) => c.id !== first.id);
+          if (updated.length && !updated[updated.length - 1].faceUp) {
+            updated[updated.length - 1] = {
+              ...updated[updated.length - 1],
+              faceUp: true,
+            };
+          }
+          return updated;
+        });
+
+        // add to foundation
+        const foundations = state.foundations.map((pile, i) =>
+          i === to.foundation ? [...pile, first] : pile
+        );
+
+        return { tableau, foundations };
+      });
+      return;
+    }
+
+    /* ---------------- WASTE → TABLEAU ---------------- */
+    if (
+      from.type === "waste" &&
+      to.type === "tableau"
+    ) {
+      if (!state.canPlaceOnTableau(first, to.column)) return;
+      saveHistory(); // 
+      set((state) => {
+        const tableau = [...state.tableau];
+
+        tableau[to.column] = [
+          ...tableau[to.column],
+          first,
+        ];
+
+        const stock = state.stock.filter(
+          (c) => c.id !== first.id
+        );
+
+        return { tableau, stock };
+      });
+
+      return;
+    }
+
+
+if (from.type === "waste" && to.type === "foundation") {
+  if (!state.canPlaceOnFoundation(first, to.foundation)) return;
+  saveHistory();
+
+  set((state) => {
+    const foundations = state.foundations.map((pile, i) =>
+      i === to.foundation ? [...pile, first] : pile
+    );
+    const stock = state.stock.filter((c) => c.id !== first.id);
+    return { foundations, stock };
+  });
+  return;
+}
+
+
+  },
+
+  /* ---------------- UNDO ---------------- */
+
+  undo: () => {
+    const state = get();
+
+    if (state.history.length === 0) return;
+
+    const previous =
+      state.history[state.history.length - 1];
+
+    const future = [
+      {
+        stock: state.stock,
+        stockIndex: state.stockIndex,
+        tableau: state.tableau,
+        foundations: state.foundations,
+      },
+      ...state.future,
+    ];
+
+    set({
+      ...previous,
+      history: state.history.slice(0, -1),
+      future,
+    });
+  },
+
+  /* ---------------- REDO ---------------- */
+
+  redo: () => {
+    const state = get();
+
+    if (state.future.length === 0) return;
+
+    const next = state.future[0];
+
+    const history = [
+      ...state.history,
+      {
+        stock: state.stock,
+        stockIndex: state.stockIndex,
+        tableau: state.tableau,
+        foundations: state.foundations,
+      },
+    ];
+
+    set({
+      ...next,
+      history,
+      future: state.future.slice(1),
+    });
   },
 }));
 
