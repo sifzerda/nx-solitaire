@@ -1,174 +1,287 @@
+// components/DropZone.js
+
 "use client";
 
-import { useEffect } from "react";
-import { memo } from "react";
+import { useEffect, memo, useCallback } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-
 import useGameStore from "./useGameStore";
 
+/* ---------------- TYPES ---------------- */
+
 const ItemTypes = { CARD: "card" };
+
+/* ---------------- CONSTANTS ---------------- */
 
 const CARD_WIDTH = `w-15 sm:w-18 md:w-22 lg:w-28`;
 const CARD_HEIGHT = `h-24 sm:h-26 md:h-30 lg:h-40`;
 const CARD_TEXT = `text-md sm:text-md md:text-base lg:text-lg`;
 
-const rankValue = (rank) =>
-({
-    A: 1,
-    2: 2,
-    3: 3,
-    4: 4,
-    5: 5,
-    6: 6,
-    7: 7,
-    8: 8,
-    9: 9,
-    10: 10,
-    J: 11,
-    Q: 12,
-    K: 13,
-}[rank]);
+/* ---------------- ENGINE HELPERS ---------------- */
 
-const isRed = (suit) =>
-    suit === "♥" || suit === "♦";
+const rankValue = {
+  A: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
+  8: 8,
+  9: 9,
+  10: 10,
+  J: 11,
+  Q: 12,
+  K: 13,
+};
+
+const RED_SUITS = new Set(["♥", "♦"]);
+
+const isRed = (suit) => RED_SUITS.has(suit);
+
+/* ---------------- STACK VALIDATION ---------------- */
 
 function isValidStack(stack) {
-    for (let i = 0; i < stack.length - 1; i++) {
-        const current = stack[i];
-        const next = stack[i + 1];
+  for (let i = 0; i < stack.length - 1; i++) {
+    const a = stack[i];
+    const b = stack[i + 1];
 
-        const oppositeColor =
-            isRed(current.suit) !== isRed(next.suit);
-
-        const correctOrder =
-            rankValue(current.rank) ===
-            rankValue(next.rank) + 1;
-
-        if (!oppositeColor || !correctOrder) {
-            return false;
-        }
+    if (
+      isRed(a.suit) === isRed(b.suit) ||
+      rankValue[a.rank] !== rankValue[b.rank] + 1
+    ) {
+      return false;
     }
-
-    return true;
+  }
+  return true;
 }
 
-/* ---------------- CARD ---------------- */
+/* =======================================================
+   CARD COMPONENT (OPTIMIZED)
+======================================================= */
 
 const Card = memo(function Card({
-    card,
-    columnIndex,
-    cardIndex,
+  card,
+  columnIndex,
+  cardIndex,
 }) {
-    const [{ isDragging }, drag, preview] = useDrag(() => ({
-        type: ItemTypes.CARD,
+  const [{ isDragging }, drag, preview] = useDrag(() => ({
+    type: ItemTypes.CARD,
 
-        canDrag: () => {
-            if (columnIndex === undefined || columnIndex === -1) {
-                return true;
-            }
+    canDrag: () => {
+      if (columnIndex == null || columnIndex === -1) return true;
 
-            const state = useGameStore.getState();
-            const column = state.tableau[columnIndex];
+      const state = useGameStore.getState();
+      const column = state.tableau[columnIndex];
+      if (!column) return false;
 
-            if (!column) return false;
+      const stack = column
+        .slice(cardIndex)
+        .filter((c) => c.faceUp);
 
-            const rawStack = column.slice(cardIndex);
-            const stack = rawStack.filter((c) => c.faceUp);
+      return isValidStack(stack);
+    },
 
-            return isValidStack(stack);
-        },
+    item: () => {
+      const state = useGameStore.getState();
 
-        item: () => {
-            if (columnIndex === undefined || columnIndex === -1) {
-                return { cards: [card], fromColumn: columnIndex ?? null };
-            }
+      if (columnIndex == null || columnIndex === -1) {
+        return {
+          cards: [card],
+          fromColumn: columnIndex ?? null,
+        };
+      }
 
-            const state = useGameStore.getState();
-            const column = state.tableau[columnIndex];
-            const stack = column.slice(cardIndex).filter((c) => c.faceUp);
+      const column = state.tableau[columnIndex];
 
-            return { cards: stack, fromColumn: columnIndex };
-        },
+      const stack = column
+        .slice(cardIndex)
+        .filter((c) => c.faceUp);
 
-        collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
-    }));
+      return {
+        cards: stack,
+        fromColumn: columnIndex,
+      };
+    },
 
-    useEffect(() => {
-        preview(getEmptyImage(), { captureDraggingState: true });
-    }, [preview]);
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
 
-    return (
-        <div ref={drag} className={`${CARD_WIDTH} ${CARD_HEIGHT} ${CARD_TEXT}
-        transform-gpu will-change-transform flex items-center justify-center rounded-md border border-black  bg-white font-bold cursor-grab
-        ${isDragging ? "opacity-0" : "opacity-100"}`}>
-            <img src={card.image} alt={`${card.rank}${card.suit}`} draggable={false}
-                className="w-full h-full object-contain rounded-md pointer-events-none" />
-        </div>
-    );
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  }, [preview]);
+
+  return (
+    <div
+      ref={drag}
+      className={`
+        ${CARD_WIDTH}
+        ${CARD_HEIGHT}
+        ${CARD_TEXT}
+
+        flex
+        items-center
+        justify-center
+
+        rounded-md
+        border
+        border-black
+        bg-white
+
+        cursor-grab
+        transform-gpu
+        will-change-transform
+
+        ${isDragging ? "opacity-0" : "opacity-100"}
+      `}
+    >
+      <img
+        src={card.image}
+        alt={`${card.rank}${card.suit}`}
+        draggable={false}
+        className="w-full h-full object-contain rounded-md pointer-events-none"
+      />
+    </div>
+  );
 });
 
-/* ---------------- DROPZONE ---------------- */
+/* =======================================================
+   DROPZONE COMPONENT (OPTIMIZED)
+======================================================= */
 
-const DropZone = memo(function DropZone({ cards, onDrop, canDropCard, columnIndex, suit }) {
-    const [{ isOver, canDrop }, drop] = useDrop(() => ({
-        accept: ItemTypes.CARD,
+const DropZone = memo(function DropZone({
+  cards,
+  onDrop,
+  canDropCard,
+  columnIndex,
+  suit,
+}) {
+  const flipTopTableauCard = useGameStore(
+    useCallback((s) => s.flipTopTableauCard, [])
+  );
 
-        canDrop: (item) => {
-            if (!canDropCard) return true;
-            const firstCard = item.cards[0];
-            return canDropCard(firstCard);
-        },
+  const [{ isOver, canDrop }, drop] = useDrop(() => ({
+    accept: ItemTypes.CARD,
 
-        drop: (item) => onDrop(item.cards, item.fromColumn),
+    canDrop: (item) => {
+      if (!canDropCard) return true;
+      return canDropCard(item.cards[0]);
+    },
 
-        collect: (monitor) => ({ isOver: !!monitor.isOver(), canDrop: !!monitor.canDrop() }),
-    }));
+    drop: (item) => {
+      onDrop(item.cards, item.fromColumn);
+    },
 
-    const pileHeight = cards.length <= 1 ? 100 : 100 + (cards.length - 1) * 28;
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  }));
 
-    return (
-        <div className="flex flex-col items-center shrink-0">
-            <div ref={drop} className={`${CARD_WIDTH} ${CARD_HEIGHT} 
-            rounded-md border-2 border-dashed bg-green-500 relative transition-colors
-          ${isOver ? canDrop
-                    ? "border-green-300 bg-green-800/50" : "border-red-500 bg-red-500/50" : "border-green-600"}
+  const pileHeight = cards.length <= 1
+    ? 100
+    : 100 + (cards.length - 1) * 28;
+
+  return (
+    <div className="flex flex-col items-center shrink-0">
+      <div
+        ref={drop}
+        className={`
+          ${CARD_WIDTH}
+          ${CARD_HEIGHT}
+
+          relative
+          rounded-md
+          border-2
+          border-dashed
+          bg-green-500
+          transition-colors
+
+          ${
+            isOver
+              ? canDrop
+                ? "border-green-300 bg-green-800/50"
+                : "border-red-500 bg-red-500/50"
+              : "border-green-600"
+          }
         `}
-                style={{ minHeight: `${pileHeight}px` }}>
-                {/* EMPTY FOUNDATION SUIT */}
-                {cards.length === 0 && suit && (
-                    <div className={`
-              absolute inset-0 flex items-center justify-center text-xl sm:text-2xl md:text-3xl pointer-events-none
-              ${suit === "♥" || suit === "♦" ? "text-red-500" : "text-blue-500"} opacity-90`}> {suit} </div>
-                )}
+        style={{ minHeight: `${pileHeight}px` }}
+      >
+        {/* EMPTY SUIT PLACEHOLDER */}
+        {cards.length === 0 && suit && (
+          <div
+            className={`
+              absolute inset-0 flex items-center justify-center
+              text-xl sm:text-2xl md:text-3xl
+              pointer-events-none
 
-                {/* CARDS */}
-                {cards.map((card, idx) => {
-                    const isFaceUp = card.faceUp;
-                    const isTop = idx === cards.length - 1;
+              ${
+                suit === "♥" || suit === "♦"
+                  ? "text-red-500"
+                  : "text-blue-500"
+              }
 
-                    return (
-                        <div key={card.id} className="absolute left-1/2"
-                            style={{ top: `calc(${idx} * var(--card-offset))`, zIndex: idx, transform: "translateX(-50%)" }}>
-                            {isFaceUp ? (
-                                <Card card={card} columnIndex={columnIndex} cardIndex={idx} />
-                            ) : (
-                                <div onClick={() => {
-                                    if (isTop && !card.faceUp) {
-                                        useGameStore.getState().flipTopTableauCard(columnIndex);
-                                    }
-                                }}
-                                    className={`${CARD_WIDTH} ${CARD_HEIGHT}
-                    rounded-md overflow-hidden shrink-0
-                    ${isTop && !card.faceUp ? "cursor-pointer" : "cursor-default"}`}>
-                                    <div className="w-full h-full rounded-md bg-[url('/cards/FDC.png')] bg-cover bg-center" /></div>
-                            )}
-                        </div>
-                    );
-                })}
+              opacity-90
+            `}
+          >
+            {suit}
+          </div>
+        )}
+
+        {/* CARDS */}
+        {cards.map((card, idx) => {
+          const isFaceUp = card.faceUp;
+          const isTop = idx === cards.length - 1;
+
+          return (
+            <div
+              key={card.id}
+              className="absolute left-1/2"
+              style={{
+                top: `calc(${idx} * var(--card-offset))`,
+                zIndex: idx,
+                transform: "translateX(-50%)",
+              }}
+            >
+              {isFaceUp ? (
+                <Card
+                  card={card}
+                  columnIndex={columnIndex}
+                  cardIndex={idx}
+                />
+              ) : (
+                <div
+                  onClick={() => {
+                    if (isTop && !card.faceUp) {
+                      flipTopTableauCard(columnIndex);
+                    }
+                  }}
+                  className={`
+                    ${CARD_WIDTH}
+                    ${CARD_HEIGHT}
+
+                    rounded-md
+                    overflow-hidden
+                    shrink-0
+
+                    ${
+                      isTop && !card.faceUp
+                        ? "cursor-pointer"
+                        : "cursor-default"
+                    }
+                  `}
+                >
+                  <div className="w-full h-full bg-[url('/cards/FDC.png')] bg-cover bg-center" />
+                </div>
+              )}
             </div>
-        </div>
-    );
+          );
+        })}
+      </div>
+    </div>
+  );
 });
 
 export default DropZone;
