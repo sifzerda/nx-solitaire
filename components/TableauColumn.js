@@ -11,7 +11,7 @@ const TableauColumn = memo(function TableauColumn({ index }) {
 
   return (
     <div
-  className="relative min-w-[80px] min-h-24 sm:min-h-26 md:min-h-30 lg:min-h-40"
+  className="relative min-w-20 min-h-24 sm:min-h-26 md:min-h-30 lg:min-h-40"
   data-dropzone="tableau"
       data-column={index}
       style={{ contain: "paint" }}
