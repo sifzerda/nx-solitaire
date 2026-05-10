@@ -2,12 +2,22 @@
 
 "use client";
 
-import { useEffect, useMemo, memo } from "react";
-import { DndProvider, useDragLayer } from "react-dnd";
+import {
+  useEffect,
+  useMemo,
+  memo,
+} from "react";
+
+import {
+  DndProvider,
+  useDragLayer,
+} from "react-dnd";
+
 import { TouchBackend } from "react-dnd-touch-backend";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import useGameStore from "./useGameStore";
+
 import TableauColumn from "./TableauColumn";
 import FoundationPile from "./FoundationPile";
 import StockArea from "./StockArea";
@@ -15,22 +25,50 @@ import StockArea from "./StockArea";
 /* -------------------- CONSTANTS -------------------- */
 
 const suits = ["♠", "♥", "♦", "♣"];
-const ranks = [ "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" ];
-const suitLetter = { "♠": "S", "♥": "H", "♦": "D", "♣": "C" };
+
+const ranks = [
+  "A",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "J",
+  "Q",
+  "K",
+];
+
+const suitLetter = {
+  "♠": "S",
+  "♥": "H",
+  "♦": "D",
+  "♣": "C",
+};
+
 const CARD_WIDTH = `w-15 sm:w-18 md:w-22 lg:w-28`;
 const CARD_HEIGHT = `h-24 sm:h-26 md:h-30 lg:h-40`;
 const CARD_TEXT = `text-md sm:text-md md:text-base lg:text-lg`;
 
 const ALL_CARDS = suits.flatMap((suit) =>
-  ranks.map((rank) => ({ suit, rank, image: `/cards/${rank}${suitLetter[suit]}.svg` }))
+  ranks.map((rank) => ({
+    suit,
+    rank,
+    image: `/cards/${rank}${suitLetter[suit]}.svg`,
+  }))
 );
 
 /* -------------------- HELPERS -------------------- */
 
 function createDeck() {
-  return suits.flatMap((suit) => 
+  return suits.flatMap((suit) =>
     ranks.map((rank) => ({
-      suit, rank, id: `${rank}${suit}`,
+      suit,
+      rank,
+      id: `${rank}${suit}`,
       image: `/cards/${rank}${suitLetter[suit]}.svg`,
     }))
   );
@@ -328,8 +366,11 @@ export default function Solitaire() {
             gap-1
             sm:gap-2
             md:gap-3
+
             items-start
+
             overflow-x-auto
+
             flex-1
           "
         >

@@ -2,6 +2,27 @@
 
 import { create } from "zustand";
 
+const suits = ["♠", "♥", "♦", "♣"];
+const RED_SUITS = new Set(["♥", "♦"]);
+function isRed(suit) {
+  return RED_SUITS.has(suit);
+}
+const rankValue = {
+  A: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
+  8: 8,
+  9: 9,
+  10: 10,
+  J: 11,
+  Q: 12,
+  K: 13,
+};
+
 /* -------------------- STORE -------------------- */
 
 const useGameStore = create((set, get) => ({
@@ -63,13 +84,9 @@ const useGameStore = create((set, get) => ({
   },
 
   canPlaceOnFoundation: (card, index) => {
-    const suits = ["♠", "♥", "♦", "♣"];
 
-    const rankValue = (rank) =>
-    ({
-      A: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7,
-      8: 8, 9: 9, 10: 10, J: 11, Q: 12, K: 13,
-    }[rank]);
+
+
 
     const pile = get().foundations[index];
     const topCard = pile[pile.length - 1];
@@ -77,7 +94,7 @@ const useGameStore = create((set, get) => ({
     if (card.suit !== suits[index]) return false;
     if (!topCard) return card.rank === "A";
 
-    return rankValue(card.rank) === rankValue(topCard.rank) + 1;
+    return rankValue[card.rank] === rankValue[topCard.rank] + 1;
   },
 
   moveToFoundation: (card, index) => {
@@ -97,18 +114,11 @@ const useGameStore = create((set, get) => ({
     const pile = state.tableau[index];
     const bottomCard = pile[pile.length - 1];
 
-    const isRed = (s) => s === "♥" || s === "♦";
-    const rankValue = (r) =>
-    ({
-      A: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7,
-      8: 8, 9: 9, 10: 10, J: 11, Q: 12, K: 13,
-    }[r]);
-
     if (!bottomCard) return card.rank === "K";
 
     return (
       isRed(card.suit) !== isRed(bottomCard.suit) &&
-      rankValue(card.rank) === rankValue(bottomCard.rank) - 1
+      rankValue[card.rank] === rankValue[bottomCard.rank] - 1
     );
   },
 
