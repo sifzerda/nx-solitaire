@@ -2,13 +2,16 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import useGameStore from "./useGameStore";
 
 import TableauColumn from "./TableauColumn";
 import FoundationPile from "./FoundationPile";
 import StockArea from "./StockArea";
+
+import WinScreen from "./WinScreen";
+
 
 /* -------------------- CONSTANTS -------------------- */
 
@@ -24,6 +27,8 @@ const suitLetter = {
   "♦": "D",
   "♣": "C",
 };
+
+const gameBgClass = "bg-green-600 bg-[url('/GBG3.png')] bg-contain";
 
 /* -------------------- DECK -------------------- */
 
@@ -74,6 +79,10 @@ function createGame() {
 export default function Solitaire() {
   const initializeGame = useGameStore((s) => s.initializeGame);
 
+  const foundations = useGameStore((s) => s.foundations);
+
+  const [forceWin, setForceWin] = useState(false);
+
   /* preload images */
   useEffect(() => {
     const images = createDeck().map((card) => {
@@ -92,6 +101,10 @@ export default function Solitaire() {
     initializeGame(createGame());
   }, [initializeGame]);
 
+const hasWon =
+  forceWin ||
+  foundations.every((pile) => pile.length === 13);
+
   return (
     <div className="
       p-2 sm:p-3 md:p-5
@@ -105,6 +118,34 @@ export default function Solitaire() {
       min-h-140 sm:min-h-160 md:min-h-200 lg:min-h-220
     "
     style={{ overscrollBehavior: "contain" }}>
+
+      <button
+  onClick={() => setForceWin(true)}
+  className="
+    fixed top-3 right-3
+    bg-white text-black
+    px-3 py-2 rounded-md
+    shadow-md
+    z-50
+    text-sm
+  "
+>
+  Force Win
+</button>
+
+<button
+  onClick={() => setForceWin(false)}
+  className="
+    fixed top-14 right-3
+    bg-gray-900 text-white
+    px-3 py-2 rounded-md
+    shadow-md
+    z-50
+    text-sm
+  "
+>
+  Reset Win
+</button>
       
       {/* TOP ROW */}
       <div className="flex gap-4 justify-between items-start mb-6">
@@ -121,8 +162,12 @@ export default function Solitaire() {
       <div className="flex gap-1 sm:gap-2 md:gap-3 items-start overflow-x-auto flex-1">
         {Array.from({ length: 7 }).map((_, i) => (
           <TableauColumn key={i} index={i} />
+
         ))}
       </div>
+
+      {hasWon ? <WinScreen bgClass={gameBgClass} /> : null}
+
     </div>
   );
 }
