@@ -28,7 +28,7 @@ const suitLetter = {
   "♣": "C",
 };
 
-const gameBgClass = "bg-green-600 bg-[url('/GBG3.png')] bg-contain";
+const gameBgClass = "bg-green-600 bg-[url('/GBG4.png')] bg-contain";
 
 /* -------------------- DECK -------------------- */
 
@@ -109,7 +109,7 @@ const hasWon =
     <div className="
       p-2 sm:p-3 md:p-5
       bg-green-600
-      bg-[url('/GBG3.png')]
+      bg-[url('/GBG4.png')]
       bg-contain
       h-auto
       overflow-auto
