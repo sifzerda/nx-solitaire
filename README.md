@@ -119,6 +119,10 @@ SEO = 100
 - [x] move foundation icon into box
 
 - [ ] restart/redraw game
-- [ ] win screen, move count, time taken.
+- [x] win screen, move count, time taken.
 - [ ] restyle stockpile reset btn
 - [ ] fix up GUI for pointer event system
+
+- [ ] time, undo move , hint
+
+- [ ] when a column is empty, is collapses - make sure they don't
