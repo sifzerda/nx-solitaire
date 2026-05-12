@@ -17,9 +17,7 @@ import WinScreen from "./WinScreen";
 
 const suits = ["♠", "♥", "♦", "♣"];
 
-const ranks = [
-  "A","2","3","4","5","6","7","8","9","10","J","Q","K",
-];
+const ranks = [ "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" ];
 
 const suitLetter = {
   "♠": "S",
@@ -34,7 +32,8 @@ const gameBgClass = "bg-green-600 bg-[url('/GBG4.png')] bg-contain";
 
 function createDeck() {
   return suits.flatMap((suit) =>
-    ranks.map((rank) => ({ suit, rank, id: `${rank}${suit}`,
+    ranks.map((rank) => ({
+      suit, rank, id: `${rank}${suit}`,
       image: `/cards/${rank}${suitLetter[suit]}.svg`,
     }))
   );
@@ -101,9 +100,9 @@ export default function Solitaire() {
     initializeGame(createGame());
   }, [initializeGame]);
 
-const hasWon =
-  forceWin ||
-  foundations.every((pile) => pile.length === 13);
+  const hasWon =
+    forceWin ||
+    foundations.every((pile) => pile.length === 13);
 
   return (
     <div className="
@@ -117,11 +116,11 @@ const hasWon =
       select-none touch-none
       min-h-140 sm:min-h-160 md:min-h-200 lg:min-h-220
     "
-    style={{ overscrollBehavior: "contain" }}>
+      style={{ overscrollBehavior: "contain" }}>
 
       <button
-  onClick={() => setForceWin(true)}
-  className="
+        onClick={() => setForceWin(true)}
+        className="
     fixed top-3 right-3
     bg-white text-black
     px-3 py-2 rounded-md
@@ -129,24 +128,10 @@ const hasWon =
     z-50
     text-sm
   "
->
-  Force Win
-</button>
+      >
+        Force Win
+      </button>
 
-<button
-  onClick={() => setForceWin(false)}
-  className="
-    fixed top-14 right-3
-    bg-gray-900 text-white
-    px-3 py-2 rounded-md
-    shadow-md
-    z-50
-    text-sm
-  "
->
-  Reset Win
-</button>
-      
       {/* TOP ROW */}
       <div className="flex gap-4 justify-between items-start mb-6">
         <StockArea />
@@ -166,7 +151,15 @@ const hasWon =
         ))}
       </div>
 
-      {hasWon ? <WinScreen bgClass={gameBgClass} /> : null}
+      {hasWon ? (
+        <WinScreen
+          bgClass={gameBgClass}
+          onRestart={() => {
+            setForceWin(false);
+            initializeGame(createGame());
+          }}
+        />
+      ) : null}
 
     </div>
   );

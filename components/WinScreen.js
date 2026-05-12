@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 const CARD_WIDTH = 80;
 const CARD_HEIGHT = 112;
@@ -15,7 +16,9 @@ const KING_IMAGES = [
     "/cards/KC.svg",
 ];
 
-export default function WinScreen({ bgClass }) {
+export default function WinScreen({ bgClass, onRestart }) {
+    const router = useRouter();
+    
     const canvasRef = useRef(null);
     const animationRef = useRef(null);
     const imagesRef = useRef({});
@@ -185,6 +188,32 @@ export default function WinScreen({ bgClass }) {
     return (
         <div className={`fixed inset-0 z-50 ${bgClass}`}>
             <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" />
+
+            {/* WIN UI */}
+            <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-black/60 backdrop-blur-sm rounded-2xl p-8 flex flex-col items-center gap-5">
+                    <h1 className="text-white text-4xl font-bold">You Win!</h1>
+
+                    <button
+                        onClick={() => {
+                            onRestart?.();
+                            router.push("/");
+                        }}
+                        className="
+                            px-6 py-3
+                            rounded-xl
+                            bg-white
+                            text-black
+                            font-semibold
+                            shadow-lg
+                            hover:scale-105
+                            active:scale-95
+                            transition
+                        ">
+                        Play Again
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }
