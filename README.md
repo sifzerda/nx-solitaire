@@ -51,12 +51,18 @@ npm run start
 
 ## Tech
 
-- SPA App Router in Next.js
-- Auth using jose, JWT, bcrypt, AuthContext Provider wrapping Layout
-- Prisma Neon DB
-- Zustand for store, game state management
-- useMemo to avoid memory leaks
-- react-draggable
+- Next.js App Router
+- Auth:
+  - jose
+  - JWT
+  - bcrypt
+  - AuthContext Provider
+- ~~Prisma Neon DB~~
+- State management:
+  - zustand
+  - immer for store
+- useMemo
+- fireworks.js/react package [here](https://www.npmjs.com/package/@fireworks-js/react?activeTab=code)
 - Vercel
 
 ## Support
@@ -76,7 +82,9 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 ## Authors and acknowledgment
 
-The author acknowledges and credits those who have contributed to this project.
+The author acknowledges and credits those who have contributed to this project, including:
+
+- https://github.com/crashmax-dev/fireworks-js
 
 ## License
 
@@ -90,10 +98,10 @@ This project is complete. Currently highscores page, if any, is just for display
 
 ## Lighthouse scores:
 
-Performance = 80
-Accessibility = 90
-Best Practices = 100
-SEO = 100
+Performance = 80 =>
+Accessibility = 90 =>
+Best Practices = 100 =>
+SEO = 100 =>
 
 ## TO DO:
 
@@ -126,3 +134,5 @@ SEO = 100
 - [ ] time, undo move , hint
 
 - [ ] when a column is empty, is collapses - make sure they don't
+
+- [ ] currently can dnd out anywhere in tableau column, needs fix
