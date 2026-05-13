@@ -84,7 +84,7 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 The author acknowledges and credits those who have contributed to this project, including:
 
-- https://github.com/crashmax-dev/fireworks-js
+- [fireworks-js](https://github.com/crashmax-dev/fireworks-js)
 
 ## License
 

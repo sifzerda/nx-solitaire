@@ -96,7 +96,7 @@ export default function WinScreen({ onRestart }) {
                     fixed
                     bottom-5
                     right-5
-                    z-[60]
+                    z-60
                     px-5
                     py-3
                     rounded-xl
