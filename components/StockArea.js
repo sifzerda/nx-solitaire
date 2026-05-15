@@ -6,8 +6,19 @@ import { memo } from "react";
 import useGameStore from "./useGameStore";
 import Card from "./Card";
 
-const CARD_WIDTH = `w-15 sm:w-18 md:w-22 lg:w-28`;
-const CARD_HEIGHT = `h-24 sm:h-26 md:h-30 lg:h-40`;
+const CARD_WIDTH = `
+  w-14
+  sm:w-16
+  md:w-20
+  lg:w-24
+`;
+
+const CARD_HEIGHT = `
+  h-22
+  sm:h-30
+  md:h-38
+  lg:h-42
+`;
 
 const StockArea = memo(function StockArea() {
     const stock = useGameStore((s) => s.stock);
@@ -42,7 +53,7 @@ const StockArea = memo(function StockArea() {
               rounded-md
               bg-[url('/cards/FDC.png')]
               bg-cover bg-center" />
-)}
+                )}
 
                 <div className="absolute bottom-1 right-1 text-white text-[15px]"> {stock.length}/24 </div>
             </div>
@@ -57,7 +68,7 @@ const StockArea = memo(function StockArea() {
                 {topStockCard ? (
                     <Card
                         card={{ ...topStockCard, faceUp: true }}
-                        cards={[ { ...topStockCard, faceUp: true } ]}
+                        cards={[{ ...topStockCard, faceUp: true }]}
 
                         /* make waste consistent source */
                         source={{ type: "waste", column: -1 }} />
@@ -66,15 +77,15 @@ const StockArea = memo(function StockArea() {
             w-full h-full
             border-2 border-dashed border-white/40
             rounded-md" />
- )}
+                )}
             </div>
 
             {/* ---------------- RESET ---------------- */}
             {isAtEnd && (
                 <button onPointerDown={(e) => {
-                        e.preventDefault();
-                        resetStockCycle();
-                    }}
+                    e.preventDefault();
+                    resetStockCycle();
+                }}
                     className="
             px-2 py-1
             sm:px-3 sm:py-2

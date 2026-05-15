@@ -132,9 +132,7 @@ const useGameStore = create((set, get) => ({
     const top = pile[pile.length - 1];
 
     console.group("🏛 canPlaceOnFoundation");
-    console.log("card:", card.id, "→ slot", index);
-    console.log("pile:", pile.map(c => c.id));
-    console.log("top:", top?.id ?? "EMPTY");
+ 
     console.groupEnd();
 
     if (!top) return card.rank === "A";

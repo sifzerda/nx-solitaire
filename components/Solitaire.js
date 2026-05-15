@@ -105,38 +105,44 @@ export default function Solitaire() {
     foundations.every((pile) => pile.length === 13);
 
   return (
-    <div className="
-      p-2 sm:p-3 md:p-5
-      bg-green-600
-      bg-[url('/GBG4.png')]
-      bg-contain
-      h-auto
-      overflow-auto
-      flex flex-col
-      select-none touch-none
-      min-h-140 sm:min-h-160 md:min-h-200 lg:min-h-220
-    "
-      style={{ overscrollBehavior: "contain" }}>
+    <div
+      className="
+        w-screen
+        max-w-screen
+        overflow-x-hidden
 
+        p-1 sm:p-2 md:p-4
+
+        bg-green-600
+        bg-[url('/GBG4.png')]
+        bg-contain
+
+        flex flex-col
+        select-none touch-none
+
+        min-h-screen
+      "
+      style={{ overscrollBehavior: "contain" }}
+    >
       <button
         onClick={() => setForceWin(true)}
         className="
-    fixed top-3 right-3
-    bg-white text-black
-    px-3 py-2 rounded-md
-    shadow-md
-    z-50
-    text-sm
-  "
+          fixed top-3 right-3
+          bg-white text-black
+          px-3 py-2 rounded-md
+          shadow-md
+          z-50
+          text-sm
+        "
       >
         Force Win
       </button>
 
       {/* TOP ROW */}
-      <div className="flex gap-4 justify-between items-start mb-6">
+      <div className="flex justify-between items-start gap-2 mb-3 sm:mb-5">
         <StockArea />
 
-        <div className="flex gap-1 sm:gap-2 md:gap-3">
+        <div className="flex gap-1 sm:gap-2">
           {Array.from({ length: 4 }).map((_, i) => (
             <FoundationPile key={i} index={i} />
           ))}
@@ -144,10 +150,28 @@ export default function Solitaire() {
       </div>
 
       {/* TABLEAU */}
-      <div className="flex gap-1 sm:gap-2 md:gap-3 items-start overflow-x-auto flex-1">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <TableauColumn key={i} index={i} />
+      <div
+        className="
+          flex
+          flex-1
+          items-start
 
+          gap-[2px] sm:gap-2
+
+          min-w-0
+          w-full
+        "
+      >
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div
+            key={i}
+            className="
+              flex-1
+              min-w-0
+            "
+          >
+            <TableauColumn index={i} />
+          </div>
         ))}
       </div>
 
@@ -160,7 +184,6 @@ export default function Solitaire() {
           }}
         />
       ) : null}
-
     </div>
   );
 }

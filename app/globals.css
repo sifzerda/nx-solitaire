@@ -25,22 +25,26 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* ===================== custom =====================*/ 
+/* ===================== custom ===================== */
 
 :root {
-  --card-offset: 28px;
+  --card-width: 96px;
   --card-height: 160px;
+  --card-overlap: -72px;
 }
 
 @media (max-width: 640px) {
   :root {
-    --card-offset: 14px;
-    --card-height: 96px;
+    --card-width: 56px;
+    --card-height: 82px;
+    --card-overlap: -52px;
   }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
   :root {
-    --card-height: 104px;
+    --card-width: 72px;
+    --card-height: 112px;
+    --card-overlap: -62px;
   }
 }

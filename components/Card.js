@@ -4,12 +4,14 @@
 
 import { memo, useCallback } from "react";
 import usePointerDrag from "./usePointerDrag";
+import { CARD_SIZE } from "./cardSizing";
 
 const Card = memo(function Card({ card, stack, index = 0, source }) {
   const { startDrag } = usePointerDrag();
 
   const onPointerDown = useCallback(
-     (e) => { e.preventDefault();
+    (e) => {
+      e.preventDefault();
       if (!card) return;
 
       // SAFE STACK RESOLUTION
@@ -22,16 +24,11 @@ const Card = memo(function Card({ card, stack, index = 0, source }) {
   return (
     <div
       onPointerDown={onPointerDown}
-      className="
-        w-15 sm:w-18 md:w-22 lg:w-28
-        h-24 sm:h-26 md:h-30 lg:h-40
-        rounded-md
-        overflow-hidden
-        touch-none
-        cursor-grab
-        select-none">
+      className={`
+    ${CARD_SIZE}
+  `}>
       <img src={card.image} alt={card.id} draggable={false} className=
-      "w-full h-full object-cover pointer-events-none" />
+        "w-full h-full object-cover pointer-events-none" />
     </div>
   );
 });
