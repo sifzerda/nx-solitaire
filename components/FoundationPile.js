@@ -14,8 +14,12 @@ const FoundationPile = memo(function FoundationPile({ index }) {
 
   return (
 
-    <div data-dropzone="foundation" data-foundation={index} className={`
-  ${CARD_SIZE}
+    <div data-dropzone="foundation" data-foundation={index} className="
+  w-16 h-24
+  sm:w-18 sm:h-32
+  md:w-22 md:h-40
+  lg:w-26 lg:h-44
+
   relative
   rounded-md
   border-2 border-dashed border-white/40
@@ -23,7 +27,8 @@ const FoundationPile = memo(function FoundationPile({ index }) {
   flex items-center justify-center
   overflow-hidden
   touch-none
-`}>
+">
+
       {topCard ? (
         <div className="absolute inset-0" style={{ pointerEvents: "none" }}>
           <img src={topCard.image} alt={topCard.id} draggable={false}
@@ -31,9 +36,9 @@ const FoundationPile = memo(function FoundationPile({ index }) {
         </div>
       ) : (
         <div className="
-  text-lg
-  sm:text-2xl
-  md:text-3xl
+  text-5xl
+  sm:text-6xl
+  md:text-7xl
 
   text-white/50
   font-bold

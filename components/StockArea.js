@@ -5,20 +5,8 @@
 import { memo } from "react";
 import useGameStore from "./useGameStore";
 import Card from "./Card";
+import { CARD_SIZE } from "./cardSizing";
 
-const CARD_WIDTH = `
-  w-14
-  sm:w-16
-  md:w-20
-  lg:w-24
-`;
-
-const CARD_HEIGHT = `
-  h-22
-  sm:h-30
-  md:h-38
-  lg:h-42
-`;
 
 const StockArea = memo(function StockArea() {
     const stock = useGameStore((s) => s.stock);
@@ -35,8 +23,7 @@ const StockArea = memo(function StockArea() {
             {/* ---------------- STOCK ---------------- */}
             <div onClick={nextStockCard} className={`
           relative
-          ${CARD_WIDTH}
-          ${CARD_HEIGHT}
+          ${CARD_SIZE}
           border-2 border-dashed
           bg-green-500
           border-green-600
@@ -61,8 +48,7 @@ const StockArea = memo(function StockArea() {
             {/* ---------------- WASTE (FIXED DRAG SOURCE) ---------------- */}
             <div data-dropzone="waste" className={`
           relative
-          ${CARD_WIDTH}
-          ${CARD_HEIGHT}
+          ${CARD_SIZE}
           rounded-md`}
                 style={{ contain: "layout paint size" }}>
                 {topStockCard ? (
