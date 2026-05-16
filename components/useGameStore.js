@@ -131,10 +131,6 @@ const useGameStore = create((set, get) => ({
     const pile = get().foundations[index];
     const top = pile[pile.length - 1];
 
-    console.group("🏛 canPlaceOnFoundation");
- 
-    console.groupEnd();
-
     if (!top) return card.rank === "A";
     return (
       card.suit === top.suit &&
