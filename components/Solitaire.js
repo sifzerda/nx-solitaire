@@ -5,26 +5,21 @@
 import { useEffect, useState } from "react";
 
 import useGameStore from "./useGameStore";
-
 import TableauColumn from "./TableauColumn";
 import FoundationPile from "./FoundationPile";
 import StockArea from "./StockArea";
-
 import WinScreen from "./WinScreen";
 
 /* -------------------- CONSTANTS -------------------- */
 
 const suits = ["♠", "♥", "♦", "♣"];
-
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-
 const suitLetter = {
   "♠": "S",
   "♥": "H",
   "♦": "D",
   "♣": "C",
 };
-
 const gameBgClass = "bg-green-600 bg-[url('/GBG4.png')] bg-contain";
 
 /* -------------------- DECK -------------------- */
