@@ -129,10 +129,10 @@ SEO = 100 =>
 - [ ] restart/redraw game
 - [x] win screen, move count, time taken.
 - [ ] restyle stockpile reset btn
-- [ ] fix up GUI for pointer event system
+- [x] fix up GUI for pointer event system
 
 - [ ] time, undo move , hint
 
-- [ ] when a column is empty, is collapses - make sure they don't
+- [x] when a column is empty, is collapses - make sure they don't
 
-- [ ] currently can dnd out anywhere in tableau column, needs fix
+- [x] currently can dnd out anywhere in tableau column, needs fix
