@@ -7,7 +7,7 @@ import useGameStore from "./useGameStore";
 import Card from "./Card";
 import { CARD_CLASS } from "./cardSizing";
 
-const StockArea = memo(function StockArea() {
+const StockArea = memo(function StockArea({ type }) {
     const stock = useGameStore((s) => s.stock);
     const stockIndex = useGameStore((s) => s.stockIndex);
     const nextStockCard = useGameStore((s) => s.nextStockCard);
