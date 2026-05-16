@@ -18,10 +18,10 @@ export default function WinScreen({ onRestart }) {
                 options={{
                     autoresize: true,
 
-                    opacity: 0.5,
+                    opacity: 0.08,
                     acceleration: 1.05,
-                    friction: 0.97,
-                    gravity: 1.5,
+                    friction: 0.99,
+                    gravity: 1,
 
                     particles: 90,
 
@@ -67,8 +67,8 @@ export default function WinScreen({ onRestart }) {
                     },
 
                     decay: {
-                        min: 0.015,
-                        max: 0.03,
+                        min: 0.01,
+                        max: 0.02,
                     },
 
                     mouse: {
