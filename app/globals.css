@@ -28,9 +28,9 @@ body {
 /* ===================== custom ===================== */
 
 :root {
-  --card-width: 64px;
-  --card-height: 92px;
-  --card-overlap: -72px;
+  --card-width: 50px;
+  --card-height: 72px;
+  --card-overlap: -60px;
 }
 
 @media (min-width: 640px) {

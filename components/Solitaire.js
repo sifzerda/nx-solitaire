@@ -135,8 +135,7 @@ export default function Solitaire() {
           shadow-md
           z-50
           text-sm
-        "
-      >
+        ">
         Force Win
       </button>
 

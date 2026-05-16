@@ -7,6 +7,10 @@ import useGameStore from "./useGameStore";
 import { CARD_CLASS } from "./cardSizing";
 
 const suits = ["♠", "♥", "♦", "♣"];
+const getSuitColor = (suit) => {
+  if (suit === "♥" || suit === "♦") return "text-red-500";
+  return "text-blue-400";
+};
 
 const FoundationPile = memo(function FoundationPile({ index }) {
   const cards = useGameStore((s) => s.foundations[index]);
@@ -41,15 +45,17 @@ const FoundationPile = memo(function FoundationPile({ index }) {
           className="w-full h-full object-cover rounded-md" />
         </div>
       ) : (
-        <div className="
-  text-5xl
-  sm:text-6xl
-  md:text-7xl
-  text-white/50
-  font-bold
-">
-          {suits[index]}
-        </div>
+<div
+  className={`
+    text-5xl
+    sm:text-6xl
+    md:text-7xl
+    font-bold
+    ${getSuitColor(suits[index])}
+  `}
+>
+  {suits[index]}
+</div>
       )}
     </div>
   );

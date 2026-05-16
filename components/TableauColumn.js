@@ -33,8 +33,9 @@ const TableauColumn = memo(function TableauColumn({ index }) {
                 className={`
                   ${CARD_CLASS}
                   rounded-md
-                  bg-green-800
                   border
+                  bg-[url('/cards/FDC.png')]
+                  bg-cover bg-center"
                 `}
                 style={{
                   marginTop: overlap,
