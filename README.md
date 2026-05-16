@@ -105,26 +105,7 @@ SEO = 100 =>
 
 ## TO DO:
 
-- Move Styling into another file, e.g. globals
 - Make a highscores page and db storage like minesweeper, recording user name/ref + time taken + number of moves
-
-- [x] foundation dnd order
-- [x] foundations have suits
-- [x] dnd rules for stockpile
-- [x] stockpile cycles
-- [x] create dnd game rules for foundation
-- [x] create dnd rules for tableau
-- [x] front and back/flip cards
-- [x] cards are stacked in pile
-- [x] Memoized game
-- [x] change inline styling to tailwind classes
-- [x] optimize memory and efficiency
-- [x] enable dragging tableau stacks
-- [x] make responsive and enable mobile play
-- [x] change card appearance to enable display stacked for card stack dnd
-- [x] remove trash debug dropzone
-- [x] remove 'column...', 'waste', 'tableau'
-- [x] move foundation icon into box
 
 - [ ] restart/redraw game
 - [x] win screen, move count, time taken.
