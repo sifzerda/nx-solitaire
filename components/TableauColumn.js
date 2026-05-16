@@ -5,20 +5,18 @@
 import { memo } from "react";
 import useGameStore from "./useGameStore";
 import Card from "./Card";
-import { CARD_SIZE } from "./cardSizing";
+import { CARD_CLASS, CARD_OVERLAP } from "./cardSizing";
 
 const TableauColumn = memo(function TableauColumn({ index }) {
   const cards = useGameStore((s) => s.tableau[index]);
 
   return (
     <div
-      className={`
-        relative
-        flex-1
-        min-w-0
-        min-h-22
-        cursor-grab
-      `}
+      className="
+    relative
+    shrink-0
+    cursor-grab
+  "
       data-dropzone="tableau"
       data-column={index}
       style={{ contain: "paint" }}
@@ -26,14 +24,14 @@ const TableauColumn = memo(function TableauColumn({ index }) {
       <div className="flex flex-col">
         {cards.map((card, idx) => {
           const overlap =
-            idx === 0 ? 0 : "var(--card-overlap)";
+            idx === 0 ? 0 : CARD_OVERLAP;
 
           if (!card.faceUp) {
             return (
               <div
                 key={card.id}
                 className={`
-                  ${CARD_SIZE}
+                  ${CARD_CLASS}
                   rounded-md
                   bg-green-800
                   border

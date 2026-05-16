@@ -4,7 +4,7 @@
 
 import { memo, useCallback } from "react";
 import usePointerDrag from "./usePointerDrag";
-import { CARD_SIZE } from "./cardSizing";
+import { CARD_CLASS } from "./cardSizing";
 
 const Card = memo(function Card({ card, stack, index = 0, source }) {
   const { startDrag } = usePointerDrag();
@@ -25,10 +25,10 @@ const Card = memo(function Card({ card, stack, index = 0, source }) {
     <div
       onPointerDown={onPointerDown}
       className={`
-    ${CARD_SIZE}
+    ${CARD_CLASS}
   `}>
       <img src={card.image} alt={card.id} draggable={false} className=
-        "w-full h-full object-cover pointer-events-none" />
+        "w-full h-full object-contain pointer-events-none" />
     </div>
   );
 });
