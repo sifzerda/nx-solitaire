@@ -105,14 +105,13 @@ export default function Solitaire() {
 
   return (
     <div className="bg-black flex-1">
-    <div className="
+      <div className="
       mx-auto
       w-fit
 
         p-1 sm:p-2 md:p-4
 
-        bg-green-600
-        bg-[url('/GBG4.png')]
+        bg-[url('/paper.png')]
         bg-cover
 
         border-5 border-ridged border-green-900
@@ -124,11 +123,11 @@ export default function Solitaire() {
         sm:min-h-200
         md:min-h-200
       "
-      style={{ overscrollBehavior: "contain" }}
-    >
-      <button
-        onClick={() => setForceWin(true)}
-        className="
+        style={{ overscrollBehavior: "contain" }}
+      >
+        <button
+          onClick={() => setForceWin(true)}
+          className="
           fixed top-3 right-3
           bg-white text-black
           px-3 py-2 rounded-md
@@ -136,13 +135,13 @@ export default function Solitaire() {
           z-50
           text-sm
         ">
-        Force Win
-      </button>
+          Force Win
+        </button>
 
-      {/* TOP ROW */}
-      <div className="w-full px-2 sm:px-4 md:px-6">
-        <div
-          className="
+        {/* TOP ROW */}
+        <div className="w-full px-2 sm:px-4 md:px-6">
+          <div
+            className="
       mx-auto
       w-fit
 
@@ -158,40 +157,40 @@ export default function Solitaire() {
       md:gap-x-4
       md:gap-y-6
     "
-        >
-          {/* ---------- TOP ROW ---------- */}
+          >
+            {/* ---------- TOP ROW ---------- */}
 
-          {/* Stock/Waste spans first 3 tableau columns */}
-          <div className="col-span-3">
-            <StockArea />
+            {/* Stock/Waste spans first 3 tableau columns */}
+            <div className="col-span-3">
+              <StockArea />
+            </div>
+
+            {/* Foundations align to tableau columns 4-7 */}
+            {Array.from({ length: 4 }).map((_, i) => (
+              <FoundationPile key={i} index={i} />
+            ))}
+
+            {/* ---------- TABLEAU ---------- */}
+
+            {Array.from({ length: 7 }).map((_, i) => (
+              <TableauColumn
+                key={i}
+                index={i}
+              />
+            ))}
           </div>
-
-          {/* Foundations align to tableau columns 4-7 */}
-          {Array.from({ length: 4 }).map((_, i) => (
-            <FoundationPile key={i} index={i} />
-          ))}
-
-          {/* ---------- TABLEAU ---------- */}
-
-          {Array.from({ length: 7 }).map((_, i) => (
-            <TableauColumn
-              key={i}
-              index={i}
-            />
-          ))}
         </div>
-      </div>
 
-      {hasWon ? (
-        <WinScreen
-          bgClass={gameBgClass}
-          onRestart={() => {
-            setForceWin(false);
-            initializeGame(createGame());
-          }}
-        />
-      ) : null}
-    </div>
+        {hasWon ? (
+          <WinScreen
+            bgClass={gameBgClass}
+            onRestart={() => {
+              setForceWin(false);
+              initializeGame(createGame());
+            }}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }

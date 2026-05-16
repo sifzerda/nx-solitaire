@@ -11,15 +11,18 @@ const TableauColumn = memo(function TableauColumn({ index }) {
   const cards = useGameStore((s) => s.tableau[index]);
 
   return (
-    <div
-      className="
+    <div className="
     relative
     shrink-0
     cursor-grab
   "
       data-dropzone="tableau"
       data-column={index}
-      style={{ contain: "paint" }}
+      style={{
+        contain: "paint",
+        width: "var(--card-width)",
+        minHeight: "calc(var(--card-height) * 1.2)",
+      }}
     >
       <div className="flex flex-col">
         {cards.map((card, idx) => {
