@@ -3,7 +3,6 @@
 "use client";
 
 import useGameStore from "./useGameStore";
-//import { CARD_SIZE, CARD_PIXELS } from "./cardSizing";
 
 // module-level — one instance, never reset by re-renders
 let dragData = null;

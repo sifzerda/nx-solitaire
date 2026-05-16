@@ -190,33 +190,55 @@ const useGameStore = create((set, get) => ({
     }
 
     /* ---------------- TABLEAU → FOUNDATION ---------------- */
-    if (from.type === "tableau" && to.type === "foundation") {
-      if (!state.canPlaceOnFoundation(first, to.foundation)) return;
-      saveHistory();
+if (from.type === "tableau" && to.type === "foundation") {
 
-      set((state) => {
-        // remove card from source column and flip new top
-        const tableau = state.tableau.map((pile, i) => {
-          if (i !== from.column) return pile;
-          const updated = pile.filter((c) => c.id !== first.id);
-          if (updated.length && !updated[updated.length - 1].faceUp) {
-            updated[updated.length - 1] = {
-              ...updated[updated.length - 1],
-              faceUp: true,
-            };
-          }
-          return updated;
-        });
+  const sourcePile = state.tableau[from.column];
+  const topCard = sourcePile[sourcePile.length - 1];
 
-        // add to foundation
-        const foundations = state.foundations.map((pile, i) =>
-          i === to.foundation ? [...pile, first] : pile
-        );
+  // ONLY allow the top tableau card
+  if (
+    cards.length !== 1 ||
+    !topCard ||
+    topCard.id !== first.id
+  ) {
+    return;
+  }
 
-        return { tableau, foundations };
-      });
-      return;
-    }
+  if (!state.canPlaceOnFoundation(first, to.foundation)) return;
+
+  saveHistory();
+
+  set((state) => {
+    const tableau = state.tableau.map((pile, i) => {
+      if (i !== from.column) return pile;
+
+      const updated = pile.slice(0, -1);
+
+      // flip next card
+      if (
+        updated.length &&
+        !updated[updated.length - 1].faceUp
+      ) {
+        updated[updated.length - 1] = {
+          ...updated[updated.length - 1],
+          faceUp: true,
+        };
+      }
+
+      return updated;
+    });
+
+    const foundations = state.foundations.map((pile, i) =>
+      i === to.foundation
+        ? [...pile, first]
+        : pile
+    );
+
+    return { tableau, foundations };
+  });
+
+  return;
+}
 
     /* ---------------- WASTE → TABLEAU ---------------- */
     if (
