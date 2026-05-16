@@ -16,7 +16,10 @@ export default function Header() {
     const menuRef = useRef(null);
     const buttonRef = useRef(null);
 
-    const links = [{ href: "/", label: "Play" }];
+    const links = [
+        { href: "/", label: "Play" },
+        { href: "/about", label: "About" }
+    ];
 
     if (isLoggedIn) {
         links.push({ label: "Logout", action: "logout" });
