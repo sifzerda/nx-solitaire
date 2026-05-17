@@ -118,3 +118,5 @@ SEO = 100 =>
 - [x] when a column is empty, is collapses - make sure they don't
 
 - [x] currently can dnd out anywhere in tableau column, needs fix
+
+- [ ] add rust and tauri
