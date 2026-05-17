@@ -20,7 +20,7 @@ const suitLetter = {
   "♦": "D",
   "♣": "C",
 };
-const gameBgClass = "bg-green-600 bg-[url('/GBG4.png')] bg-contain";
+const gameBgClass = "bg-green-600 bg-[url('/paper.png')] bg-contain";
 
 /* -------------------- DECK -------------------- */
 
