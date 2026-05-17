@@ -71,10 +71,7 @@ function createGame() {
 
 export default function Solitaire() {
   const initializeGame = useGameStore((s) => s.initializeGame);
-
   const foundations = useGameStore((s) => s.foundations);
-
-  const [forceWin, setForceWin] = useState(false);
 
   /* preload images */
   useEffect(() => {
@@ -94,9 +91,7 @@ export default function Solitaire() {
     initializeGame(createGame());
   }, [initializeGame]);
 
-  const hasWon =
-    forceWin ||
-    foundations.every((pile) => pile.length === 13);
+  const hasWon = foundations.every((pile) => pile.length === 13);
 
   return (
     <div className="bg-black flex-1">
@@ -120,18 +115,6 @@ export default function Solitaire() {
       "
         style={{ overscrollBehavior: "contain" }}
       >
-        <button
-          onClick={() => setForceWin(true)}
-          className="
-          fixed top-3 right-3
-          bg-white text-black
-          px-3 py-2 rounded-md
-          shadow-md
-          z-50
-          text-sm
-        ">
-          Force Win
-        </button>
 
         {/* TOP ROW */}
         <div className="w-full px-2 sm:px-4 md:px-6">
@@ -180,7 +163,6 @@ export default function Solitaire() {
           <WinScreen
             bgClass={gameBgClass}
             onRestart={() => {
-              setForceWin(false);
               initializeGame(createGame());
             }}
           />
