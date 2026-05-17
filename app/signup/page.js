@@ -49,10 +49,10 @@ export default function Signup() {
             <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-center py-24 px-16 bg-white dark:bg-black">
 
                 {/* Card */}
-                <div className="w-full max-w-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black p-8 flex flex-col items-center">
+                <div className="w-full max-w-md border border-zinc-200 dark:border-zinc-800 bg-linear-to-br from-red-900/30 via-purple-900/30 to-blue-900/30 p-8 flex flex-col items-center">
 
-                    {/* Top gold line */}
-                    <div className="w-full h-0.5 bg-linear-to-r from-yellow-600 via-yellow-400 to-yellow-600 mb-6" />
+                    {/* Top blue line */}
+                    <div className="w-full h-0.5 bg-linear-to-r from-indigo-900 via-blue-600 to-indigo-900 mb-6" />
 
                     {/* Title */}
                     <h1 className="text-3xl tracking-wide mb-6 text-black dark:text-white flex items-center gap-2">
@@ -115,7 +115,7 @@ export default function Signup() {
                     </p>
 
                     {/* Bottom blue line */}
-                    <div className="w-full h-0.5 bg-linear-to-r from-blue-900 via-blue-600 to-blue-900 mt-6" />
+                    <div className="w-full h-0.5 bg-linear-to-r from-indigo-900 via-blue-600 to-indigo-900 mt-6" />
 
                 </div>
 
