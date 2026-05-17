@@ -116,7 +116,6 @@ SEO = 100 =>
 - [ ] time, undo move , hint
 
 - [x] when a column is empty, is collapses - make sure they don't
-
 - [x] currently can dnd out anywhere in tableau column, needs fix
 
 - [ ] add rust and tauri
