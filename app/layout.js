@@ -1,6 +1,5 @@
 import { Geist, Geist_Mono, UnifrakturCook } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "../lib/authContext";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -30,15 +29,11 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${unifraktur.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
 
-        <AuthProvider>
-
             <Header />
 
             <main className="grow">{children}</main>
 
             <Footer />
-
-        </AuthProvider>
 
       </body>
     </html>
