@@ -2,116 +2,70 @@
 
 "use client";
 
-import { useRef } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Fireworks } from "@fireworks-js/react";
 
-export default function WinScreen({ onRestart }) {
+// Keep object references stable
+const FIREWORKS_OPTIONS = Object.freeze({
+    autoresize: true,
+    // Lower opacity reduces overdraw cost
+    opacity: 0.06,
+    // Physics
+    acceleration: 1.02,
+    friction: 0.98,
+    gravity: 1.2,
+    // fewer particles + lower intensity
+    particles: 45,
+    intensity: 18,
+    // Reduce extra rendering work
+    traceLength: 2,
+    traceSpeed: 8,
+    explosion: 4,
+    flickering: 20,
+    lineStyle: "round",
+    hue: { min: 0, max: 360 },
+    // Fewer launches
+    delay: { min: 40, max: 80 },
+    rocketsPoint: { min: 20, max: 80 },
+    lineWidth: {
+        explosion: { min: 1, max: 2 },
+        trace: { min: 0.5, max: 1 },
+    },
+    brightness: { min: 50, max: 70 },
+    // Faster cleanup
+    decay: { min: 0.02, max: 0.035 },
+    // Disable interaction listeners
+    mouse: { click: false, move: false, max: 0 },
+});
+
+function WinScreen({ onRestart }) {
     const router = useRouter();
-    const fireworksRef = useRef(null);
+    // Stable callback prevents button rerenders downstream
+    const handleRestart = useCallback(() => {
+        onRestart?.();
+        router.push("/");
+    }, [onRestart, router]);
+    // Stable style object if you later add props
+    const fireworksOptions = useMemo(() => FIREWORKS_OPTIONS, []);
 
     return (
         <>
-            <Fireworks
-                ref={fireworksRef}
-                className="fixed inset-0 z-50 pointer-events-none"
-                options={{
-                    autoresize: true,
+            <Fireworks className="fixed inset-0 z-50 pointer-events-none" options={fireworksOptions} />
 
-                    opacity: 0.08,
-                    acceleration: 1.05,
-                    friction: 0.99,
-                    gravity: 1,
-
-                    particles: 90,
-
-                    traceLength: 3,
-                    traceSpeed: 10,
-
-                    explosion: 5,
-                    intensity: 30,
-                    flickering: 50,
-
-                    lineStyle: "round",
-
-                    hue: {
-                        min: 0,
-                        max: 360,
-                    },
-
-                    delay: {
-                        min: 15,
-                        max: 30,
-                    },
-
-                    rocketsPoint: {
-                        min: 10,
-                        max: 90,
-                    },
-
-                    lineWidth: {
-                        explosion: {
-                            min: 1,
-                            max: 3,
-                        },
-
-                        trace: {
-                            min: 0.1,
-                            max: 1,
-                        },
-                    },
-
-                    brightness: {
-                        min: 50,
-                        max: 80,
-                    },
-
-                    decay: {
-                        min: 0.01,
-                        max: 0.02,
-                    },
-
-                    mouse: {
-                        click: false,
-                        move: false,
-                        max: 1,
-                    },
-                }}
-                style={{
-                    position: "fixed",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    zIndex: 50,
-                    pointerEvents: "none",
-                }}
-            />
-
-            <button
-                onClick={() => {
-                    onRestart?.();
-                    router.push("/");
-                }}
-                className="
-                    fixed
-                    bottom-5
-                    right-5
-                    z-60
-                    px-5
-                    py-3
-                    rounded-xl
-                    bg-white/90
-                    text-black
-                    font-semibold
-                    shadow-xl
-                    backdrop-blur-sm
-                    hover:scale-105
-                    active:scale-95
-                    transition
-                "
-            >
+            <button onClick={handleRestart} className="
+                    fixed bottom-5 right-5 z-60
+                    px-5 py-3 rounded-xl
+                    bg-white/90 text-black font-semibold
+                    shadow-xl backdrop-blur-sm
+                    transition-transform
+                    hover:scale-105 active:scale-95
+                    will-change-transform
+                ">
                 New Game
             </button>
         </>
     );
 }
+
+export default memo(WinScreen);

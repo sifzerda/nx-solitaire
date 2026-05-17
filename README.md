@@ -97,7 +97,7 @@ This project is complete. Currently highscores page, if any, is just for display
 
 ## Optimization:
 
-## Lighthouse scores:
+### Lighthouse scores:
 
 Performance = 80 =>
 Accessibility = 90 =>
