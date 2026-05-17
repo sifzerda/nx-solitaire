@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "nx-solitaire",
+  "productName": "solitaire by sifzerda",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.sifzerda.solitaire",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "solitaire",
+        "title": "solitaire by sifzerda",
         "width": 800,
         "height": 600,
         "resizable": true,
