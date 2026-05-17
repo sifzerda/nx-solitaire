@@ -29,23 +29,17 @@ const TableauColumn = memo(function TableauColumn({ index }) {
           const overlap =
             idx === 0 ? 0 : CARD_OVERLAP;
 
-          if (!card.faceUp) {
-            return (
-              <div
-                key={card.id}
-                className={`
-                  ${CARD_CLASS}
-                  rounded-md
-                  border
-                  bg-[url('/cards/FDC.png')]
-                  bg-cover bg-center"
-                `}
-                style={{
-                  marginTop: overlap,
-                }}
-              />
-            );
-          }
+if (!card.faceUp) {
+  return (
+    <div
+      key={card.id}
+      className={`${CARD_CLASS} rounded-md border overflow-hidden`}
+      style={{ marginTop: overlap }}
+    >
+      <div className="w-full h-full rounded-md bg-[url('/cards/FDC.png')] bg-cover bg-center" />
+    </div>
+  );
+}
 
           return (
             <div
