@@ -14,11 +14,16 @@ export default function Header() {
     // detect Tauri desktop app
     const isDesktop = typeof window !== "undefined" && window.__TAURI__;
 
+    const baseLinks = [
+        { label: "Play", href: "/" },
+        { label: "About", href: "/about" },
+    ];
+
     const links = isDesktop
-        ? [{ label: "Play", href: "/" }]
+        ? baseLinks
         : [
-            { label: "Play", href: "/" },
-            { label: "About", href: "/about" },
+            ...baseLinks,
+            { label: "Download", href: "/Solitaire.exe", download: true },
         ];
 
     useEffect(() => {
@@ -39,54 +44,81 @@ export default function Header() {
                 {/* TITLE */}
                 <h1 className="text-2xl md:text-4xl font-bold tracking-wide font-[UnifrakturCook] truncate">solitaire</h1>
 
-                {/* DESKTOP NAV */}
-                <div className="hidden md:flex items-center gap-3">
-                    {links.map((item) => (
-                        <Link key={item.label} href={item.href} className={`min-w-18 text-center px-3 py-1 text-sm border rounded-sm transition inline-block
-                                ${pathname === item.href
-                                ? "border-blue-400 text-blue-400"
-                                : "border-yellow-500 text-white hover:text-yellow-400"
-                            }`}>
-                            {item.label}
-                        </Link>
-                    ))}
-                </div>
-
-                {/* ONLY SHOW DOWNLOAD ON WEBSITE */}
-                {!isDesktop && (
-                    <a href="/Solitaire.exe" download className=
-                        "border border-green-400/40 bg-green-500/10 px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] text-zinc-400 transition-all duration-200 hover:text-green-400 hover:border-green-400">
-                        Download</a>
-                )}
-
-                {/* MOBILE MENU BUTTON */}
                 <button ref={buttonRef} onClick={() => setOpen((prev) => !prev)}
-                    className="md:hidden min-w-18 text-center border border-yellow-500 px-3 py-2 text-xs uppercase tracking-widest rounded-sm hover:text-yellow-400">
+                    className="md:hidden min-w-18 text-center font-mono border border-yellow-500 px-3 py-2 text-xs uppercase tracking-[0.25em] hover:text-yellow-400">
                     {open ? "Close" : "Menu"}
                 </button>
+
+                {/* DESKTOP NAV */}
+                <div className="hidden md:flex items-center gap-3">
+                    {links.map((item) =>
+                        item.download ? (
+                            <a key={item.label} href={item.href} download className={`
+        border border-green-400/40 bg-green-500/10 px-4 py-2 font-mono text-xs uppercase tracking-[0.25em]
+        text-white transition-all duration-200 hover:text-green-400 hover:border-green-400
+      `}>
+                                {item.label}
+                            </a>
+                        ) : (
+                            <Link key={item.label} href={item.href} className={`
+        border px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-all duration-200
+        ${pathname === item.href
+                                    ? "border-blue-400/40 text-white hover:text-blue-400 hover:border-blue-400"
+                                    : "border-yellow-500/40 text-white hover:text-yellow-400 hover:border-yellow-400"
+                                }`}>
+                                {item.label}
+                            </Link>
+                        )
+                    )}
+                </div>
+
             </div>
 
             {/* MOBILE DROPDOWN */}
             <div ref={menuRef}
-                className={`md:hidden absolute left-0 top-full z-50 w-full border-b-2 border-yellow-500 bg-black transition-all duration-200 ease-out
+                className={`md:hidden absolute left-0 top-full z-50 w-full font-mono uppercase tracking-[0.25em] border-b-2 border-yellow-500 bg-black transition-all duration-200 ease-out
                     ${open
                         ? "opacity-100 translate-y-0"
                         : "pointer-events-none opacity-0 -translate-y-2"
                     }`}>
                 <div className="flex flex-col gap-2 p-3">
-                    {links.map((item) => (
-                        <Link key={item.label} href={item.href} onClick={() => setOpen(false)}
-                            className={`block border px-4 py-3 text-sm rounded-sm transition
-                                ${pathname === item.href
-                                    ? "border-blue-400 text-blue-400"
-                                    : "border-yellow-500 text-white hover:text-yellow-400"
-                                }`}>
-                            {item.label}
-                        </Link>
-                    ))}
+                    {links.map((item) =>
+                        item.download ? (
+                            <a
+                                key={item.label}
+                                href={item.href}
+                                download
+                                onClick={() => setOpen(false)}
+                                className="
+        block border px-4 py-3 text-sm font-mono uppercase tracking-[0.25em] transition
+        border-green-400/40 bg-green-500/10 text-white
+        hover:text-green-400 hover:border-green-400
+      "
+                            >
+                                {item.label}
+                            </a>
+                        ) : (
+                            <Link
+                                key={item.label}
+                                href={item.href}
+                                onClick={() => setOpen(false)}
+                                className={`
+        block border px-4 py-3 text-sm transition
+        ${pathname === item.href
+                                        ? "border-blue-400/40 text-blue-400 hover:border-blue-400"
+                                        : "border-yellow-500/40 text-white hover:text-yellow-400 hover:border-yellow-400"
+                                    }
+      `}
+                            >
+                                {item.label}
+                            </Link>
+                        )
+                    )}
                 </div>
             </div>
 
         </header>
     );
 }
+
+
