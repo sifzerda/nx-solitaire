@@ -24,9 +24,9 @@ const FoundationPile = memo(function FoundationPile({ index }) {
         ${CARD_CLASS}
         relative
         rounded-md
-        border-2
-        border-dashed
-        border-white/40
+        border-4
+        border-double
+        border-green-600
         flex
         items-center
         justify-center

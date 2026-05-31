@@ -10,48 +10,68 @@ let dragElement = null;
 let rafRef = null;
 let latestPos = { x: 0, y: 0 };
 
+let hoveredDropzone = null;
+
 export default function usePointerDrag() {
   const moveCards = useGameStore((s) => s.moveCards);
 
-function createDragElement(cards) {
-  const el = document.createElement("div");
+  function clearDropzoneHighlight() {
+    if (!hoveredDropzone) return;
 
-  const styles = getComputedStyle(document.documentElement);
+    hoveredDropzone.classList.remove("dropzone-hover");
+    hoveredDropzone = null;
+  }
 
-  const cardWidth = styles.getPropertyValue("--card-width").trim();
-  const overlap = styles.getPropertyValue("--card-overlap").trim();
+  function setDropzoneHighlight(el) {
+    if (hoveredDropzone === el) return;
 
-  el.style.position = "fixed";
-  el.style.left = "0";
-  el.style.top = "0";
-  el.style.zIndex = "9999";
-  el.style.pointerEvents = "none";
-  el.style.willChange = "transform";
+    clearDropzoneHighlight();
 
-  cards.forEach((card, idx) => {
-    const img = document.createElement("img");
+    hoveredDropzone = el;
+    hoveredDropzone.classList.add("dropzone-hover");
+  }
 
-    img.src = card.image;
-    img.draggable = false;
+  function createDragElement(cards) {
+    const el = document.createElement("div");
 
-    img.style.width = cardWidth;
-    img.style.borderRadius = "6px";
-    img.style.display = "block";
+    const styles = getComputedStyle(document.documentElement);
 
-    if (idx > 0) {
-      img.style.marginTop = overlap;
-    }
+    const cardWidth = styles.getPropertyValue("--card-width").trim();
+    const overlap = styles.getPropertyValue("--card-overlap").trim();
 
-    el.appendChild(img);
-  });
+    el.style.position = "fixed";
+    el.style.left = "0";
+    el.style.top = "0";
+    el.style.zIndex = "9999";
+    el.style.pointerEvents = "none";
+    el.style.willChange = "transform";
 
-  document.body.appendChild(el);
-  dragElement = el;
-}
+    cards.forEach((card, idx) => {
+      const img = document.createElement("img");
+
+      img.src = card.image;
+      img.draggable = false;
+
+      img.style.width = cardWidth;
+      img.style.borderRadius = "6px";
+      img.style.display = "block";
+
+      if (idx > 0) {
+        img.style.marginTop = overlap;
+      }
+
+      el.appendChild(img);
+    });
+
+    document.body.appendChild(el);
+    dragElement = el;
+  }
 
   function updatePosition() {
     rafRef = null;
+
     if (!dragElement) return;
+
     dragElement.style.transform =
       `translate3d(${latestPos.x}px, ${latestPos.y}px, 0)`;
   }
@@ -61,42 +81,95 @@ function createDragElement(cards) {
       x: e.clientX - dragData.offsetX,
       y: e.clientY - dragData.offsetY,
     };
-    if (!rafRef) rafRef = requestAnimationFrame(updatePosition);
+
+    if (!rafRef) {
+      rafRef = requestAnimationFrame(updatePosition);
+    }
+
+    const elements = document.elementsFromPoint(
+      e.clientX,
+      e.clientY
+    );
+
+    const dropEl = elements.find(
+      (el) => el.dataset.dropzone
+    );
+
+    if (dropEl) {
+      setDropzoneHighlight(dropEl);
+    } else {
+      clearDropzoneHighlight();
+    }
   }
 
-function onPointerUp(e) {
-  if (!dragData) return;
+  function onPointerUp(e) {
+    if (!dragData) return;
 
-  const { cards, source } = dragData;
-  const elements = document.elementsFromPoint(e.clientX, e.clientY);
-  const dropEl = elements.find((el) => el.dataset.dropzone);
+    const { cards, source } = dragData;
 
-  if (dropEl) {
-    const to = {
-      type: dropEl.dataset.dropzone,
-      column: dropEl.dataset.column !== undefined
-        ? Number(dropEl.dataset.column) : undefined,
-      foundation: dropEl.dataset.foundation !== undefined
-        ? Number(dropEl.dataset.foundation) : undefined,
-    };
-    moveCards({ cards, from: source, to });
+    const elements = document.elementsFromPoint(
+      e.clientX,
+      e.clientY
+    );
+
+    const dropEl = elements.find(
+      (el) => el.dataset.dropzone
+    );
+
+    if (dropEl) {
+      const to = {
+        type: dropEl.dataset.dropzone,
+        column:
+          dropEl.dataset.column !== undefined
+            ? Number(dropEl.dataset.column)
+            : undefined,
+        foundation:
+          dropEl.dataset.foundation !== undefined
+            ? Number(dropEl.dataset.foundation)
+            : undefined,
+      };
+
+      moveCards({
+        cards,
+        from: source,
+        to,
+      });
+    }
+
+    cleanup();
   }
 
-  cleanup();
-}
   function cleanup() {
-    window.removeEventListener("pointermove", onPointerMove);
-    window.removeEventListener("pointerup", onPointerUp);
+    clearDropzoneHighlight();
+
+    window.removeEventListener(
+      "pointermove",
+      onPointerMove
+    );
+
+    window.removeEventListener(
+      "pointerup",
+      onPointerUp
+    );
+
     dragElement?.remove();
+
     dragElement = null;
     dragData = null;
-    if (rafRef) cancelAnimationFrame(rafRef);
+
+    if (rafRef) {
+      cancelAnimationFrame(rafRef);
+    }
+
     rafRef = null;
   }
 
   function startDrag(e, dragPayload) {
     e.preventDefault();
-    const rect = e.currentTarget.getBoundingClientRect();
+
+    const rect =
+      e.currentTarget.getBoundingClientRect();
+
     const { cards, source } = dragPayload;
 
     dragData = {
@@ -107,14 +180,23 @@ function onPointerUp(e) {
     };
 
     createDragElement(cards);
+
     latestPos = {
       x: e.clientX - dragData.offsetX,
       y: e.clientY - dragData.offsetY,
     };
+
     updatePosition();
 
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener(
+      "pointermove",
+      onPointerMove
+    );
+
+    window.addEventListener(
+      "pointerup",
+      onPointerUp
+    );
   }
 
   return { startDrag };
