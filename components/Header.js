@@ -23,7 +23,7 @@ export default function Header() {
         ? baseLinks
         : [
             ...baseLinks,
-            { label: "Download", href: "/Zolitaire.exe", download: true },
+            { label: "Download", href: "/Solitaire.exe", download: true },
         ];
 
     useEffect(() => {
