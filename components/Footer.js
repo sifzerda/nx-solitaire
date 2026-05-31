@@ -16,10 +16,8 @@ export default function Footer() {
                     <span className="text-blue-400">
 
                         {/* GitHub icon (simple inline SVG to avoid deps) */}
-                        <a
-                            href="https://github.com/sifzerda/nx-solitaire"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <a href="https://github.com/sifzerda/nx-solitaire"
+                            target="_blank" rel="noopener noreferrer"
                             className="mb-2 text-white hover:text-blue-400 transition">
                             <FaGithub className="w-4 h-4" />
                         </a>

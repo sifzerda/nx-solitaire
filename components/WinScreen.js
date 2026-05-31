@@ -49,13 +49,7 @@ function WinScreen({ onRestart }) {
             {/* Overlay */}
 
             <div className="fixed inset-0 z-50 flex items-center md:items-center justify-center p-6 -translate-y-50 md:translate-y-0">
-                <div className="
-                        relative overflow-hidden
-                        rounded-md
-                        border-2 border-black
-                        bg-black/45
-                        backdrop-blur-2xl
-                        shadow-2xl">
+                <div className="relative overflow-hidden rounded-md border-2 border-black bg-black/45 backdrop-blur-2xl shadow-2xl">
                     {/* Glow */}
                     <div className="absolute inset-0 bg-transparent pointer-events-none" />
 
@@ -73,29 +67,9 @@ function WinScreen({ onRestart }) {
                         </div>
 
                         {/* Button */}
-                        <button onClick={handleRestart} className="
-                                group relative overflow-hidden
-                                mt-1 inline-flex items-center gap-3
-                                rounded-md 
-                                border border-yellow-300
-                                px-3 py-2 text-yellow-300
-                                bg-black/30
-                                shadow-[0_10px_30px_rgba(16,185,129,0.35)]
-                                transition-all duration-200 
-                                hover:bg-black/80 hover:text-green-500 hover:border-green-500
-                                hover:shadow-[0_14px_40px_rgba(16,185,129,0.5)]
-                                active:scale-[0.98]
-                                will-change-transform">
+                        <button onClick={handleRestart} className="group relative overflow-hidden mt-1 inline-flex items-center gap-3 rounded-md  border border-yellow-300 px-3 py-2 text-yellow-300 bg-black/30 shadow-[0_10px_30px_rgba(16,185,129,0.35)] transition-all duration-200  hover:bg-black/80 hover:text-green-500 hover:border-green-500 hover:shadow-[0_14px_40px_rgba(16,185,129,0.5)] active:scale-[0.98] will-change-transform">
                             {/* Shine */}
-                            <div className="
-                                    absolute inset-0
-                                    -translate-x-full
-                                    bg-linear-to-r
-                                    from-transparent
-                                    via-white/20
-                                    to-transparent
-                                    transition-transform duration-700
-                                    group-hover:translate-x-full" />
+                            <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                             <span className="relative text-lg">New Game</span>
                         </button>
                     </div>

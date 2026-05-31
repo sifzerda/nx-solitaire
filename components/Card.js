@@ -10,9 +10,7 @@ const Card = memo(function Card({ card, stack, index = 0, source }) {
   const { startDrag } = usePointerDrag();
 
   const onPointerDown = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (!card) return;
+    (e) => {e.preventDefault(); if (!card) return;
 
       // SAFE STACK RESOLUTION
       const resolvedStack = Array.isArray(stack) && stack.length > 0 ? stack.slice(index) : [card];
@@ -22,14 +20,8 @@ const Card = memo(function Card({ card, stack, index = 0, source }) {
   );
 
   return (
-    <div
-      onPointerDown={onPointerDown}
-      className={`
-    ${CARD_CLASS}
-  `}>
-      <img src={card.image} alt={card.id} draggable={false} className=
-        "w-full h-full object-contain pointer-events-none" />
-    </div>
+    <div onPointerDown={onPointerDown} className={`${CARD_CLASS}`}>
+      <img src={card.image} alt={card.id} draggable={false} className="w-full h-full object-contain pointer-events-none" /></div>
   );
 });
 

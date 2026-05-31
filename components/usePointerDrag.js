@@ -86,14 +86,9 @@ export default function usePointerDrag() {
       rafRef = requestAnimationFrame(updatePosition);
     }
 
-    const elements = document.elementsFromPoint(
-      e.clientX,
-      e.clientY
-    );
+    const elements = document.elementsFromPoint(e.clientX, e.clientY);
 
-    const dropEl = elements.find(
-      (el) => el.dataset.dropzone
-    );
+    const dropEl = elements.find((el) => el.dataset.dropzone);
 
     if (dropEl) {
       setDropzoneHighlight(dropEl);
@@ -107,14 +102,8 @@ export default function usePointerDrag() {
 
     const { cards, source } = dragData;
 
-    const elements = document.elementsFromPoint(
-      e.clientX,
-      e.clientY
-    );
-
-    const dropEl = elements.find(
-      (el) => el.dataset.dropzone
-    );
+    const elements = document.elementsFromPoint(e.clientX, e.clientY);
+    const dropEl = elements.find((el) => el.dataset.dropzone);
 
     if (dropEl) {
       const to = {
@@ -129,11 +118,7 @@ export default function usePointerDrag() {
             : undefined,
       };
 
-      moveCards({
-        cards,
-        from: source,
-        to,
-      });
+      moveCards({cards, from: source, to});
     }
 
     cleanup();
@@ -142,18 +127,9 @@ export default function usePointerDrag() {
   function cleanup() {
     clearDropzoneHighlight();
 
-    window.removeEventListener(
-      "pointermove",
-      onPointerMove
-    );
-
-    window.removeEventListener(
-      "pointerup",
-      onPointerUp
-    );
-
+    window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("pointerup", onPointerUp);
     dragElement?.remove();
-
     dragElement = null;
     dragData = null;
 
@@ -167,8 +143,7 @@ export default function usePointerDrag() {
   function startDrag(e, dragPayload) {
     e.preventDefault();
 
-    const rect =
-      e.currentTarget.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
 
     const { cards, source } = dragPayload;
 
@@ -188,15 +163,8 @@ export default function usePointerDrag() {
 
     updatePosition();
 
-    window.addEventListener(
-      "pointermove",
-      onPointerMove
-    );
-
-    window.addEventListener(
-      "pointerup",
-      onPointerUp
-    );
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
   }
 
   return { startDrag };

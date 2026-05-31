@@ -84,26 +84,16 @@ export default function Header() {
                 <div className="flex flex-col gap-2 p-3">
                     {links.map((item) =>
                         item.download ? (
-                            <a
-                                key={item.label}
-                                href={item.href}
-                                download
-                                onClick={() => setOpen(false)}
+                            <a key={item.label} href={item.href} download onClick={() => setOpen(false)}
                                 className="
         block border px-4 py-3 text-sm font-mono uppercase tracking-[0.25em] transition
         border-green-400/40 bg-green-500/10 text-white
-        hover:text-green-400 hover:border-green-400
-      "
-                            >
+        hover:text-green-400 hover:border-green-400">
                                 {item.label}
                             </a>
                         ) : (
-                            <Link
-                                key={item.label}
-                                href={item.href}
-                                onClick={() => setOpen(false)}
-                                className={`
-        block border px-4 py-3 text-sm transition
+                            <Link key={item.label} href={item.href} onClick={() => setOpen(false)}
+                                className={`block border px-4 py-3 text-sm transition
         ${pathname === item.href
                                         ? "border-blue-400/40 text-blue-400 hover:border-blue-400"
                                         : "border-yellow-500/40 text-white hover:text-yellow-400 hover:border-yellow-400"

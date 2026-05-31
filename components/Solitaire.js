@@ -68,7 +68,6 @@ function createGame() {
 }
 
 /* -------------------- COMPONENT -------------------- */
-
 export default function Solitaire() {
   const initializeGame = useGameStore((s) => s.initializeGame);
   const foundations = useGameStore((s) => s.foundations);
@@ -95,47 +94,19 @@ export default function Solitaire() {
 
   return (
     <div className="bg-black flex-1">
-      <div className="
-      mx-auto
-      w-fit
-
+      <div className="mx-auto w-fit
         p-1 sm:p-2 md:p-4
-
-        bg-[url('/paper.png')]
-        bg-cover
-
+        bg-[url('/paper.png')] bg-cover
         border-5 border-ridged border-green-900
-
-        flex flex-col
-        select-none touch-none
-
+        flex flex-col select-none touch-none
         min-h-150
         sm:min-h-200
-        md:min-h-200
-      "
-        style={{ overscrollBehavior: "contain" }}
-      >
+        md:min-h-200"
+        style={{ overscrollBehavior: "contain" }}>
 
         {/* TOP ROW */}
         <div className="w-full px-2 sm:px-4 md:px-6">
-          <div
-            className="
-      mx-auto
-      w-fit
-
-      grid
-      grid-cols-7
-
-      gap-x-1
-      gap-y-4
-
-      sm:gap-x-3
-      sm:gap-y-5
-
-      md:gap-x-4
-      md:gap-y-6
-    "
-          >
+          <div className="mx-auto w-fit grid grid-cols-7 gap-x-1 gap-y-4 sm:gap-x-3 sm:gap-y-5 md:gap-x-4 md:gap-y-6">
             {/* ---------- TOP ROW ---------- */}
 
             {/* Stock/Waste spans first 3 tableau columns */}
@@ -151,22 +122,12 @@ export default function Solitaire() {
             {/* ---------- TABLEAU ---------- */}
 
             {Array.from({ length: 7 }).map((_, i) => (
-              <TableauColumn
-                key={i}
-                index={i}
-              />
+              <TableauColumn key={i} index={i} />
             ))}
           </div>
         </div>
 
-        {hasWon ? (
-          <WinScreen
-            bgClass={gameBgClass}
-            onRestart={() => {
-              initializeGame(createGame());
-            }}
-          />
-        ) : null}
+        {hasWon ? (<WinScreen bgClass={gameBgClass} onRestart={() => {initializeGame(createGame());}} />) : null}
       </div>
     </div>
   );

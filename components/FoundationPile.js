@@ -16,46 +16,22 @@ const FoundationPile = memo(function FoundationPile({ index }) {
   const cards = useGameStore((s) => s.foundations[index]);
   const topCard = cards[cards.length - 1];
 
- return (
-    <div
-      data-dropzone="foundation"
-      data-foundation={index}
-      className={`
-        ${CARD_CLASS}
-        relative
-        rounded-md
-        border-4
-        border-double
-        border-green-600
-        flex
-        items-center
-        justify-center
-        overflow-hidden
-        touch-none
-      `}
-    >
+  return (
+    <div data-dropzone="foundation" data-foundation={index}
+      className={`${CARD_CLASS} relative rounded-md border-4 border-double border-green-600 flex items-center justify-center overflow-hidden touch-none`}>
 
       {topCard ? (
-        <div className="absolute inset-0" 
-        style={{ pointerEvents: "none" }}>
-          <img 
-          src={topCard.image} 
-          alt={topCard.id} 
-          draggable={false}
-          className="w-full h-full object-cover rounded-md" />
+        <div className="absolute inset-0"
+          style={{ pointerEvents: "none" }}>
+          <img src={topCard.image} alt={topCard.id} draggable={false}
+            className="w-full h-full object-cover rounded-md" />
         </div>
       ) : (
-<div
-  className={`
-    text-5xl
-    sm:text-6xl
-    md:text-7xl
-    font-bold
-    ${getSuitColor(suits[index])}
-  `}
->
-  {suits[index]}
-</div>
+        <div
+          className={`text-5xl sm:text-6xl md:text-7xl font-bold
+    ${getSuitColor(suits[index])}`}>
+          {suits[index]}
+        </div>
       )}
     </div>
   );
