@@ -110,7 +110,7 @@ SEO = 100 =>
 
 - [x] restart/redraw game
 - [x] win screen, move count, time taken.
-- [ ] restyle stockpile reset btn
+- [x] restyle stockpile reset btn
 - [x] fix up GUI for pointer event system
 
 - [ ] time, undo move , hint
