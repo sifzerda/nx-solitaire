@@ -25,9 +25,9 @@ const TableauColumn = memo(function TableauColumn({ index }) {
 if (!card.faceUp) {
   return (
     <div key={card.id}
-      className={`${CARD_CLASS} rounded-md border overflow-hidden`}
+      className={`${CARD_CLASS} rounded-xs border overflow-hidden`}
       style={{ marginTop: overlap }}>
-      <div className="w-full h-full rounded-md bg-[url('/cards/FDC.png')] bg-cover bg-center" />
+      <div className="w-full h-full rounded-xs bg-[url('/cards/FDC.png')] bg-cover bg-center" />
     </div>
   );
 }

@@ -18,13 +18,13 @@ const FoundationPile = memo(function FoundationPile({ index }) {
 
   return (
     <div data-dropzone="foundation" data-foundation={index}
-      className={`${CARD_CLASS} relative rounded-md border-4 border-double border-green-600 flex items-center justify-center overflow-hidden touch-none`}>
+      className={`${CARD_CLASS} relative rounded-xs border-4 border-double border-green-600 flex items-center justify-center overflow-hidden touch-none`}>
 
       {topCard ? (
         <div className="absolute inset-0"
           style={{ pointerEvents: "none" }}>
           <img src={topCard.image} alt={topCard.id} draggable={false}
-            className="w-full h-full object-cover rounded-md" />
+            className="w-full h-full object-cover rounded-xs" />
         </div>
       ) : (
         <div
