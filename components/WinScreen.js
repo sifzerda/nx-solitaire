@@ -8,29 +8,43 @@ import { Fireworks } from "@fireworks-js/react";
 import { Trophy } from "lucide-react";
 
 const FIREWORKS_OPTIONS = Object.freeze({
-    autoresize: true,
-    opacity: 0.06,
-    acceleration: 1.02,
-    friction: 0.98,
-    gravity: 1.2,
-    particles: 45,
-    intensity: 18,
-    traceLength: 2,
-    traceSpeed: 8,
-    explosion: 4,
-    flickering: 20,
-    lineStyle: "round",
+  autoresize: true,
 
-    hue: { min: 0, max: 360 },
-    delay: { min: 40, max: 80 },
-    rocketsPoint: { min: 20, max: 80 },
-    lineWidth: {
-        explosion: { min: 1, max: 2 },
-        trace: { min: 0.5, max: 1 },
-    },
-    brightness: { min: 50, max: 70 },
-    decay: { min: 0.02, max: 0.035 },
-    mouse: { click: false, move: false, max: 0 },
+  opacity: 0.08,
+
+  acceleration: 1.02,
+  friction: 0.98,
+  gravity: 1.1,
+
+  particles: 25,        // ↓ big win
+  intensity: 12,        // ↓ big win
+
+  traceLength: 0.8,
+  traceSpeed: 8,
+
+  explosion: 3,
+
+  flickering: 10,
+
+  lineStyle: "round",
+
+  hue: { min: 0, max: 360 },
+  delay: { min: 60, max: 100 },
+
+  rocketsPoint: { min: 25, max: 75 },
+
+  lineWidth: {
+    explosion: { min: 1, max: 1.5 },
+    trace: { min: 0.3, max: 0.6 },
+  },
+
+  brightness: { min: 60, max: 80 },
+
+  decay: { min: 0.08, max: 0.12 },
+
+  mouse: { click: false, move: false, max: 0 },
+
+  recycle: false,
 });
 
 function WinScreen({ onRestart }) {
