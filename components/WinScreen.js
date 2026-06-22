@@ -2,50 +2,10 @@
 
 "use client";
 
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Fireworks } from "@fireworks-js/react";
 import { Trophy } from "lucide-react";
-
-const FIREWORKS_OPTIONS = Object.freeze({
-  autoresize: true,
-
-  opacity: 0.08,
-
-  acceleration: 1.02,
-  friction: 0.98,
-  gravity: 1.1,
-
-  particles: 25,        // ↓ big win
-  intensity: 12,        // ↓ big win
-
-  traceLength: 0.8,
-  traceSpeed: 8,
-
-  explosion: 3,
-
-  flickering: 10,
-
-  lineStyle: "round",
-
-  hue: { min: 0, max: 360 },
-  delay: { min: 60, max: 100 },
-
-  rocketsPoint: { min: 25, max: 75 },
-
-  lineWidth: {
-    explosion: { min: 1, max: 1.5 },
-    trace: { min: 0.3, max: 0.6 },
-  },
-
-  brightness: { min: 60, max: 80 },
-
-  decay: { min: 0.08, max: 0.12 },
-
-  mouse: { click: false, move: false, max: 0 },
-
-  recycle: false,
-});
 
 function WinScreen({ onRestart }) {
     const router = useRouter();
@@ -55,11 +15,9 @@ function WinScreen({ onRestart }) {
         router.push("/");
     }, [onRestart, router]);
 
-    const fireworksOptions = useMemo(() => FIREWORKS_OPTIONS, []);
-
     return (
         <>
-            <Fireworks className="fixed inset-0 z-40 pointer-events-none" options={fireworksOptions} />
+            <Fireworks className="fixed inset-0 z-40 pointer-events-none" />
             {/* Overlay */}
 
             <div className="fixed inset-0 z-50 flex items-center md:items-center justify-center p-6 -translate-y-50 md:translate-y-0">
