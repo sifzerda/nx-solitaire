@@ -53,12 +53,7 @@ npm run start
 ## Tech
 
 - Next.js App Router
-- Auth:
-  - jose
-  - JWT
-  - bcrypt
-  - AuthContext Provider
-- ~~Prisma Neon DB~~
+- custom dnd
 - State management:
   - zustand
   - immer for store
@@ -106,16 +101,12 @@ SEO = 100 =>
 
 ## Tasks:
 
-- Make a highscores page and db storage like minesweeper, recording user name/ref + time taken + number of moves
-
 - [x] restart/redraw game
 - [x] win screen, move count, time taken.
 - [x] restyle stockpile reset btn
 - [x] fix up GUI for pointer event system
-
 - [ ] time, undo move , hint
-
 - [x] when a column is empty, is collapses - make sure they don't
 - [x] currently can dnd out anywhere in tableau column, needs fix
-
 - [x] add rust and tauri
+- [ ] optimize winscreen
