@@ -10,8 +10,12 @@ import { CARD_CLASS, CARD_OVERLAP } from "./cardSizing";
 const TableauColumn = memo(function TableauColumn({ index }) {
   const cards = useGameStore((s) => s.tableau[index]);
 
+  const hint = useGameStore((s) => s.hint);
+  const isHintTarget = hint?.to?.type === "tableau" && hint.to.column === index;
+
   return (
-    <div className="relative shrink-0 cursor-grab"
+    <div className={`relative shrink-0 cursor-grab 
+    ${ isHintTarget ? "outline outline-4 outline-red-500" : "" }`}
       data-dropzone="tableau" data-column={index}
       style={{
         contain: "paint",

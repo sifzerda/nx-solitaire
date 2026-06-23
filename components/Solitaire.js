@@ -63,9 +63,13 @@ export default function Solitaire() {
   const initializeGame = useGameStore((s) => s.initializeGame);
   const foundations = useGameStore((s) => s.foundations);
 
+  const undo = useGameStore((s) => s.undo);
+  const showHint = useGameStore((s) => s.showHint);
+
   /* preload images */
   useEffect(() => {
-    const images = createDeck().map((card) => {const img = new Image();
+    const images = createDeck().map((card) => {
+      const img = new Image();
       img.src = card.image;
       return img;
     });
@@ -76,7 +80,8 @@ export default function Solitaire() {
   }, []);
 
   /* init once */
-  useEffect(() => {initializeGame(createGame());
+  useEffect(() => {
+    initializeGame(createGame());
   }, [initializeGame]);
 
   const hasWon = foundations.every((pile) => pile.length === 13);
@@ -84,6 +89,21 @@ export default function Solitaire() {
   return (
     <div className="bg-black flex-1">
       <div className="mx-auto w-fit p-1 sm:p-2 md:p-4 bg-[url('/paper.png')] bg-cover border-5 border-ridged border-green-900 flex flex-col select-none touch-none min-h-150 sm:min-h-200 md:min-h-200" style={{ overscrollBehavior: "contain" }}>
+
+
+
+        <div className="flex gap-2 mb-2">
+          <button onClick={undo} className="px-3 py-1 text-black bg-white rounded"
+          >Undo</button>
+          <button onClick={showHint} className="px-3 py-1 text-black bg-white rounded"
+          >Hint</button>
+        </div>
+
+        <button onClick={undo} className="px-3 py-1 text-black bg-white rounded"
+        >New Game</button>
+
+
+
         {/* TOP ROW */}
         <div className="w-full px-2 sm:px-4 md:px-6">
           <div className="mx-auto w-fit grid grid-cols-7 gap-x-1 gap-y-4 sm:gap-x-3 sm:gap-y-5 md:gap-x-4 md:gap-y-6">

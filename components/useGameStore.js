@@ -9,21 +9,15 @@ function isRed(suit) {
   return RED_SUITS.has(suit);
 }
 
-const rankValue = {
-  A: 1,
-  2: 2,
-  3: 3,
-  4: 4,
-  5: 5,
-  6: 6,
-  7: 7,
-  8: 8,
-  9: 9,
-  10: 10,
-  J: 11,
-  Q: 12,
-  K: 13,
-};
+const rankValue = { A: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, J: 11, Q: 12, K: 13 };
+
+//hint system helper
+const createSnapshot = (state) => ({
+  stock: [...state.stock],
+  stockIndex: state.stockIndex,
+  tableau: state.tableau.map((p) => [...p]),
+  foundations: state.foundations.map((p) => [...p]),
+});
 
 /* -------------------- STORE -------------------- */
 
@@ -36,15 +30,7 @@ const useGameStore = create((set, get) => ({
   /* ---------------- HISTORY (UNDO / REDO) ---------------- */
   history: [],
   future: [],
-
-  /* ---------------- SNAPSHOT ---------------- */
-
-  snapshot: (state) => ({
-    stock: state.stock,
-    stockIndex: state.stockIndex,
-    tableau: state.tableau.map((p) => [...p]),
-    foundations: state.foundations.map((p) => [...p]),
-  }),
+  hint: null,
 
   /* ---------------- INIT ---------------- */
 
@@ -54,15 +40,23 @@ const useGameStore = create((set, get) => ({
       stockIndex: game.stock.length - 1,
       history: [],
       future: [],
+      hint: null,
     });
   },
 
   /* ---------------- STOCK ---------------- */
 
   nextStockCard: () => {
-    set((state) => {
-      if (state.stock.length === 0) return state;
+    const state = get();
 
+    if (state.stock.length === 0) return;
+
+    set({
+      history: [...state.history, createSnapshot(state)],
+      future: [],
+    });
+
+    set((state) => {
       const nextIndex = state.stockIndex - 1;
 
       return {
@@ -72,6 +66,13 @@ const useGameStore = create((set, get) => ({
   },
 
   resetStockCycle: () => {
+    const state = get();
+
+    set({
+      history: [...state.history, createSnapshot(state)],
+      future: [],
+    });
+
     set((state) => ({
       stockIndex: state.stock.length - 1,
     }));
@@ -149,12 +150,7 @@ const useGameStore = create((set, get) => ({
     const first = cards[0];
 
     /* ---------------- SAVE HISTORY (IMPORTANT) ---------------- */
-    const snapshot = {
-      stock: state.stock,
-      stockIndex: state.stockIndex,
-      tableau: state.tableau.map((p) => [...p]),
-      foundations: state.foundations.map((p) => [...p]),
-    };
+    const snapshot = createSnapshot(state);
 
     // helper — only call after validation passes
     const saveHistory = () =>
@@ -162,18 +158,16 @@ const useGameStore = create((set, get) => ({
 
     /* ---------------- TABLEAU → TABLEAU ---------------- */
     if (
-      from.type === "tableau" &&
-      to.type === "tableau"
+      from.type === "tableau" && to.type === "tableau"
     ) {
       if (!state.canPlaceOnTableau(first, to.column)) return;
+
+      saveHistory();
 
       set((state) => {
         const tableau = [...state.tableau];
 
-        tableau[from.column] = tableau[from.column].slice(
-          0,
-          tableau[from.column].length - cards.length
-        );
+        tableau[from.column] = tableau[from.column].slice(0, tableau[from.column].length - cards.length);
 
         tableau[to.column] = [
           ...tableau[to.column],
@@ -195,9 +189,7 @@ const useGameStore = create((set, get) => ({
 
       // ONLY allow the top tableau card
       if (
-        cards.length !== 1 ||
-        !topCard ||
-        topCard.id !== first.id
+        cards.length !== 1 || !topCard || topCard.id !== first.id
       ) {
         return;
       }
@@ -214,8 +206,7 @@ const useGameStore = create((set, get) => ({
 
           // flip next card
           if (
-            updated.length &&
-            !updated[updated.length - 1].faceUp
+            updated.length && !updated[updated.length - 1].faceUp
           ) {
             updated[updated.length - 1] = {
               ...updated[updated.length - 1],
@@ -226,10 +217,7 @@ const useGameStore = create((set, get) => ({
           return updated;
         });
 
-        const foundations = state.foundations.map((pile, i) =>
-          i === to.foundation
-            ? [...pile, first]
-            : pile
+        const foundations = state.foundations.map((pile, i) => i === to.foundation ? [...pile, first] : pile
         );
 
         return { tableau, foundations };
@@ -240,8 +228,7 @@ const useGameStore = create((set, get) => ({
 
     /* ---------------- WASTE → TABLEAU ---------------- */
     if (
-      from.type === "waste" &&
-      to.type === "tableau"
+      from.type === "waste" && to.type === "tableau"
     ) {
       if (!state.canPlaceOnTableau(first, to.column)) return;
       saveHistory(); // 
@@ -277,8 +264,124 @@ const useGameStore = create((set, get) => ({
       });
       return;
     }
+  },
 
+  findHint: () => {
+    const state = get();
 
+    /* ---------------- TABLEAU -> FOUNDATION ---------------- */
+
+    for (let col = 0; col < 7; col++) {
+      const pile = state.tableau[col];
+
+      if (!pile.length) continue;
+
+      const card = pile[pile.length - 1];
+
+      if (!card.faceUp) continue;
+
+      for (let foundation = 0; foundation < 4; foundation++) {
+        if (state.canPlaceOnFoundation(card, foundation)) {
+          return {
+            from: {
+              type: "tableau",
+              column: col,
+              cardId: card.id,
+            },
+            to: {
+              type: "foundation",
+              foundation,
+            },
+          };
+        }
+      }
+    }
+
+    /* ---------------- WASTE -> FOUNDATION ---------------- */
+
+    const waste = state.stock[state.stockIndex];
+
+    if (waste) {
+      for (let foundation = 0; foundation < 4; foundation++) {
+        if (state.canPlaceOnFoundation(waste, foundation)) {
+          return {
+            from: {
+              type: "waste",
+              cardId: waste.id,
+            },
+            to: {
+              type: "foundation",
+              foundation,
+            },
+          };
+        }
+      }
+    }
+
+    /* ---------------- TABLEAU -> TABLEAU ---------------- */
+
+    for (let fromCol = 0; fromCol < 7; fromCol++) {
+      const pile = state.tableau[fromCol];
+
+      for (let i = 0; i < pile.length; i++) {
+        const card = pile[i];
+
+        if (!card.faceUp) continue;
+
+        for (let toCol = 0; toCol < 7; toCol++) {
+          if (toCol === fromCol) continue;
+
+          if (state.canPlaceOnTableau(card, toCol)) {
+            return {
+              from: {
+                type: "tableau",
+                column: fromCol,
+                cardId: card.id,
+              },
+              to: {
+                type: "tableau",
+                column: toCol,
+              },
+            };
+          }
+        }
+      }
+    }
+
+    /* ---------------- WASTE -> TABLEAU ---------------- */
+
+    if (waste) {
+      for (let col = 0; col < 7; col++) {
+        if (state.canPlaceOnTableau(waste, col)) {
+          return {
+            from: {
+              type: "waste",
+              cardId: waste.id,
+            },
+            to: {
+              type: "tableau",
+              column: col,
+            },
+          };
+        }
+      }
+    }
+
+    return null;
+  },
+
+  showHint: () => {
+    const hint = get().findHint();
+
+    if (!hint) return;
+
+    set({ hint });
+
+    setTimeout(() => {
+      if (get().hint === hint) {
+        set({ hint: null });
+      }
+    }, 1500);
   },
 
   /* ---------------- UNDO ---------------- */
@@ -292,12 +395,7 @@ const useGameStore = create((set, get) => ({
       state.history[state.history.length - 1];
 
     const future = [
-      {
-        stock: state.stock,
-        stockIndex: state.stockIndex,
-        tableau: state.tableau,
-        foundations: state.foundations,
-      },
+      createSnapshot(state),
       ...state.future,
     ];
 
@@ -307,6 +405,9 @@ const useGameStore = create((set, get) => ({
       future,
     });
   },
+
+  setHint: (hint) => set({ hint }),
+  clearHint: () => set({ hint: null }),
 
   /* ---------------- REDO ---------------- */
 
@@ -319,12 +420,7 @@ const useGameStore = create((set, get) => ({
 
     const history = [
       ...state.history,
-      {
-        stock: state.stock,
-        stockIndex: state.stockIndex,
-        tableau: state.tableau,
-        foundations: state.foundations,
-      },
+      createSnapshot(state),
     ];
 
     set({
