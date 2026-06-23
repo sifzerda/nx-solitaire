@@ -3,17 +3,14 @@
 "use client";
 
 import { memo, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { Fireworks } from "@fireworks-js/react";
 import { Trophy } from "lucide-react";
 
 function WinScreen({ onRestart }) {
-    const router = useRouter();
 
     const handleRestart = useCallback(() => {
         onRestart?.();
-        router.push("/");
-    }, [onRestart, router]);
+    }, [onRestart]);
 
     return (
         <>

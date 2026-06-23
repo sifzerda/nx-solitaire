@@ -2,12 +2,14 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import useGameStore from "./useGameStore";
 import TableauColumn from "./TableauColumn";
 import FoundationPile from "./FoundationPile";
 import StockArea from "./StockArea";
 import WinScreen from "./WinScreen";
+
+import createGame from "./createGame";
 
 /* -------------------- CONSTANTS -------------------- */
 
@@ -37,26 +39,6 @@ function shuffle(array) {
   return arr;
 }
 
-/* -------------------- GAME INIT -------------------- */
-
-function createGame() {
-  const shuffled = shuffle(createDeck());
-  const tableau = Array.from({ length: 7 }, () => []);
-  let index = 0;
-
-  for (let col = 0; col < 7; col++) {
-    for (let row = 0; row <= col; row++) {
-      tableau[col].push({
-        ...shuffled[index], faceUp: row === col,
-      });
-
-      index++;
-    }
-  }
-  const stock = shuffled.slice(index);
-  return { stock, stockIndex: 0, tableau, foundations: [[], [], [], []] };
-}
-
 /* -------------------- COMPONENT -------------------- */
 export default function Solitaire() {
   const [debugWin, setDebugWin] = useState(false);
@@ -65,6 +47,11 @@ export default function Solitaire() {
 
   const undo = useGameStore((s) => s.undo);
   const showHint = useGameStore((s) => s.showHint);
+
+const restartGame = useCallback(() => {
+  setDebugWin(false);
+  initializeGame(createGame());
+}, [initializeGame]);
 
   /* preload images */
   useEffect(() => {
@@ -92,15 +79,46 @@ export default function Solitaire() {
 
 
 
-        <div className="flex gap-2 mb-2">
-          <button onClick={undo} className="px-3 py-1 text-black bg-white rounded"
-          >Undo</button>
-          <button onClick={showHint} className="px-3 py-1 text-black bg-white rounded"
-          >Hint</button>
-        </div>
+<div className="flex gap-2 mb-3">
+  <button
+    onClick={undo}
+    className="
+      px-3 py-1
+      rounded
+      bg-white
+      text-black
+      cursor-pointer
+    "
+  >
+    Undo
+  </button>
 
-        <button onClick={undo} className="px-3 py-1 text-black bg-white rounded"
-        >New Game</button>
+  <button
+    onClick={showHint}
+    className="
+      px-3 py-1
+      rounded
+      bg-white
+      text-black
+      cursor-pointer
+    "
+  >
+    Hint
+  </button>
+
+  <button
+    onClick={restartGame}
+    className="
+      px-3 py-1
+      rounded
+      bg-white
+      text-black
+      cursor-pointer
+    "
+  >
+    New Game
+  </button>
+</div>
 
 
 
@@ -125,13 +143,8 @@ export default function Solitaire() {
         </div>
 
         {(hasWon || debugWin) ? (
-          <WinScreen bgClass={gameBgClass} onRestart={() => {
-            setDebugWin(false);
-            initializeGame(createGame());
-          }}
-          />
+          <WinScreen bgClass={gameBgClass} onRestart={restartGame} />
         ) : null}
-
       </div>
     </div>
   );
