@@ -97,9 +97,7 @@ export default function Header() {
         ${pathname === item.href
                                         ? "border-blue-400/40 text-blue-400 hover:border-blue-400"
                                         : "border-yellow-500/40 text-white hover:text-yellow-400 hover:border-yellow-400"
-                                    }
-      `}
-                            >
+                                    }`}>
                                 {item.label}
                             </Link>
                         )

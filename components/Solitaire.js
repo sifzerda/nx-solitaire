@@ -8,7 +8,6 @@ import TableauColumn from "./TableauColumn";
 import FoundationPile from "./FoundationPile";
 import StockArea from "./StockArea";
 import WinScreen from "./WinScreen";
-
 import createGame from "./createGame";
 
 /* -------------------- CONSTANTS -------------------- */
@@ -48,10 +47,10 @@ export default function Solitaire() {
   const undo = useGameStore((s) => s.undo);
   const showHint = useGameStore((s) => s.showHint);
 
-const restartGame = useCallback(() => {
-  setDebugWin(false);
-  initializeGame(createGame());
-}, [initializeGame]);
+  const restartGame = useCallback(() => {
+    setDebugWin(false);
+    initializeGame(createGame());
+  }, [initializeGame]);
 
   /* preload images */
   useEffect(() => {
@@ -77,55 +76,65 @@ const restartGame = useCallback(() => {
     <div className="bg-black flex-1">
       <div className="mx-auto w-fit p-1 sm:p-2 md:p-4 bg-[url('/paper.png')] bg-cover border-5 border-ridged border-green-900 flex flex-col select-none touch-none min-h-150 sm:min-h-200 md:min-h-200" style={{ overscrollBehavior: "contain" }}>
 
-
-
-<div className="flex gap-2 mb-3">
-  <button
-    onClick={undo}
-    className="
-      px-3 py-1
-      rounded
-      bg-white
-      text-black
-      cursor-pointer
-    "
-  >
-    Undo
-  </button>
-
-  <button
-    onClick={showHint}
-    className="
-      px-3 py-1
-      rounded
-      bg-white
-      text-black
-      cursor-pointer
-    "
-  >
-    Hint
-  </button>
-
-  <button
-    onClick={restartGame}
-    className="
-      px-3 py-1
-      rounded
-      bg-white
-      text-black
-      cursor-pointer
-    "
-  >
-    New Game
-  </button>
-</div>
-
-
-
         {/* TOP ROW */}
         <div className="w-full px-2 sm:px-4 md:px-6">
           <div className="mx-auto w-fit grid grid-cols-7 gap-x-1 gap-y-4 sm:gap-x-3 sm:gap-y-5 md:gap-x-4 md:gap-y-6">
             {/* ---------- TOP ROW ---------- */}
+            <div className="col-start-4 col-span-4 flex justify-end gap-2">
+              <button 
+              className="
+              border border-green-400/40
+              bg-green-500/10 
+              px-2 py-2 
+              shadow-[0_8px_20px_rgba(0,0,0,0.45)]
+              font-mono text-xs uppercase 
+              tracking-[0.25em]
+              hover:bg-green-500/20
+              active:bg-green-500/30
+              active:scale-95
+              active:translate-y-0.5
+              active:shadow-none
+              "
+              onClick={undo}>
+                Undo
+              </button>
+
+              <button 
+              className="
+              border border-green-400/40
+              bg-green-500/10 
+              px-2 py-2 
+              shadow-[0_8px_20px_rgba(0,0,0,0.45)]
+              font-mono text-xs uppercase 
+              tracking-[0.25em]
+              hover:bg-green-500/20
+              active:bg-green-500/30
+              active:scale-95
+              active:translate-y-0.5
+              active:shadow-none
+              "
+              onClick={showHint}>
+                Hint
+              </button>
+
+              <button 
+              className="
+              border border-green-400/40
+              bg-green-500/10 
+              px-2 py-2 
+              shadow-[0_8px_20px_rgba(0,0,0,0.45)]
+              font-mono text-xs uppercase 
+              tracking-[0.25em]
+              hover:bg-green-500/20
+              active:bg-green-500/30
+              active:scale-95
+              active:translate-y-0.5
+              active:shadow-none
+              "
+              onClick={restartGame}>
+                New Game
+              </button>
+            </div>
             {/* ---------- <button onClick={() => setDebugWin(v => !v)} className="fixed bottom-4 right-4 z-[9999] bg-red-600 text-white px-4 py-2 rounded">{debugWin ? "Hide Win" : "Test Win"}</button> ---------- */}
 
             {/* Stock/Waste spans first 3 tableau columns */}
@@ -142,9 +151,7 @@ const restartGame = useCallback(() => {
           </div>
         </div>
 
-        {(hasWon || debugWin) ? (
-          <WinScreen bgClass={gameBgClass} onRestart={restartGame} />
-        ) : null}
+        {(hasWon || debugWin) ? (<WinScreen bgClass={gameBgClass} onRestart={restartGame} />) : null}
       </div>
     </div>
   );
