@@ -11,11 +11,6 @@ export default function Header() {
     const buttonRef = useRef(null);
     const [open, setOpen] = useState(false);
 
-    const isDesktop = typeof window !== "undefined" && "__TAURI__" in window;
-
-    // Hide header completely in desktop app
-    if (isDesktop) return null;
-
     const links = [
         { label: "Play", href: "/" },
         { label: "About", href: "/about" },
@@ -47,23 +42,24 @@ export default function Header() {
 
                 {/* DESKTOP NAV */}
                 <div className="hidden md:flex items-center gap-3">
-                    {links.map((item) => item.download ? (
-                        <a key={item.label} href={item.href} download className={`
+                    {links.map((item) =>
+                        item.download ? (
+                            <a key={item.label} href={item.href} download className={`
         border border-green-400/40 bg-green-500/10 px-4 py-2 font-mono text-xs uppercase tracking-[0.25em]
         text-white transition-all duration-200 hover:text-green-400 hover:border-green-400
       `}>
-                            {item.label}
-                        </a>
-                    ) : (
-                        <Link key={item.label} href={item.href} className={`
+                                {item.label}
+                            </a>
+                        ) : (
+                            <Link key={item.label} href={item.href} className={`
         border px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-all duration-200
         ${pathname === item.href
-                                ? "border-blue-400/40 text-white hover:text-blue-400 hover:border-blue-400"
-                                : "border-yellow-500/40 text-white hover:text-yellow-400 hover:border-yellow-400"
-                            }`}>
-                            {item.label}
-                        </Link>
-                    )
+                                    ? "border-blue-400/40 text-white hover:text-blue-400 hover:border-blue-400"
+                                    : "border-yellow-500/40 text-white hover:text-yellow-400 hover:border-yellow-400"
+                                }`}>
+                                {item.label}
+                            </Link>
+                        )
                     )}
                 </div>
 

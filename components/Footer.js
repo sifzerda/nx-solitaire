@@ -3,11 +3,6 @@
 import { FaGithub } from "react-icons/fa";
 
 export default function Footer() {
-    const [isDesktop, setIsDesktop] = useState(false);
-
-    useEffect(() => {
-        setIsDesktop("__TAURI__" in window);
-    }, []);
 
     return (
         <footer className="w-full bg-black text-white">

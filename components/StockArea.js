@@ -16,21 +16,31 @@ const StockArea = memo(function StockArea({ type }) {
     const topStockCard = stock[stockIndex];
     const isAtEnd = stockIndex === 0;
 
+    const hint = useGameStore((s) => s.hint);
+    const isHintWaste = hint?.from?.type === "waste" && hint.from.cardId === topStockCard?.id;
+
     return (
-        <div className="flex w-fit gap-1 sm:gap-2 md:gap-3 items-center">
+        <div className="flex w-fit gap-2 sm:gap-3 md:gap-4 items-center">
 
             {/* ---------------- STOCK ---------------- */}
             <div onClick={nextStockCard} className={`relative ${CARD_CLASS} border-2 border-dashed bg-green-500 border-green-600 rounded-xs cursor-pointer overflow-hidden flex items-center justify-center touch-none`}
                 style={{ contain: "layout paint size" }}>
                 {stock.length > 0 && (
                     <div className="w-full h-full rounded-xs bg-[url('/cards/FDC.png')] bg-cover bg-center" />)}
-
-                {/* ---------------- <div className="absolute bottom-1 right-1 text-white text-[15px]"> {stock.length}/24 </div>  ---------------- */}
             </div>
 
             {/* ---------------- WASTE (FIXED DRAG SOURCE) ---------------- */}
-            <div data-dropzone="waste" className={`relative ${CARD_CLASS} rounded-xs`}
-                style={{ contain: "layout paint size" }}>
+            <div
+                data-dropzone="waste"
+                className={`
+        relative ${CARD_CLASS}
+        rounded-xs
+        ${isHintWaste
+                        ? "ring-4 ring-green-400 shadow-[0_0_18px_rgba(34,197,94,0.7)] z-10"
+                        : ""
+                    }
+    `}
+            >
                 {topStockCard ? (
                     <Card card={{ ...topStockCard, faceUp: true }} cards={[{ ...topStockCard, faceUp: true }]}
                         /* make waste consistent source */
@@ -40,23 +50,40 @@ const StockArea = memo(function StockArea({ type }) {
             </div>
 
             {/* ---------------- RESET ---------------- */}
-            <div className={`${CARD_CLASS} flex items-center justify-center -ml-2 sm:ml-2`}>
+            <div className={`${CARD_CLASS} flex items-center justify-center border-2 border-dashed border-white/40`}>
                 {isAtEnd && (
-                    <button onPointerUp={(e) => {
-                        e.preventDefault();
-                        resetStockCycle();
-                    }}
-                        className="group relative flex items-center justify-center rounded-xs backdrop-blur-xl border border-amber-400/90 text-amber-200 font-bold shadow-[0_8px_20px_rgba(0,0,0,0.45)] transition-all duration-100 hover:scale-[1.03] hover:border-amber-300/70 hover:text-white active:translate-y-0.75 active:shadow-[0_2px_6px_rgba(0,0,0,0.5)] cursor-pointer touch-none select-none"
-                        style={{width: "70%", height: "70%", zIndex: 100, fontSize: "calc(var(--card-width) * 0.45)",}}>
-                        {/* Bottom rim */}
-                        <div className="absolute inset-x-0 -bottom-1 h-2 rounded-b-xs bg-amber-900/40 transition-all duration-100 group-active:h-0 group-active:bottom-0" />
+                    <button onPointerUp={(e) => { e.preventDefault(); resetStockCycle(); }}
+                        className="
+                        group relative 
+                        flex  
+                         rounded-xs 
+ leading-none
+ border border-green-400/70
+              px-1 py-1 
+              sm:px-3 
+              sm:py-3
+              sm:text-3xl
+              
+                            shadow-[0_4px_5px_rgba(0,0,0,0.45)]
+                            bg-green-500/10 
+               font-mono text-2xl uppercase 
+                            hover:bg-blue-500/30
+                           hover:text-white 
+              active:bg-green-400/50
+              active:scale-95
+              active:translate-y-0.5
+              active:shadow-none
+            
+              transition-colors duration-100
+                           cursor-pointer 
+                           touch-none 
+                           select-none"
 
-                        {/* Glass highlight */}
-                        <div className="absolute inset-0 rounded-xs bg-linear-to-b from-white/15 via-white/5 to-transparent pointer-events-none" />
-
-                        <span className="relative z-10 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] transition-transform duration-100 group-active:translate-y-px">
+                        style={{  zIndex: 100,   }}>
+ 
+                        
                             ↺
-                        </span>
+                        
                     </button>
                 )}
             </div>

@@ -2,45 +2,20 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import useGameStore from "./useGameStore";
 import TableauColumn from "./TableauColumn";
 import FoundationPile from "./FoundationPile";
 import StockArea from "./StockArea";
 import WinScreen from "./WinScreen";
-import createGame from "./createGame";
+import createGame, { createDeck } from "./createGame";
 
 /* -------------------- CONSTANTS -------------------- */
-
-const suits = ["♠", "♥", "♦", "♣"];
-const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-const suitLetter = { "♠": "S", "♥": "H", "♦": "D", "♣": "C" };
 const gameBgClass = "bg-green-600 bg-[url('/paper.png')] bg-contain";
-
-/* -------------------- DECK -------------------- */
-
-function createDeck() {
-  return suits.flatMap((suit) =>
-    ranks.map((rank) => ({
-      suit, rank, id: `${rank}${suit}`,
-      image: `/cards/${rank}${suitLetter[suit]}.svg`,
-    }))
-  );
-}
-
-function shuffle(array) {
-  const arr = [...array];
-
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
+const deckImages = createDeck();
 /* -------------------- COMPONENT -------------------- */
+
 export default function Solitaire() {
-  const [debugWin, setDebugWin] = useState(false);
   const initializeGame = useGameStore((s) => s.initializeGame);
   const foundations = useGameStore((s) => s.foundations);
 
@@ -48,20 +23,21 @@ export default function Solitaire() {
   const showHint = useGameStore((s) => s.showHint);
 
   const restartGame = useCallback(() => {
-    setDebugWin(false);
     initializeGame(createGame());
   }, [initializeGame]);
 
   /* preload images */
   useEffect(() => {
-    const images = createDeck().map((card) => {
+    const images = deckImages.map((card) => {
       const img = new Image();
       img.src = card.image;
       return img;
     });
 
     return () => {
-      images.length = 0;
+      images.forEach((img) => {
+        img.src = "";
+      });
     };
   }, []);
 
@@ -81,77 +57,75 @@ export default function Solitaire() {
           <div className="mx-auto w-fit grid grid-cols-7 gap-x-1 gap-y-4 sm:gap-x-3 sm:gap-y-5 md:gap-x-4 md:gap-y-6">
             {/* ---------- TOP ROW ---------- */}
             <div className="col-start-4 col-span-4 flex justify-end gap-2">
-              <button 
-              className="
-              border border-green-400/40
+              <button className="
+              border border-green-400/70
               bg-green-500/10 
               px-2 py-2 
-              shadow-[0_8px_20px_rgba(0,0,0,0.45)]
+              shadow-[0_4px_5px_rgba(0,0,0,0.45)]
               font-mono text-xs uppercase 
               tracking-[0.25em]
-              hover:bg-green-500/20
-              active:bg-green-500/30
+              cursor-pointer
+              hover:bg-blue-500/30
+              active:bg-green-400/50
               active:scale-95
               active:translate-y-0.5
               active:shadow-none
+              transition-colors duration-100
               "
-              onClick={undo}>
+                onClick={undo}>
                 Undo
               </button>
 
-              <button 
-              className="
-              border border-green-400/40
+              <button className="
+              border border-green-400/70
               bg-green-500/10 
               px-2 py-2 
-              shadow-[0_8px_20px_rgba(0,0,0,0.45)]
+              shadow-[0_4px_5px_rgba(0,0,0,0.45)]
               font-mono text-xs uppercase 
               tracking-[0.25em]
-              hover:bg-green-500/20
-              active:bg-green-500/30
+              cursor-pointer
+              hover:bg-blue-500/30
+              active:bg-green-400/50
               active:scale-95
               active:translate-y-0.5
               active:shadow-none
+              transition-colors duration-100
               "
-              onClick={showHint}>
+                onClick={showHint}>
                 Hint
               </button>
 
-              <button 
-              className="
-              border border-green-400/40
+              <button className="
+              border border-green-400/70
               bg-green-500/10 
               px-2 py-2 
-              shadow-[0_8px_20px_rgba(0,0,0,0.45)]
+              shadow-[0_4px_5px_rgba(0,0,0,0.45)]
               font-mono text-xs uppercase 
               tracking-[0.25em]
-              hover:bg-green-500/20
-              active:bg-green-500/30
+              cursor-pointer
+              hover:bg-blue-500/30
+              active:bg-green-400/50
               active:scale-95
               active:translate-y-0.5
               active:shadow-none
+              transition-colors duration-100
               "
-              onClick={restartGame}>
-                New Game
-              </button>
+                onClick={restartGame}>New Game</button>
+
             </div>
-            {/* ---------- <button onClick={() => setDebugWin(v => !v)} className="fixed bottom-4 right-4 z-[9999] bg-red-600 text-white px-4 py-2 rounded">{debugWin ? "Hide Win" : "Test Win"}</button> ---------- */}
 
             {/* Stock/Waste spans first 3 tableau columns */}
-            <div className="col-span-3">
-              <StockArea />
-            </div>
+            <div className="col-span-3"><StockArea /></div>
 
             {/* Foundations align to tableau columns 4-7 */}
             {Array.from({ length: 4 }).map((_, i) => (<FoundationPile key={i} index={i} />))}
 
             {/* ---------- TABLEAU ---------- */}
-
             {Array.from({ length: 7 }).map((_, i) => (<TableauColumn key={i} index={i} />))}
           </div>
         </div>
 
-        {(hasWon || debugWin) ? (<WinScreen bgClass={gameBgClass} onRestart={restartGame} />) : null}
+        {(hasWon) ? (<WinScreen bgClass={gameBgClass} onRestart={restartGame} />) : null}
       </div>
     </div>
   );

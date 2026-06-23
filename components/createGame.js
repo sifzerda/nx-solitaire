@@ -3,20 +3,10 @@
 /* -------------------- GAME INIT -------------------- */
 
 const suits = ["♠", "♥", "♦", "♣"];
+const ranks = [ "A","2","3","4","5","6", "7","8","9","10","J","Q","K" ];
+const suitLetter = { "♠": "S", "♥": "H", "♦": "D", "♣": "C" };
 
-const ranks = [
-  "A","2","3","4","5","6",
-  "7","8","9","10","J","Q","K"
-];
-
-const suitLetter = {
-  "♠": "S",
-  "♥": "H",
-  "♦": "D",
-  "♣": "C",
-};
-
-function createDeck() {
+export function createDeck() {
   return suits.flatMap((suit) =>
     ranks.map((rank) => ({
       suit,
@@ -37,18 +27,12 @@ function shuffle(array) {
 
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-
   return arr;
 }
 
 export default function createGame() {
   const shuffled = shuffle(createDeck());
-
-  const tableau = Array.from(
-    { length: 7 },
-    () => []
-  );
-
+  const tableau = Array.from({ length: 7 }, () => []);
   let index = 0;
 
   for (let col = 0; col < 7; col++) {
@@ -57,7 +41,6 @@ export default function createGame() {
         ...shuffled[index],
         faceUp: row === col,
       });
-
       index++;
     }
   }

@@ -27,7 +27,7 @@ const Card = memo(function Card({ card, stack, index = 0, source }) {
   return (
     <div onPointerDown={onPointerDown} className={
       `${CARD_CLASS}
-       ${isHintCard ? "ring-4 ring-red-500" : "" }
+       ${isHintCard ? "border-4 border-red-500 z-20" : ""}
   `}>
       <img src={card.image} alt={card.id} draggable={false} className="w-full h-full object-contain pointer-events-none" /></div>
   );

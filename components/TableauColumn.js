@@ -15,7 +15,7 @@ const TableauColumn = memo(function TableauColumn({ index }) {
 
   return (
     <div className={`relative shrink-0 cursor-grab 
-    ${ isHintTarget ? "outline outline-4 outline-red-500" : "" }`}
+    ${ isHintTarget ? "outline-4 outline-red-500" : "" }`}
       data-dropzone="tableau" data-column={index}
       style={{
         contain: "paint",
