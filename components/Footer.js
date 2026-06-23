@@ -3,6 +3,12 @@
 import { FaGithub } from "react-icons/fa";
 
 export default function Footer() {
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    useEffect(() => {
+        setIsDesktop("__TAURI__" in window);
+    }, []);
+
     return (
         <footer className="w-full bg-black text-white">
             <div className="flex flex-col items-center mb-2 border-t-2 border-yellow-500">
@@ -11,8 +17,6 @@ export default function Footer() {
                 <div className="flex items-center gap-3 text-lg mb-1 mt-2">
                     <span className="text-blue-400">♠</span>
                     <span className="text-red-500">♥</span>
-
-
                     <span className="text-blue-400">
 
                         {/* GitHub icon (simple inline SVG to avoid deps) */}

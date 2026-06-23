@@ -24,18 +24,20 @@ export const metadata = {
   description: "A game of Solitaire built with Next.js and Zustand",
 };
 
+const isDesktop = process.env.NEXT_PUBLIC_DESKTOP === "true";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${unifraktur.variable} h-full antialiased`}>
       <body className="min-h-screen flex flex-col">
 
-        <Header />
+        {!isDesktop && <Header />}
 
         <main className="flex-1 flex flex-col">
           {children}
         </main>
 
-        <Footer />
+        {!isDesktop && <Footer />}
 
       </body>
     </html>
