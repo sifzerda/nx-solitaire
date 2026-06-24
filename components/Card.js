@@ -10,7 +10,6 @@ import { CARD_CLASS } from "./cardSizing";
 
 const Card = memo(function Card({ card, stack, index = 0, source }) {
   const { startDrag } = usePointerDrag();
-
   const hint = useGameStore((s) => s.hint);
   const isHintCard = hint?.from?.cardId === card.id;
 
@@ -28,22 +27,14 @@ const Card = memo(function Card({ card, stack, index = 0, source }) {
   return (
     <div onPointerDown={onPointerDown} className={
       `${CARD_CLASS}
-      relative
-      overflow-hidden
+      relative overflow-hidden
        ${isHintCard ? "border-4 border-red-500 z-20" : ""}
   `}>
-      <Image
-        src={card.image}
-        alt={card.id}
-        fill
-        draggable={false}
+      <Image src={card.image} alt={card.id} fill draggable={false}
         sizes="var(--card-width)"
-        className="
-          object-contain
-          pointer-events-none
-          select-none
-        "
-      /></div>
+        className="object-contain pointer-events-none select-none"
+      />
+      </div>
   );
 });
 
