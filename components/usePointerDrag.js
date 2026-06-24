@@ -45,7 +45,7 @@ export default function usePointerDrag() {
     hoveredDropzone = el;
     hoveredDropzone.classList.add("dropzone-hover");
   }
-
+  
   function createDragElement(cards) {
     ensureDragContainer();
 
@@ -114,7 +114,6 @@ export default function usePointerDrag() {
       clearDropzoneHighlight();
     }
   }
-
   function onPointerUp(e) {
     if (!dragData) return;
 
@@ -135,7 +134,6 @@ export default function usePointerDrag() {
 
     cleanup();
   }
-
   function cleanup() {
     clearDropzoneHighlight();
 

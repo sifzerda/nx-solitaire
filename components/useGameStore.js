@@ -33,9 +33,7 @@ const useGameStore = create((set, get) => ({
   future: [],
   hint: null,
 
-
   /* ---------------- INIT ---------------- */
-
 
   initializeGame: (game) => {
     set({
