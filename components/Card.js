@@ -2,6 +2,7 @@
 
 "use client";
 
+import Image from "next/image";
 import { memo, useCallback } from "react";
 import useGameStore from "./useGameStore";
 import usePointerDrag from "./usePointerDrag";
@@ -27,9 +28,22 @@ const Card = memo(function Card({ card, stack, index = 0, source }) {
   return (
     <div onPointerDown={onPointerDown} className={
       `${CARD_CLASS}
+      relative
+      overflow-hidden
        ${isHintCard ? "border-4 border-red-500 z-20" : ""}
   `}>
-      <img src={card.image} alt={card.id} draggable={false} className="w-full h-full object-contain pointer-events-none" /></div>
+      <Image
+        src={card.image}
+        alt={card.id}
+        fill
+        draggable={false}
+        sizes="var(--card-width)"
+        className="
+          object-contain
+          pointer-events-none
+          select-none
+        "
+      /></div>
   );
 });
 

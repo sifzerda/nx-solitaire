@@ -2,6 +2,7 @@
 
 "use client";
 
+import Image from "next/image";
 import { memo } from "react";
 import useGameStore from "./useGameStore";
 import { CARD_CLASS } from "./cardSizing";
@@ -20,16 +21,24 @@ const FoundationPile = memo(function FoundationPile({ index }) {
 
   return (
     <div data-dropzone="foundation" data-foundation={index}
-      
+
       className={`${CARD_CLASS} 
       relative rounded-xs border-4 border-double border-green-600 flex items-center justify-center overflow-hidden touch-none 
-      ${isHintTarget ? "outline-4 outline-red 500" : "" }`}>
+      ${isHintTarget ? "outline-4 outline-red 500" : ""}`}>
 
       {topCard ? (
         <div className="absolute inset-0"
           style={{ pointerEvents: "none" }}>
-          <img src={topCard.image} alt={topCard.id} draggable={false}
-            className="w-full h-full object-cover rounded-xs" />
+          <div className="absolute inset-0">
+            <Image
+              src={topCard.image}
+              alt={topCard.id}
+              fill
+              draggable={false}
+              sizes="var(--card-width)"
+              className="object-cover rounded-xs pointer-events-none"
+            />
+          </div>
         </div>
       ) : (
         <div
