@@ -95,8 +95,8 @@ This project is complete.
 - [x] win screen, move count, time taken.
 - [x] restyle stockpile reset btn
 - [x] fix up GUI for pointer event system
-- [ ] time, undo move , hint
+- [x] undo move, hint
 - [x] when a column is empty, is collapses - make sure they don't
 - [x] currently can dnd out anywhere in tableau column, needs fix
 - [x] add rust and tauri
-- [ ] optimize winscreen
+- [x] optimize winscreen
