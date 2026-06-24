@@ -1,5 +1,4 @@
 // components/usePointerDrag.js
-
 "use client";
 
 import useGameStore from "./useGameStore";
@@ -7,10 +6,26 @@ import useGameStore from "./useGameStore";
 // module-level — one instance, never reset by re-renders
 let dragData = null;
 let dragElement = null;
+let dragImages = [];
+let imageCache = new WeakMap();
 let rafRef = null;
 let latestPos = { x: 0, y: 0 };
-
 let hoveredDropzone = null;
+
+function ensureDragContainer() {
+  if (dragElement) return;
+
+  dragElement = document.createElement("div");
+
+  dragElement.style.position = "fixed";
+  dragElement.style.left = "0";
+  dragElement.style.top = "0";
+  dragElement.style.zIndex = "9999";
+  dragElement.style.pointerEvents = "none";
+  dragElement.style.willChange = "transform";
+
+  document.body.appendChild(dragElement);
+}
 
 export default function usePointerDrag() {
   const moveCards = useGameStore((s) => s.moveCards);
@@ -32,39 +47,44 @@ export default function usePointerDrag() {
   }
 
   function createDragElement(cards) {
-    const el = document.createElement("div");
+    ensureDragContainer();
 
     const styles = getComputedStyle(document.documentElement);
-
     const cardWidth = styles.getPropertyValue("--card-width").trim();
     const overlap = styles.getPropertyValue("--card-overlap").trim();
 
-    el.style.position = "fixed";
-    el.style.left = "0";
-    el.style.top = "0";
-    el.style.zIndex = "9999";
-    el.style.pointerEvents = "none";
-    el.style.willChange = "transform";
-
-    cards.forEach((card, idx) => {
+    while (dragImages.length < cards.length) {
       const img = document.createElement("img");
 
-      img.src = card.image;
       img.draggable = false;
-
       img.style.width = cardWidth;
       img.style.borderRadius = "6px";
+      img.style.display = "block";
+
+      dragImages.push(img);
+      dragElement.appendChild(img);
+    }
+
+    dragImages.forEach((img) => {
+      img.style.display = "none";
+      img.style.marginTop = "0";
+    });
+
+    cards.forEach((card, idx) => {
+      const img = dragImages[idx];
+
+      if (imageCache.get(img) !== card.image) {
+        img.src = card.image;
+        imageCache.set(img, card.image);
+      }
       img.style.display = "block";
 
       if (idx > 0) {
         img.style.marginTop = overlap;
       }
-
-      el.appendChild(img);
     });
 
-    document.body.appendChild(el);
-    dragElement = el;
+    dragElement.style.display = "block";
   }
 
   function updatePosition() {
@@ -72,8 +92,7 @@ export default function usePointerDrag() {
 
     if (!dragElement) return;
 
-    dragElement.style.transform =
-      `translate3d(${latestPos.x}px, ${latestPos.y}px, 0)`;
+    dragElement.style.transform = `translate3d(${latestPos.x}px, ${latestPos.y}px, 0)`;
   }
 
   function onPointerMove(e) {
@@ -124,8 +143,9 @@ export default function usePointerDrag() {
 
     window.removeEventListener("pointermove", onPointerMove);
     window.removeEventListener("pointerup", onPointerUp);
-    dragElement?.remove();
-    dragElement = null;
+    if (dragElement) {
+      dragElement.style.display = "none";
+    }
     dragData = null;
 
     if (rafRef) {
@@ -139,7 +159,6 @@ export default function usePointerDrag() {
     e.preventDefault();
 
     const rect = e.currentTarget.getBoundingClientRect();
-
     const { cards, source } = dragPayload;
 
     dragData = {
