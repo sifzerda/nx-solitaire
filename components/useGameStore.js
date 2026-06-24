@@ -26,13 +26,16 @@ const useGameStore = create((set, get) => ({
   stockIndex: 0,
   tableau: [[], [], [], [], [], [], []],
   foundations: [[], [], [], []],
+  draggingIds: [],
 
   /* ---------------- HISTORY (UNDO / REDO) ---------------- */
   history: [],
   future: [],
   hint: null,
 
+
   /* ---------------- INIT ---------------- */
+
 
   initializeGame: (game) => {
     set({
@@ -105,11 +108,8 @@ const useGameStore = create((set, get) => ({
   removeCardFromAll: (id) => {
     set((state) => ({
       stock: state.stock.filter((c) => c.id !== id),
-      tableau: state.tableau.map((p) =>
-        p.filter((c) => c.id !== id)
-      ),
-      foundations: state.foundations.map((p) =>
-        p.filter((c) => c.id !== id)
+      tableau: state.tableau.map((p) => p.filter((c) => c.id !== id)),
+      foundations: state.foundations.map((p) => p.filter((c) => c.id !== id)
       ),
     }));
   },
@@ -177,7 +177,6 @@ const useGameStore = create((set, get) => ({
         return { tableau };
       });
 
-      state.flipTopTableauCard(from.column);
       return;
     }
 
@@ -203,17 +202,6 @@ const useGameStore = create((set, get) => ({
           if (i !== from.column) return pile;
 
           const updated = pile.slice(0, -1);
-
-          // flip next card
-          if (
-            updated.length && !updated[updated.length - 1].faceUp
-          ) {
-            updated[updated.length - 1] = {
-              ...updated[updated.length - 1],
-              faceUp: true,
-            };
-          }
-
           return updated;
         });
 
@@ -383,6 +371,9 @@ const useGameStore = create((set, get) => ({
       }
     }, 1500);
   },
+
+  setDraggingIds: (ids) => set({ draggingIds: ids }),
+  clearDraggingIds: () => set({ draggingIds: [] }),
 
   /* ---------------- UNDO ---------------- */
 

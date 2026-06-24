@@ -87,7 +87,6 @@ export default function usePointerDrag() {
     }
 
     const elements = document.elementsFromPoint(e.clientX, e.clientY);
-
     const dropEl = elements.find((el) => el.dataset.dropzone);
 
     if (dropEl) {
@@ -108,17 +107,11 @@ export default function usePointerDrag() {
     if (dropEl) {
       const to = {
         type: dropEl.dataset.dropzone,
-        column:
-          dropEl.dataset.column !== undefined
-            ? Number(dropEl.dataset.column)
-            : undefined,
-        foundation:
-          dropEl.dataset.foundation !== undefined
-            ? Number(dropEl.dataset.foundation)
-            : undefined,
+        column: dropEl.dataset.column !== undefined ? Number(dropEl.dataset.column) : undefined,
+        foundation: dropEl.dataset.foundation !== undefined ? Number(dropEl.dataset.foundation) : undefined,
       };
 
-      moveCards({cards, from: source, to});
+      moveCards({ cards, from: source, to });
     }
 
     cleanup();
@@ -126,6 +119,8 @@ export default function usePointerDrag() {
 
   function cleanup() {
     clearDropzoneHighlight();
+
+    useGameStore.getState().clearDraggingIds();
 
     window.removeEventListener("pointermove", onPointerMove);
     window.removeEventListener("pointerup", onPointerUp);
@@ -153,6 +148,8 @@ export default function usePointerDrag() {
       offsetX: e.clientX - rect.left,
       offsetY: e.clientY - rect.top,
     };
+
+    useGameStore.getState().setDraggingIds(cards.map((c) => c.id));
 
     createDragElement(cards);
 

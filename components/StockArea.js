@@ -14,11 +14,12 @@ const StockArea = memo(function StockArea({ type }) {
     const resetStockCycle = useGameStore((s) => s.resetStockCycle);
     const topStockCard = stock[stockIndex];
     const isAtEnd = stockIndex === 0;
+    const draggingIds = useGameStore((s) => s.draggingIds);
     const hint = useGameStore((s) => s.hint);
     const isHintWaste = hint?.from?.type === "waste" && hint.from.cardId === topStockCard?.id;
 
     return (
-        <div className="flex w-fit gap-2 sm:gap-3 md:gap-4 items-center">
+        <div className="flex w-fit sm:gap-3 md:gap-4 items-center">
 
             {/* ---------------- STOCK ---------------- */}
             <div onClick={nextStockCard} className={`relative ${CARD_CLASS} border-2 border-dashed bg-green-500 border-green-600 rounded-xs cursor-pointer overflow-hidden flex items-center justify-center touch-none`}
@@ -28,12 +29,12 @@ const StockArea = memo(function StockArea({ type }) {
             </div>
 
             {/* ---------------- WASTE (FIXED DRAG SOURCE) ---------------- */}
-            <div data-dropzone="waste" className={`relative ${CARD_CLASS} rounded-xs
+            <div data-dropzone="waste" className={`relative ${CARD_CLASS} rounded-xs cursor-pointer 
         ${isHintWaste
-                        ? "ring-4 ring-green-400 shadow-[0_0_18px_rgba(34,197,94,0.7)] z-10"
-                        : ""
-                    }`}>
-                {topStockCard ? (
+                    ? "ring-4 ring-green-400 shadow-[0_0_18px_rgba(34,197,94,0.7)] z-10"
+                    : ""
+                }`}>
+                {topStockCard && !draggingIds.includes(topStockCard.id) ? (
                     <Card card={{ ...topStockCard, faceUp: true }} cards={[{ ...topStockCard, faceUp: true }]}
                         /* make waste consistent source */
                         source={{ type: "waste", column: -1 }} />
@@ -46,8 +47,8 @@ const StockArea = memo(function StockArea({ type }) {
                 {isAtEnd && (
                     <button onPointerUp={(e) => { e.preventDefault(); resetStockCycle(); }}
                         className="group relative flex rounded-xs leading-none
-              border border-green-400/70 px-2 py-2 ml-2
-              sm:ml-0 sm:px-3 sm:py-3 sm:text-3xl
+              border border-green-400/70 px-2 py-2
+              sm:px-3 sm:py-3 sm:text-3xl
               shadow-[0_4px_5px_rgba(0,0,0,0.45)]
             bg-green-500/10 font-mono text-2xl
             hover:bg-blue-500/30 hover:text-white 
