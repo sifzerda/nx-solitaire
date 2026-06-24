@@ -109,8 +109,7 @@ const useGameStore = create((set, get) => ({
     set((state) => ({
       stock: state.stock.filter((c) => c.id !== id),
       tableau: state.tableau.map((p) => p.filter((c) => c.id !== id)),
-      foundations: state.foundations.map((p) => p.filter((c) => c.id !== id)
-      ),
+      foundations: state.foundations.map((p) => p.filter((c) => c.id !== id)),
     }));
   },
 
@@ -136,8 +135,7 @@ const useGameStore = create((set, get) => ({
       return card.rank === "A" && card.suit === suits[index];
     }
     return (
-      card.suit === top.suit &&
-      rankValue[card.rank] === rankValue[top.rank] + 1
+      card.suit === top.suit && rankValue[card.rank] === rankValue[top.rank] + 1
     );
   },
 
@@ -157,9 +155,7 @@ const useGameStore = create((set, get) => ({
       set({ history: [...get().history, snapshot], future: [] });
 
     /* ---------------- TABLEAU → TABLEAU ---------------- */
-    if (
-      from.type === "tableau" && to.type === "tableau"
-    ) {
+    if (from.type === "tableau" && to.type === "tableau") {
       if (!state.canPlaceOnTableau(first, to.column)) return;
 
       saveHistory();
@@ -187,9 +183,7 @@ const useGameStore = create((set, get) => ({
       const topCard = sourcePile[sourcePile.length - 1];
 
       // ONLY allow the top tableau card
-      if (
-        cards.length !== 1 || !topCard || topCard.id !== first.id
-      ) {
+      if (cards.length !== 1 || !topCard || topCard.id !== first.id) {
         return;
       }
 
@@ -228,9 +222,7 @@ const useGameStore = create((set, get) => ({
           first,
         ];
 
-        const stock = state.stock.filter(
-          (c) => c.id !== first.id
-        );
+        const stock = state.stock.filter((c) => c.id !== first.id);
 
         return { tableau, stock };
       });
@@ -244,8 +236,7 @@ const useGameStore = create((set, get) => ({
       saveHistory();
 
       set((state) => {
-        const foundations = state.foundations.map((pile, i) =>
-          i === to.foundation ? [...pile, first] : pile
+        const foundations = state.foundations.map((pile, i) => i === to.foundation ? [...pile, first] : pile
         );
         const stock = state.stock.filter((c) => c.id !== first.id);
         return { foundations, stock };
