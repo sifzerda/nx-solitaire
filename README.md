@@ -33,7 +33,7 @@ This app has been deployed to Vercel. Visit the site: [Solitaire Next.js](https:
 
 ## Installation
 
-Play through app site, no installation required. Otherwise clone into local machine and open on IDE:
+Play through app site, no installation required. Download exe on site through download link. Otherwise clone into local machine and open on IDE:
 
 ```bash
 # clone the repo
