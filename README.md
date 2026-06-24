@@ -28,9 +28,8 @@ This is a rebuild and refactor of my first fullstack minesweeper game into a ser
 
 This app has been deployed to Vercel. Visit the site: [Solitaire Next.js](https://nx-solitaire.vercel.app/)
 
-![pic1](https://github.com/user-attachments/assets/e15545a2-c388-4fad-a517-22426a19e132)
-![pic2](https://github.com/user-attachments/assets/78a042ff-8b67-4f14-8759-2fcb28dd8bd4)
-![pic4](https://github.com/user-attachments/assets/74a9d0e0-6ab2-4911-9d22-1ddda94e0905)
+![pic1](https://github.com/user-attachments/assets/952b1607-ce61-4d80-8d27-2fe27363115a)
+![pic2](https://github.com/user-attachments/assets/3f3b9608-ea93-4a2e-aff1-ff7d98ccce18)
 
 ## Installation
 
