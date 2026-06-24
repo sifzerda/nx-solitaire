@@ -373,8 +373,7 @@ const useGameStore = create((set, get) => ({
 
     if (state.history.length === 0) return;
 
-    const previous =
-      state.history[state.history.length - 1];
+    const previous = state.history[state.history.length - 1];
 
     const future = [
       createSnapshot(state),
