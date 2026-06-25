@@ -49,7 +49,6 @@ const useGameStore = create((set, get) => ({
 
   nextStockCard: () => {
     const state = get();
-
     if (state.stock.length === 0) return;
 
     set({
@@ -98,7 +97,6 @@ const useGameStore = create((set, get) => ({
       }
 
       tableau[colIndex] = pile;
-
       return { tableau };
     });
   },
@@ -149,8 +147,7 @@ const useGameStore = create((set, get) => ({
     const snapshot = createSnapshot(state);
 
     // helper — only call after validation passes
-    const saveHistory = () =>
-      set({ history: [...get().history, snapshot], future: [] });
+    const saveHistory = () => set({ history: [...get().history, snapshot], future: [] });
 
     /* ---------------- TABLEAU → TABLEAU ---------------- */
     if (from.type === "tableau" && to.type === "tableau") {
@@ -186,7 +183,6 @@ const useGameStore = create((set, get) => ({
       }
 
       if (!state.canPlaceOnFoundation(first, to.foundation)) return;
-
       saveHistory();
 
       set((state) => {
@@ -197,9 +193,7 @@ const useGameStore = create((set, get) => ({
           return updated;
         });
 
-        const foundations = state.foundations.map((pile, i) => i === to.foundation ? [...pile, first] : pile
-        );
-
+        const foundations = state.foundations.map((pile, i) => i === to.foundation ? [...pile, first] : pile);
         return { tableau, foundations };
       });
 
@@ -207,9 +201,7 @@ const useGameStore = create((set, get) => ({
     }
 
     /* ---------------- WASTE → TABLEAU ---------------- */
-    if (
-      from.type === "waste" && to.type === "tableau"
-    ) {
+    if (from.type === "waste" && to.type === "tableau") {
       if (!state.canPlaceOnTableau(first, to.column)) return;
       saveHistory(); // 
       set((state) => {
@@ -221,7 +213,6 @@ const useGameStore = create((set, get) => ({
         ];
 
         const stock = state.stock.filter((c) => c.id !== first.id);
-
         return { tableau, stock };
       });
 
@@ -234,8 +225,7 @@ const useGameStore = create((set, get) => ({
       saveHistory();
 
       set((state) => {
-        const foundations = state.foundations.map((pile, i) => i === to.foundation ? [...pile, first] : pile
-        );
+        const foundations = state.foundations.map((pile, i) => i === to.foundation ? [...pile, first] : pile);
         const stock = state.stock.filter((c) => c.id !== first.id);
         return { foundations, stock };
       });
@@ -250,11 +240,9 @@ const useGameStore = create((set, get) => ({
 
     for (let col = 0; col < 7; col++) {
       const pile = state.tableau[col];
-
       if (!pile.length) continue;
 
       const card = pile[pile.length - 1];
-
       if (!card.faceUp) continue;
 
       for (let foundation = 0; foundation < 4; foundation++) {
@@ -368,7 +356,6 @@ const useGameStore = create((set, get) => ({
 
   undo: () => {
     const state = get();
-
     if (state.history.length === 0) return;
 
     const previous = state.history[state.history.length - 1];
@@ -392,7 +379,6 @@ const useGameStore = create((set, get) => ({
 
   redo: () => {
     const state = get();
-
     if (state.future.length === 0) return;
 
     const next = state.future[0];
