@@ -12,6 +12,7 @@
 - [Authors and Acknowledgment](#authors-and-acknowledgment)
 - [License](#license)
 - [Project Status](#project-status)
+- [Tests](#tests)
 - [Tasks](#tasks)
 
 ## Description
@@ -59,6 +60,9 @@ npm run start
 - useMemo
 - fireworks.js react package [here](https://www.npmjs.com/package/@fireworks-js/react?activeTab=code)
 - Vercel
+- Rust
+- Tauri
+- Jest 
 
 ## Support
 
@@ -88,6 +92,13 @@ Distributed under the MIT License. See LICENSE.txt for more information.
 ## Project status
 
 This project is complete. 
+
+## Tests
+
+2 tests in Jest:
+
+- Page: renders page and checks buttons work
+- Playthrough: runs game and checks win possible
 
 ## Tasks:
 
