@@ -1,5 +1,5 @@
 // GamePlaythrough.test.js
-// tests game can play
+// tests game can play and a pre-arranged winnable game can be won.
 
 import useGameStore from "../components/useGameStore";
 
