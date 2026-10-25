@@ -1,7 +1,7 @@
-// GamePlaythrough.test.js
+// Playthrough.test.js
 // tests game can play and a pre-arranged winnable game can be won.
 
-import useGameStore from "../components/useGameStore";
+import useGameStore from "../store/useGameStore";
 
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = [ "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" ];

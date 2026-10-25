@@ -4,14 +4,19 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Solitaire from "../components/Solitaire";
-import useGameStore from "../components/useGameStore";
+import useGameStore from "../store/useGameStore";
 
 jest.mock("../components/TableauColumn", () => () => <div />);
 jest.mock("../components/FoundationPile", () => () => <div />);
 jest.mock("../components/StockArea", () => () => <div />);
 jest.mock("../components/WinScreen", () => () => <div />);
 
-jest.mock("../components/useGameStore", () => jest.fn());
+jest.mock("../store/useGameStore", () => {
+  const mockStore = jest.fn();
+  mockStore.getState = jest.fn(() => ({ clearDraggingIds: jest.fn() }));
+  mockStore.subscribe = jest.fn(() => jest.fn());
+  return mockStore;
+});
 
 jest.mock("../components/createGame", () => ({
   __esModule: true,

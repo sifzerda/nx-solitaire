@@ -7,6 +7,8 @@ const createJestConfig = nextJest({ dir: "./" });
 const customJestConfig = {
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  clearMocks: true,
+  coverageProvider: "v8",
 };
 
 export default createJestConfig(customJestConfig);
