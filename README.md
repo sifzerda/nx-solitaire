@@ -95,10 +95,11 @@ This project is complete.
 
 ## Tests
 
-2 tests in Jest:
+3 tests in Jest:
 
 - Page: renders page and checks buttons work
-- Playthrough: runs game and checks win possible
+- Playthrough: runs game and checks pre-arranged win possible
+- Solitaire: runs through game operations
 
 ## Tasks:
 

@@ -200,16 +200,16 @@ const useGameStore = create((set, get) => {
     },
 
     canPlaceOnTableau: (card, column) => isIndex(column, 7) && tableauAllows(card, get().tableau[column]),
-   
+
     canPlaceOnFoundation: (card, index) => isIndex(index, 4) && foundationAllows(card, get().foundations[index], index),
-   
+
     canDragCards: ({
       cards,
       source
     }) => !!resolveSource(get(), cards, source),
-  
+
     canMoveCards: payload => !!resolveMove(get(), payload),
-  
+
     moveCards: payload => {
       const state = get();
       const cards = resolveMove(state, payload);
